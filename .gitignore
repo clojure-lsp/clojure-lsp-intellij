@@ -1,0 +1,10 @@
+.idea
+.gradle
+build
+.DS_Store
+.cpcache
+/.nrepl-port
+.lsp/.cache
+.clj-kondo/.cache
+.project
+.settings

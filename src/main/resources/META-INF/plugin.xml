@@ -1,0 +1,13 @@
+<idea-plugin>
+    <id>com.github.clojure-lsp</id>
+    <name>Clojure LSP</name>
+    <vendor url="https://github.com/clojure-lsp/clojure-lsp-intellij-plugin">clojure-lsp</vendor>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="Clojure LSP"
+                    anchor="right"
+                    factoryClass="com.github.clojure_lsp.intellij.Factory" />
+    </extensions>
+</idea-plugin>
