@@ -4,10 +4,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
-    id("java") // remove?
-    id("dev.clojurephant.clojure") version "0.8.0-beta.1"
-    id("org.jetbrains.kotlin.jvm") version "1.7.0" // remove?
-    id("org.jetbrains.intellij") version "1.10.0"
+    id("dev.clojurephant.clojure") version "0.7.0"
+    id("org.jetbrains.intellij") version "1.11.0"
     id("org.jetbrains.changelog") version "1.3.1"
 }
 
@@ -26,7 +24,7 @@ dependencies {
     implementation ("org.clojure:clojure:1.11.1")
 
     // devDeps
-    // implementation ("nrepl:nrepl:1.0.0")
+    implementation ("nrepl:nrepl:1.0.0")
 }
 
 // Useful to override another IC platforms from env
@@ -129,7 +127,7 @@ tasks {
 }
 
 clojure.builds.named("main") {
-    aotNamespaces.add("com.github.clojure-lsp.intellij.factory")
+    aotNamespaces.add("com.github.clojure-lsp.intellij.extension.startup")
     checkAll()
-    setReflection("fail")
+    reflection.set("fail")
 }

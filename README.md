@@ -2,7 +2,7 @@
 
 <!-- Plugin description -->
 
-clojure-lsp plugin for Intellij IDE.
+Support for Clojure & ClojureScript development via Language Server (LSP)
 
 <!-- Plugin description end -->
 
