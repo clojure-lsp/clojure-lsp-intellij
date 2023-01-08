@@ -1,1 +1,2 @@
-{:paths ["src/main/clojure"]}
+{:paths ["src/main/clojure"]
+ :deps {com.intellij/openapi {:mvn/version "7.0.3"}}}

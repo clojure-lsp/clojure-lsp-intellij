@@ -9,9 +9,10 @@
         <postStartupActivity
             implementation="com.github.clojure_lsp.intellij.extension.Startup"/>
 
-        <!-- <statusBarWidgetFactory id="Clojure LSP StatusBar" -->
-        <!--                         displayName="Clojure LSP" -->
-        <!--                         order="after writeActionWidget" -->
-        <!--                         factoryClass="com.github.clojure_lsp.intellij.Factory" /> -->
+        <statusBarWidgetFactory
+            id="clojure-lsp-status-bar"
+            displayName="Clojure LSP"
+            order="before positionWidget"
+            implementation="com.github.clojure_lsp.intellij.extension.StatusBar" />
     </extensions>
 </idea-plugin>

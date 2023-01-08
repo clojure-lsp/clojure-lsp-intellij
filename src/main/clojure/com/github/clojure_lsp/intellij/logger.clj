@@ -7,5 +7,5 @@
 
 (defonce ^Logger logger (Logger/getInstance WithLoader))
 
-(defn info [^String message]
-  (.info logger message))
+(defn info [& messages]
+  (.info logger (str "[CLOJURE-LSP] " (apply format messages))))

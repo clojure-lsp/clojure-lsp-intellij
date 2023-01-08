@@ -16,9 +16,9 @@
   (try
     ((requiring-resolve 'nrepl.server/start-server)
      :port port)
-    (logger/info (str "Started nrepl server at port " port))
+    (logger/info "Started nrepl server at port %s" port)
     (catch Exception _e)))
 
 (defn -runActivity [_this ^Project _project]
-  (logger/info (str "Starting clojure-lsp plugin..."))
+  (logger/info "Starting clojure-lsp plugin...")
   (start-nrepl-server 6660))

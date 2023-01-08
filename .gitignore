@@ -1,8 +1,10 @@
 .idea
 .gradle
 build
+bin
 .DS_Store
 .cpcache
+.classpath
 /.nrepl-port
 .lsp/.cache
 .clj-kondo/.cache
