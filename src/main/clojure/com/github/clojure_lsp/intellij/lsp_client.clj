@@ -1,7 +1,9 @@
 (ns com.github.clojure-lsp.intellij.lsp-client
   (:require
+   [borkdude.dynaload :refer [dynaload]]
    [clojure.core.async :as async]
    [clojure.string :as string]
+   [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.logger :as logger]
    [lsp4clj.coercer :as coercer]
    [lsp4clj.lsp.requests :as lsp.requests]
@@ -9,13 +11,15 @@
 
 (set! *warn-on-reflection* true)
 
-(defn ^:private progress [{:keys [value]}]
-  ;; TODO
-  )
+(def start-server! (dynaload 'clojure-lsp.server/start-server!))
+
+(defmulti progress (fn [_context {:keys [token]}] token))
+
+(defmethod progress :default [_ progress]
+  (logger/warn "Unknown progress token %s" progress))
 
 (defn ^:private publish-diagnostics [{:keys [uri diagnostics]}]
-  ;; TODO
-  )
+  (swap! db/db assoc-in [:diagnostics uri] diagnostics))
 
 (defn ^:private receive-message
   [client context message]
@@ -104,10 +108,10 @@
   (receive-request [this _ req]
     ;; TODO support receive request
     (protocols.endpoint/log this :magenta "received request:" req))
-  (receive-notification [this _ {:keys [method params] :as notif}]
+  (receive-notification [this context {:keys [method params] :as notif}]
     (protocols.endpoint/log this :blue "received notification:" notif)
     (case method
-      "$/progress" (progress params)
+      "$/progress" (progress context params)
       "textDocument/publishDiagnostics" (publish-diagnostics params)
 
       (logger/warn "Unknown LSP notification method %s" method))))
@@ -122,9 +126,10 @@
     :request-id (atom 0)
     :sent-requests (atom {})}))
 
-(defn start-server-and-client! [server client]
-  ((requiring-resolve 'clojure-lsp.server/start-server!) server)
-  (protocols.endpoint/start client nil)
+(defn start-server-and-client! [server client context]
+  (start-server! server)
+  (logger/info "Finished starting call")
+  (protocols.endpoint/start client context)
   (async/go-loop []
     (when-let [log-args (async/<! (:log-ch client))]
       (logger/info log-args)

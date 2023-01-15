@@ -29,6 +29,7 @@
   (reify
     StatusBarWidget
     (ID [_] widget-id)
+    (dispose [_])
     (install [_ _])
     (getPresentation [this] this)
 

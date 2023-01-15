@@ -127,8 +127,7 @@ tasks {
 }
 
 clojure.builds.named("main") {
-    aotNamespaces.add("com.github.clojure-lsp.intellij.extension.startup")
-    aotNamespaces.add("com.github.clojure-lsp.intellij.extension.status-bar")
     checkAll()
+    aotAll()
     reflection.set("fail")
 }
