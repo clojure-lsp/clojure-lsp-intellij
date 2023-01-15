@@ -1,0 +1,137 @@
+(ns com.github.clojure-lsp.intellij.lsp-client
+  (:require
+   [clojure.core.async :as async]
+   [clojure.string :as string]
+   [com.github.clojure-lsp.intellij.logger :as logger]
+   [lsp4clj.coercer :as coercer]
+   [lsp4clj.lsp.requests :as lsp.requests]
+   [lsp4clj.protocols.endpoint :as protocols.endpoint]))
+
+(set! *warn-on-reflection* true)
+
+(defn ^:private progress [{:keys [value]}]
+  ;; TODO
+  )
+
+(defn ^:private publish-diagnostics [{:keys [uri diagnostics]}]
+  ;; TODO
+  )
+
+(defn ^:private receive-message
+  [client context message]
+  (let [message-type (coercer/input-message-type message)]
+    (try
+      (let [response
+            (case message-type
+              (:parse-error :invalid-request)
+              (protocols.endpoint/log client :red "Error reading message" message-type)
+              :request
+              (protocols.endpoint/receive-request client context message)
+              (:response.result :response.error)
+              (protocols.endpoint/receive-response client message)
+              :notification
+              (protocols.endpoint/receive-notification client context message))]
+        ;; Ensure client only responds to requests
+        (when (identical? :request message-type)
+          response))
+      (catch Throwable e
+        (protocols.endpoint/log client :red "Error receiving:" e)
+        (throw e)))))
+
+;; TODO move to lsp4clj
+(defrecord Client [client-id
+                   input output
+                   log-ch
+                   join
+                   request-id
+                   sent-requests
+                   mock-responses]
+  protocols.endpoint/IEndpoint
+  (start [this context]
+    (protocols.endpoint/log this :white "lifecycle:" "starting")
+    (let [pipeline (async/pipeline-blocking
+                    1 ;; no parallelism preserves server message order
+                    output
+                     ;; TODO: return error until initialize request is received? https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#initialize
+                     ;; `keep` means we do not reply to responses and notifications
+                    (keep #(receive-message this context %))
+                    input)]
+      (async/go
+        ;; wait for pipeline to close, indicating input closed
+        (async/<! pipeline)
+        (deliver join :done)))
+    ;; invokers can deref the return of `start` to stay alive until server is
+    ;; shut down
+    join)
+  (shutdown [this]
+    (protocols.endpoint/log this :white "lifecycle:" "shutting down")
+    ;; closing input will drain pipeline, then close output, then close
+    ;; pipeline
+    (async/close! input)
+    (if (= :done (deref join 10e3 :timeout))
+      (protocols.endpoint/log this :white "lifecycle:" "shutdown")
+      (protocols.endpoint/log this :red "lifecycle:" "shutdown timed out"))
+    (async/close! log-ch))
+  (log [this msg params]
+    (protocols.endpoint/log this :white msg params))
+  (log [_this _color msg params]
+    ;; TODO apply color
+    (async/put! log-ch (string/join " " [msg params])))
+  (send-request [this method body]
+    (let [req (lsp.requests/request (swap! request-id inc) method body)
+          p (promise)
+          start-ns (System/nanoTime)]
+      (protocols.endpoint/log this :cyan "sending request:" req)
+      ;; Important: record request before sending it, so it is sure to be
+      ;; available during receive-response.
+      (swap! sent-requests assoc (:id req) {:request p
+                                            :start-ns start-ns})
+      (async/>!! output req)
+      p))
+  (send-notification [this method body]
+    (let [notif (lsp.requests/notification method body)]
+      (protocols.endpoint/log this :blue "sending notification:" notif)
+      (async/>!! output notif)))
+  (receive-response [this {:keys [id] :as resp}]
+    (if-let [{:keys [request start-ns]} (get @sent-requests id)]
+      (let [ms (float (/ (- (System/nanoTime) start-ns) 1000000))]
+        (protocols.endpoint/log this :green (format "received response (%.0fms):" ms) resp)
+        (swap! sent-requests dissoc id)
+        (deliver request (if (:error resp)
+                           resp
+                           (:result resp))))
+      (protocols.endpoint/log this :red "received response for unmatched request:" resp)))
+  (receive-request [this _ req]
+    ;; TODO support receive request
+    (protocols.endpoint/log this :magenta "received request:" req))
+  (receive-notification [this _ {:keys [method params] :as notif}]
+    (protocols.endpoint/log this :blue "received notification:" notif)
+    (case method
+      "$/progress" (progress params)
+      "textDocument/publishDiagnostics" (publish-diagnostics params)
+
+      (logger/warn "Unknown LSP notification method %s" method))))
+
+(defn client [server]
+  (map->Client
+   {:client-id 1
+    :input (:output-ch server)
+    :output (:input-ch server)
+    :log-ch (async/chan (async/sliding-buffer 20))
+    :join (promise)
+    :request-id (atom 0)
+    :sent-requests (atom {})}))
+
+(defn start-server-and-client! [server client]
+  ((requiring-resolve 'clojure-lsp.server/start-server!) server)
+  (protocols.endpoint/start client nil)
+  (async/go-loop []
+    (when-let [log-args (async/<! (:log-ch client))]
+      (logger/info log-args)
+      (recur))))
+
+(defn request! [client [method body]]
+  (protocols.endpoint/send-request client (name method) body))
+
+(defn notify! [client [method body]]
+  (protocols.endpoint/send-notification client (name method) body))

@@ -23,7 +23,9 @@
 
 (defn -isConfigurable [_] false)
 
-(defn -createWidget ^StatusBarWidget [_this ^Project project]
+(defn -isEnabledByDefault [_] true)
+
+(defn -createWidget ^StatusBarWidget [_this ^Project _project]
   (reify
     StatusBarWidget
     (ID [_] widget-id)

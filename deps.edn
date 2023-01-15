@@ -1,2 +1,3 @@
 {:paths ["src/main/clojure"]
- :deps {com.intellij/openapi {:mvn/version "7.0.3"}}}
+ :deps {com.intellij/openapi {:mvn/version "7.0.3"}
+        com.github.clojure-lsp/clojure-lsp-server {:mvn/version "2022.12.09-15.51.10"}}}

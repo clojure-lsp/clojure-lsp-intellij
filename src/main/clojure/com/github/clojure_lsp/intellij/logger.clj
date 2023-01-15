@@ -7,5 +7,14 @@
 
 (defonce ^Logger logger (Logger/getInstance WithLoader))
 
+(defn ^:private build-msg ^String [messages]
+  (str "[CLOJURE-LSP] " (apply format (map str messages))))
+
 (defn info [& messages]
-  (.info logger (str "[CLOJURE-LSP] " (apply format messages))))
+  (.info logger (build-msg messages)))
+
+(defn warn [& messages]
+  (.warn logger (build-msg messages)))
+
+(defn error [& messages]
+  (.error logger (build-msg messages)))

@@ -5,7 +5,7 @@ fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
     id("dev.clojurephant.clojure") version "0.7.0"
-    id("org.jetbrains.intellij") version "1.11.0"
+    id("org.jetbrains.intellij") version "1.12.0"
     id("org.jetbrains.changelog") version "1.3.1"
 }
 
@@ -13,6 +13,7 @@ group = properties("pluginGroup")
 version = properties("pluginVersion")
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven {
         name = "Clojars"
@@ -21,8 +22,7 @@ repositories {
 }
 
 dependencies {
-    implementation ("org.clojure:clojure:1.11.1")
-
+    implementation ("com.github.clojure-lsp:clojure-lsp-standalone:2022.12.09-15.51.10")
     // devDeps
     implementation ("nrepl:nrepl:1.0.0")
 }
