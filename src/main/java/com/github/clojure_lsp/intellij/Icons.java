@@ -4,5 +4,6 @@ import com.intellij.openapi.util.IconLoader;
 import javax.swing.Icon;
 
 public interface Icons {
-  Icon StatusBar = IconLoader.getIcon("/clojure-lsp/icons/status-bar.svg", Icons.class);
+  Icon StatusConnected = IconLoader.getIcon("/clojure-lsp/icons/status-connected.svg", Icons.class);
+  Icon StatusDisconnected = IconLoader.getIcon("/clojure-lsp/icons/status-disconnected.svg", Icons.class);
 }

@@ -40,7 +40,7 @@
                                             :trace-ch log-ch
                                             :trace-level "verbose"})
         client (lsp-client/client server)]
-    (swap! db/db assoc
+    (swap! db/db* assoc
            :project project ;; mostly used during developing with repl
            :server server
            :client client)
@@ -59,6 +59,8 @@
                                       :work-done-token "lsp-startup"
                                       :capabilities {}}])
        (lsp-client/notify! client [:initialized {}])
+       (swap! db/db* assoc :status :connected)
+       (run! #(% :connected) (:on-status-changed-fns @db/db*))
        (logger/info "Initialized LSP server...")))))
 
 (defmethod lsp-client/progress "lsp-startup" [{:keys [progress-indicator]} {{:keys [title percentage]} :value}]

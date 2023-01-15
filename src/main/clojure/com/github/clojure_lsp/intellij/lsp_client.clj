@@ -19,7 +19,7 @@
   (logger/warn "Unknown progress token %s" progress))
 
 (defn ^:private publish-diagnostics [{:keys [uri diagnostics]}]
-  (swap! db/db assoc-in [:diagnostics uri] diagnostics))
+  (swap! db/db* assoc-in [:diagnostics uri] diagnostics))
 
 (defn ^:private receive-message
   [client context message]

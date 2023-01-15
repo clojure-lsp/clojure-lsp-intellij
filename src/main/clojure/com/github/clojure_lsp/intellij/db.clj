@@ -2,4 +2,11 @@
 
 (set! *warn-on-reflection* true)
 
-(defonce db (atom {}))
+(def ^:private initial-db
+  {:status :disconnected
+   :on-status-changed-fns []
+   :client nil
+   :server nil
+   :project nil})
+
+(defonce db* (atom initial-db))
