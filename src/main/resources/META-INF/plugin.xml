@@ -15,4 +15,15 @@
             order="before positionWidget"
             implementation="com.github.clojure_lsp.intellij.extension.StatusBar" />
     </extensions>
+
+     <projectListeners>
+        <listener topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"
+                  class="com.github.clojure_lsp.intellij.listener.FileListener"/>
+    </projectListeners>
+
+    <!-- TODO changes outside editor -->
+    <!-- <applicationListeners> -->
+    <!--     <listener class="com.github.clojure_lsp.intellij.listener.FileListener" -->
+    <!--               topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/> -->
+    <!-- </applicationListeners> -->
 </idea-plugin>
