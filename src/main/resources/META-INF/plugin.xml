@@ -21,9 +21,8 @@
                   class="com.github.clojure_lsp.intellij.listener.FileListener"/>
     </projectListeners>
 
-    <!-- TODO changes outside editor -->
-    <!-- <applicationListeners> -->
-    <!--     <listener class="com.github.clojure_lsp.intellij.listener.FileListener" -->
-    <!--               topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/> -->
-    <!-- </applicationListeners> -->
+    <applicationListeners>
+        <listener topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"
+                  class="com.github.clojure_lsp.intellij.listener.FileListener"/>
+    </applicationListeners>
 </idea-plugin>
