@@ -12,11 +12,6 @@
 
 (set! *warn-on-reflection* true)
 
-(defn ^:private collect-information [^PsiFile psi-file]
-  (when-let [virtual-file (.getVirtualFile psi-file)]
-    (when-let [diagnostics (get-in @db/db* [:diagnostics (.getUrl virtual-file)])]
-      diagnostics)))
-
 (defn ^:private severity->highlight-severity [^long severity]
   (case severity
     1 HighlightSeverity/ERROR
@@ -38,24 +33,23 @@
           offset)))
     (.getTextLength document)))
 
-(defn ^:private range->text-range ^TextRange [range ^Document document lines-count]
+(defn ^:private range->text-range ^TextRange [range ^Document document]
   (TextRange/create (position->point (:start range) document)
                     (position->point (:end range) document)))
 
 (defn -collectInformation
-  ([_ psi-file]
-   (collect-information psi-file))
-  ([_ psi-file _ _]
-   (collect-information psi-file)))
+  ([_ psi-file] psi-file)
+  ([_ psi-file _ _] psi-file))
 
-(defn -doAnnotate [_ info] info)
+(defn -doAnnotate [_ ^PsiFile psi-file]
+  (when-let [virtual-file (.getVirtualFile psi-file)]
+    (get-in @db/db* [:diagnostics (.getUrl virtual-file)])))
 
 (defn -apply [_ ^PsiFile psi-file result ^AnnotationHolder holder]
   (when-let [document ^Document (some-> (PsiDocumentManager/getInstance (.getProject psi-file))
                                         (.getDocument psi-file))]
-    (let [lines-count (.getLineCount document)]
-      (doseq [{:keys [range message code severity _source]} result]
-        (-> holder
-            (.newAnnotation (severity->highlight-severity severity) (str message " [" code "]"))
-            (.range (range->text-range range document lines-count))
-            (.create))))))
+    (doseq [{:keys [range message code severity _source]} result]
+      (-> holder
+          (.newAnnotation (severity->highlight-severity severity) (str message " [" code "]"))
+          (.range (range->text-range range document))
+          (.create)))))

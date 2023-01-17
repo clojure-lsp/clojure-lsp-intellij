@@ -16,6 +16,9 @@
             order="before positionWidget"
             implementation="com.github.clojure_lsp.intellij.extension.StatusBar" />
 
+        <editorFactoryDocumentListener
+            implementation="com.github.clojure_lsp.intellij.listener.FileListener"/>
+
         <externalAnnotator language="Clojure" implementationClass="com.github.clojure_lsp.intellij.extension.Annotator" />
 
         <spellchecker.bundledDictionaryProvider implementation="com.github.clojure_lsp.intellij.extension.BundledDictionaryProvider"/>
@@ -24,10 +27,9 @@
      <projectListeners>
         <listener topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"
                   class="com.github.clojure_lsp.intellij.listener.FileListener"/>
-    </projectListeners>
+        <!-- TODO listen to vfs events outside editor -->
+        <!-- <listener topic="com.intellij.openapi.vfs.newvfs.BulkFileListener" -->
+        <!--           class="com.github.clojure_lsp.intellij.listener.FileListener"/> -->
 
-    <applicationListeners>
-        <listener topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"
-                  class="com.github.clojure_lsp.intellij.listener.FileListener"/>
-    </applicationListeners>
+    </projectListeners>
 </idea-plugin>
