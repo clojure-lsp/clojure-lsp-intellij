@@ -4,6 +4,7 @@
     <vendor url="https://github.com/clojure-lsp/clojure-lsp-intellij-plugin">clojure-lsp</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.idea.clojure</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity
@@ -14,6 +15,10 @@
             displayName="Clojure LSP"
             order="before positionWidget"
             implementation="com.github.clojure_lsp.intellij.extension.StatusBar" />
+
+        <externalAnnotator language="Clojure" implementationClass="com.github.clojure_lsp.intellij.extension.Annotator" />
+
+        <spellchecker.bundledDictionaryProvider implementation="com.github.clojure_lsp.intellij.extension.BundledDictionaryProvider"/>
     </extensions>
 
      <projectListeners>

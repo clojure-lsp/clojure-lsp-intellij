@@ -1,6 +1,5 @@
 (ns com.github.clojure-lsp.intellij.extension.status-bar
   (:gen-class
-   :main false
    :post-init post-init
    :name com.github.clojure_lsp.intellij.extension.StatusBar
    :extends com.github.clojure_lsp.intellij.WithLoader
@@ -8,7 +7,7 @@
   (:require
    [com.github.clojure-lsp.intellij.db :as db])
   (:import
-   [com.github.clojure_lsp.intellij Icons]
+   (com.github.clojure_lsp.intellij Icons)
    (com.intellij.openapi.project Project)
    (com.intellij.openapi.wm StatusBar StatusBarWidget StatusBarWidget$IconPresentation)))
 
@@ -27,6 +26,8 @@
 (defn -isConfigurable [_] false)
 
 (defn -isEnabledByDefault [_] true)
+
+(defn -disposeWidget [_ _])
 
 (def current-status-bar* (atom nil))
 

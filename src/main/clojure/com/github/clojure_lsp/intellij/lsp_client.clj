@@ -18,8 +18,9 @@
 (defmethod progress :default [_ progress]
   (logger/warn "Unknown progress token %s" progress))
 
-(defn ^:private publish-diagnostics [{:keys [uri diagnostics]}]
-  (swap! db/db* assoc-in [:diagnostics uri] diagnostics))
+(defn ^:private publish-diagnostics [{:keys [uri diagnostics] :as diagnostics-for-uri}]
+  (swap! db/db* assoc-in [:diagnostics uri] diagnostics)
+  (run! #(% diagnostics-for-uri) (:on-diagnostics-updated-fns @db/db*)))
 
 (defn ^:private receive-message
   [client context message]

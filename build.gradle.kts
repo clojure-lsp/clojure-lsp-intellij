@@ -131,3 +131,5 @@ clojure.builds.named("main") {
     aotAll()
     reflection.set("fail")
 }
+
+sourceSets["main"].java.srcDirs("src/main/gen")
