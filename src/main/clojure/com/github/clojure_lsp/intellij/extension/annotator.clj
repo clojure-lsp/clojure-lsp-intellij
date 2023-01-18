@@ -22,14 +22,12 @@
   (if (and (<= 0 line)
            (< line (.getLineCount document)))
     (let [start-line (.getLineStartOffset document line)
-          end-line (.getLineEndOffset document line)
-          content ^CharSequence (.getCharsSequence document)]
+          end-line (.getLineEndOffset document line)]
       (loop [column 0
              offset start-line]
         (if (and (< offset end-line)
                  (< column character))
-          (let [newCol (if (= \t (nth content offset)) 2 1)]
-            (recur (+ column newCol) (inc offset)))
+          (recur (inc column) (inc offset))
           offset)))
     (.getTextLength document)))
 
