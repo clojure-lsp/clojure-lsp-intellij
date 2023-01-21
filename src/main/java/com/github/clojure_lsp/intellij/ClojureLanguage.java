@@ -10,7 +10,7 @@ public final class ClojureLanguage extends Language {
   public static final String CLOJURE_MIME_TYPE = "application/clojure";
 
   private ClojureLanguage() {
-    super("Clojure", CLOJURE_MIME_TYPE);
+    super("clojure", CLOJURE_MIME_TYPE);
   }
 
   @Nullable

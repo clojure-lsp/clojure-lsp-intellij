@@ -4,9 +4,13 @@
     <vendor url="https://github.com/clojure-lsp/clojure-lsp-intellij-plugin">clojure-lsp</vendor>
 
     <depends>com.intellij.modules.platform</depends>
-    <depends>org.jetbrains.idea.clojure</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <fileType name="Clojure" language="clojure" extensions="clj;cljs;cljc;cljd;edn;bb;clj_kondo"
+                  implementationClass="com.github.clojure_lsp.intellij.ClojureFileType" fieldName="INSTANCE"/>
+        <lang.syntaxHighlighterFactory language="clojure" implementationClass="com.github.clojure-lsp.intellij.extension.SyntaxHighlighter"/>
+
+
         <postStartupActivity
             implementation="com.github.clojure_lsp.intellij.extension.Startup"/>
 
@@ -19,12 +23,12 @@
         <editorFactoryDocumentListener
             implementation="com.github.clojure_lsp.intellij.listener.FileListener"/>
 
-        <externalAnnotator language="Clojure" implementationClass="com.github.clojure_lsp.intellij.extension.Annotator" />
+        <externalAnnotator language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.Annotator" />
 
         <spellchecker.bundledDictionaryProvider implementation="com.github.clojure_lsp.intellij.extension.BundledDictionaryProvider"/>
     </extensions>
 
-     <projectListeners>
+    <projectListeners>
         <listener topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"
                   class="com.github.clojure_lsp.intellij.listener.FileListener"/>
         <!-- TODO listen to vfs events outside editor -->
