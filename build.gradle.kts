@@ -24,6 +24,7 @@ repositories {
 dependencies {
     implementation ("com.github.clojure-lsp:clojure-lsp-standalone:2022.12.09-15.51.10")
     implementation(files("libs/clojure-kit-2020-3.1-lib.jar"))
+    implementation ("markdown-clj:markdown-clj:1.11.4")
     // devDeps
     implementation ("nrepl:nrepl:1.0.0")
 }

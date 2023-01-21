@@ -6,11 +6,22 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <fileType name="Clojure" language="clojure" extensions="clj;cljs;cljc;cljd;edn;bb;clj_kondo"
-                  implementationClass="com.github.clojure_lsp.intellij.ClojureFileType" fieldName="INSTANCE"/>
-        <lang.syntaxHighlighterFactory language="clojure" implementationClass="com.github.clojure-lsp.intellij.extension.SyntaxHighlighter"/>
+        <fileType name="Clojure" language="Clojure" extensions="clj;cljs;cljc;cljd;edn;bb;clj_kondo"
+                  implementationClass="org.intellij.clojure.lang.ClojureFileType" fieldName="INSTANCE"/>
 
+        <!-- syntax parse -->
+        <projectService serviceImplementation="org.intellij.clojure.psi.impl.ClojureDefinitionService" />
+        <lang.ast.factory language="Clojure" implementationClass="org.intellij.clojure.parser.ClojureASTFactory" />
+        <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureNSIndex"/>
+        <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureDefIndex"/>
+        <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureDefFqnIndex"/>
+        <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureKeywordIndex"/>
+        <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureKeywordFqnIndex"/>
+        <lang.parserDefinition language="Clojure" implementationClass="org.intellij.clojure.parser.ClojureParserDefinition"/>
 
+        <lang.syntaxHighlighterFactory language="Clojure" implementationClass="com.github.clojure-lsp.intellij.extension.SyntaxHighlighter"/>
+
+        <!-- LSP -->
         <postStartupActivity
             implementation="com.github.clojure_lsp.intellij.extension.Startup"/>
 
@@ -23,7 +34,10 @@
         <editorFactoryDocumentListener
             implementation="com.github.clojure_lsp.intellij.listener.FileListener"/>
 
-        <externalAnnotator language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.Annotator" />
+        <externalAnnotator language="Clojure" implementationClass="com.github.clojure_lsp.intellij.extension.Annotator" />
+
+        <documentationProvider implementationClass="com.github.clojure_lsp.intellij.extension.Documentation"
+                               language="Clojure" order="first"/>
 
         <spellchecker.bundledDictionaryProvider implementation="com.github.clojure_lsp.intellij.extension.BundledDictionaryProvider"/>
     </extensions>

@@ -7,6 +7,7 @@ defmethod
 defmulti
 defonce
 defrecord
+defprotocol
 declare
 intern
 binding

@@ -56,7 +56,7 @@
        @(lsp-client/request! client [:initialize
                                      {:root-uri (-> (.getBasePath project) io/file .toPath .toUri str)
                                       :work-done-token "lsp-startup"
-                                      :capabilities {}}])
+                                      :capabilities {:text-document {:hover {:content-format ["markdown"]}}}}])
        (lsp-client/notify! client [:initialized {}])
        (swap! db/db* assoc :status :connected)
        (run! #(% :connected) (:on-status-changed-fns @db/db*))

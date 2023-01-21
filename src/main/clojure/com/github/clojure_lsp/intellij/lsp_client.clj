@@ -136,7 +136,7 @@
       (recur))))
 
 (defn request! [client [method body]]
-  (protocols.endpoint/send-request client (name method) body))
+  (protocols.endpoint/send-request client (subs (str method) 1) body))
 
 (defn notify! [client [method body]]
   (protocols.endpoint/send-notification client (subs (str method) 1) body))
