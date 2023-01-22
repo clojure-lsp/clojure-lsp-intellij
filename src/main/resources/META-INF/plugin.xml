@@ -29,7 +29,7 @@
             id="clojure-lsp-status-bar"
             displayName="Clojure LSP"
             order="before positionWidget"
-            implementation="com.github.clojure_lsp.intellij.extension.StatusBar" />
+            implementation="com.github.clojure_lsp.intellij.extension.StatusBarFactory" />
 
         <editorFactoryDocumentListener
             implementation="com.github.clojure_lsp.intellij.listener.FileListener"/>

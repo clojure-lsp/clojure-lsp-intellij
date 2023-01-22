@@ -25,9 +25,10 @@
                                                               :position {:line (.line line-col)
                                                                          :character (.column line-col)}}])]
 
-        (-> (HtmlBuilder.)
-            (.appendRaw (markdown/md-to-html-string (:value contents)))
-            (.toString))))))
+        (when-let [raw-html (markdown/md-to-html-string (:value contents))]
+          (-> (HtmlBuilder.)
+              (.appendRaw raw-html)
+              (.toString)))))))
 
 (defn -getCustomDocumentationElement
   [_ _ _ context-element _]
