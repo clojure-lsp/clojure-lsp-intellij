@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.github.clojure-lsp</id>
     <name>Clojure LSP</name>
-    <vendor url="https://github.com/clojure-lsp/clojure-lsp-intellij-plugin">clojure-lsp</vendor>
+    <vendor url="https://github.com/clojure-lsp/clojure-lsp-intellij">clojure-lsp</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 

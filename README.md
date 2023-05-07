@@ -1,10 +1,10 @@
-# clojure-lsp-intellij-plugin
+# clojure-lsp-intellij
 
 ## IN DEVELOPMENT
 
 <!-- Plugin description -->
 
-Support for Clojure & ClojureScript development via Language Server (LSP)
+Plugin with support for Clojure & ClojureScript development via Language Server (LSP)
 
 <!-- Plugin description end -->
 

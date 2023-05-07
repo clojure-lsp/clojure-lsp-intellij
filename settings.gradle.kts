@@ -1,1 +1,1 @@
-rootProject.name = "clojure-lsp-intellij-plugin"
+rootProject.name = "clojure-lsp-intellij"
