@@ -2,6 +2,10 @@
 
 ## IN DEVELOPMENT
 
+This plugin is still in development and it's not expect to be functional yet, when in a usable stage we should release alpha versions.
+
+---
+
 <!-- Plugin description -->
 
 Plugin with support for Clojure & ClojureScript development via Language Server (LSP)
