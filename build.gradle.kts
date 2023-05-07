@@ -22,7 +22,8 @@ repositories {
 }
 
 dependencies {
-    implementation ("com.github.clojure-lsp:clojure-lsp-standalone:2022.12.09-15.51.10")
+    implementation ("com.github.clojure-lsp:clojure-lsp-standalone:2023.05.04-19.38.01")
+    // TODO Stop using clojure-kit and write own gramar for Clojure lang
     implementation(files("libs/clojure-kit-2020-3.1-lib.jar"))
     implementation ("markdown-clj:markdown-clj:1.11.4")
     // devDeps
