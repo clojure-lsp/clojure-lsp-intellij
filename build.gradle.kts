@@ -4,8 +4,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
+    `kotlin-dsl`
     id("dev.clojurephant.clojure") version "0.7.0"
-    id("org.jetbrains.intellij") version "1.12.0"
+    id("org.jetbrains.intellij") version "1.13.3"
     id("org.jetbrains.changelog") version "1.3.1"
 }
 
@@ -22,7 +23,13 @@ repositories {
 }
 
 dependencies {
-    implementation ("com.github.clojure-lsp:clojure-lsp-standalone:2023.05.04-19.38.01")
+    // implementation ("org.clojure:clojure:1.11.1")
+    // https://clojure.atlassian.net/browse/ASYNC-248
+    implementation ("org.clojure:core.async:1.5.648")
+    implementation ("com.github.clojure-lsp:clojure-lsp-standalone:2023.05.04-19.38.01") {
+        exclude("org.clojure", "core.async")
+    }
+    implementation ("com.rpl:proxy-plus:0.0.9")
     // TODO Stop using clojure-kit and write own gramar for Clojure lang
     implementation(files("libs/clojure-kit-2020-3.1-lib.jar"))
     implementation ("markdown-clj:markdown-clj:1.11.4")
@@ -39,6 +46,7 @@ intellij {
     version.set(platformVersion)
     type.set(properties("platformType"))
     plugins.set(platformPlugins.split(',').map(String::trim).filter(String::isNotEmpty))
+    updateSinceUntilBuild.set(false)
 }
 
 changelog {
@@ -46,24 +54,10 @@ changelog {
     groups.set(emptyList())
 }
 
-tasks.withType(KotlinCompile::class).all {
-    kotlinOptions {
-        jvmTarget = "11"
-        // For creation of default methods in interfaces
-        freeCompilerArgs = listOf("-Xjvm-default=all")
-    }
-}
-
 tasks {
-    // Set the JVM compatibility versions
-    properties("javaVersion").let {
-        withType<JavaCompile> {
-            sourceCompatibility = it
-            targetCompatibility = it
-        }
-        withType<KotlinCompile> {
-            kotlinOptions.jvmTarget = it
-        }
+    compileKotlin {
+        kotlinOptions.jvmTarget = properties("javaVersion")
+        kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=all")
     }
 
     wrapper {
@@ -73,7 +67,6 @@ tasks {
     patchPluginXml {
         version.set(properties("pluginVersion"))
         sinceBuild.set(properties("pluginSinceBuild"))
-        untilBuild.set(properties("pluginUntilBuild"))
 
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
         pluginDescription.set(
@@ -134,5 +127,3 @@ clojure.builds.named("main") {
     aotAll()
     reflection.set("fail")
 }
-
-sourceSets["main"].java.srcDirs("src/main/gen")

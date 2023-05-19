@@ -1,0 +1,1 @@
+{:lint-as {com.rpl.proxy-plus/proxy+ clojure.core/proxy}}

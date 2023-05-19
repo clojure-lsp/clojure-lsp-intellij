@@ -7,7 +7,6 @@
    [com.github.clojure-lsp.intellij.tasks :as tasks])
   (:gen-class
    :name com.github.clojure_lsp.intellij.extension.Startup
-   :extends com.github.clojure_lsp.intellij.WithLoader
    :implements [com.intellij.openapi.startup.StartupActivity
                 com.intellij.openapi.project.DumbAware])
   (:import

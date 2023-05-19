@@ -42,6 +42,11 @@
         <spellchecker.bundledDictionaryProvider implementation="com.github.clojure_lsp.intellij.extension.BundledDictionaryProvider"/>
     </extensions>
 
+    <applicationListeners>
+        <listener topic="com.intellij.ide.AppLifecycleListener"
+                  class="com.github.clojure_lsp.intellij.listener.AppLifecycleListener"/>
+    </applicationListeners>
+
     <projectListeners>
         <listener topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"
                   class="com.github.clojure_lsp.intellij.listener.FileListener"/>

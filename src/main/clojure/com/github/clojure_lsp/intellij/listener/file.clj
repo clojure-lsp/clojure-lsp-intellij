@@ -1,4 +1,4 @@
-(ns com.github.clojure-lsp.intellij.listener.file-listener
+(ns com.github.clojure-lsp.intellij.listener.file
   (:require
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.lsp-client :as lsp-client])
@@ -8,10 +8,8 @@
    [com.intellij.openapi.vfs VirtualFile])
   (:gen-class
    :name com.github.clojure_lsp.intellij.listener.FileListener
-   :extends com.github.clojure_lsp.intellij.WithLoader
    :implements [com.intellij.openapi.fileEditor.FileEditorManagerListener
                 com.intellij.openapi.editor.event.DocumentListener]))
-
 (def ^:private valid-extensions #{"clj" "cljs" "cljc" "cljd" "edn" "bb" "clj_kondo"})
 
 (defn -fileOpened [_this _source ^VirtualFile file]
