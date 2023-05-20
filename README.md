@@ -73,7 +73,7 @@ Below are all the currently supported LSP capabilities and their implementation 
 | documentLink/resolve                   |      |                      |
 | textDocument/documentColor             |      |                      |
 | textDocument/colorPresentation         |      |                      |
-| textDocument/formatting                |      |                      |
+| textDocument/formatting                | √    |                      |
 | textDocument/rangeFormatting           |      |                      |
 | textDocument/onTypeFormatting          |      |                      |
 | textDocument/rename                    |      |                      |

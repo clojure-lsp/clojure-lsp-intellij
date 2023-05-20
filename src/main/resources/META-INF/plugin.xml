@@ -39,6 +39,8 @@
         <documentationProvider implementationClass="com.github.clojure_lsp.intellij.extension.Documentation"
                                language="Clojure" order="first"/>
 
+        <formattingService implementation="com.github.clojure_lsp.intellij.extension.Formatting"/>
+
         <spellchecker.bundledDictionaryProvider implementation="com.github.clojure_lsp.intellij.extension.BundledDictionaryProvider"/>
 
     </extensions>
