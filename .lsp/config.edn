@@ -1,2 +1,2 @@
 {:project-specs [{:project-path "build.gradle.kts"
-                  :classpath-cmd ["./gradlew" "printClasspath" "--quiet"]}]}
+                  :classpath-cmd ["./gradlew" "classpath" "--quiet"]}]}

@@ -54,8 +54,10 @@ changelog {
     groups.set(emptyList())
 }
 
-tasks.register<DefaultTask>("printClasspath") {
-    println(sourceSets["main"].runtimeClasspath.asPath)
+tasks.register("classpath") {
+    val classpath = project.configurations.getByName("runtimeClasspath").files
+    val clojureClasspath = clojure.builds.named("main").get().sourceRoots.files
+    println(clojureClasspath.plus(classpath).joinToString(":"))
 }
 
 tasks {

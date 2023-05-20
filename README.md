@@ -20,7 +20,7 @@ Below are all the currently supported LSP capabilities and their implementation 
 |----------------------------------------|------|----------------------|
 | initialize                             | √    |                      |
 | initialized                            | √    |                      |
-| shutdown                               |      |                      |
+| shutdown                               | √    |                      |
 | exit                                   |      |                      |
 | $/cancelRequest                        |      |                      |
 | $/progress                             | √    |                      |
