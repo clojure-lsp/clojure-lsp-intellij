@@ -20,7 +20,7 @@
 
 (set! *warn-on-reflection* true)
 
-(def ^:const widget-id "clojure-lsp-status-bar")
+(def ^:const widget-id "ClojureLSPStatusBar")
 
 (defn -getId [_] widget-id)
 

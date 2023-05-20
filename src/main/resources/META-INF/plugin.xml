@@ -26,7 +26,7 @@
             implementation="com.github.clojure_lsp.intellij.extension.Startup"/>
 
         <statusBarWidgetFactory
-            id="clojure-lsp-status-bar"
+            id="ClojureLSPStatusBar"
             displayName="Clojure LSP"
             order="before positionWidget"
             implementation="com.github.clojure_lsp.intellij.extension.StatusBarFactory" />
@@ -40,7 +40,15 @@
                                language="Clojure" order="first"/>
 
         <spellchecker.bundledDictionaryProvider implementation="com.github.clojure_lsp.intellij.extension.BundledDictionaryProvider"/>
+
     </extensions>
+
+    <actions>
+        <action class="com.github.clojure_lsp.intellij.action.ReferencesAction"
+                id="ClojureLSPFindReferences">
+            <keyboard-shortcut first-keystroke="shift alt F7" keymap="$default"/>
+        </action>
+    </actions>
 
     <applicationListeners>
         <listener topic="com.intellij.ide.AppLifecycleListener"

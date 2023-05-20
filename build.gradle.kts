@@ -54,6 +54,10 @@ changelog {
     groups.set(emptyList())
 }
 
+tasks.register<DefaultTask>("printClasspath") {
+    println(sourceSets["main"].runtimeClasspath.asPath)
+}
+
 tasks {
     compileKotlin {
         kotlinOptions.jvmTarget = properties("javaVersion")
