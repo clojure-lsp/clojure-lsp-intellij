@@ -8,3 +8,4 @@
 - Support `textDocument/references`.
 - Support `textDocument/formatting`.
 - Support `textDocument/codeLens` and `codeLens/resolve`.
+- Add status bar with support for restarting server.
