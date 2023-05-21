@@ -15,8 +15,7 @@
    [com.intellij.openapi.editor Document Editor]
    [com.intellij.openapi.project Project]
    [com.intellij.openapi.util TextRange]
-   [com.intellij.psi
-    PsiElement]
+   [com.intellij.psi PsiElement]
    [com.intellij.usages
     Usage
     UsageInfo2UsageAdapter
@@ -27,38 +26,41 @@
 
 (set! *warn-on-reflection* true)
 
-(defn -actionPerformed [_ ^AnActionEvent event]
+(defn show-references [^Editor editor line character]
   (when-let [client (:client @db/db*)]
-    (when-let [editor ^Editor (.getData event CommonDataKeys/EDITOR)]
-      (let [[line character] (editor/editor->cursor-position editor)
-            references @(lsp-client/request! client [:textDocument/references
-                                                     {:text-document {:uri (editor/editor->uri editor)}
-                                                      :position {:line line
-                                                                 :character character}}])]
-        (if (seq references)
-          (let [project ^Project (.getProject editor)
-                document ^Document (.getDocument editor)
-                elements (->> references
-                              (mapv (fn [{:keys [uri range]}]
-                                      (let [start ^int (editor/position->point (:start range) document)
-                                            end ^int (editor/position->point (:end range) document)
-                                            name (.getText document (TextRange. start end))
-                                            file (editor/uri->psi-file uri project)]
-                                        (psi/->LSPPsiElement name project file start end)))))
-                usages (mapv (fn [^PsiElement element]
-                               (UsageInfo2UsageAdapter.
-                                (UsageInfo. element false))) elements)
-                options (FindUsagesOptions. project)]
-            (.showUsages (UsageViewManager/getInstance project)
-                         (into-array UsageTarget [])
-                         (into-array Usage usages)
-                         (doto (UsageViewPresentation.)
-                           (.setScopeText (.getDisplayName (.searchScope options)))
-                           (.setSearchString (.generateUsagesString options))
-                           (.setTabText (str (count references) " references"))
-                           (.setTabName "references")
-                           (.setShowCancelButton true)
-                           (.setOpenInNewTab false))))
-          (.showErrorHint (HintManager/getInstance)
-                          editor
-                          "No references found"))))))
+    (let [references @(lsp-client/request! client [:textDocument/references
+                                                   {:text-document {:uri (editor/editor->uri editor)}
+                                                    :position {:line line
+                                                               :character character}}])]
+      (if (seq references)
+        (let [project ^Project (.getProject editor)
+              document ^Document (.getDocument editor)
+              elements (->> references
+                            (mapv (fn [{:keys [uri range]}]
+                                    (let [start ^int (editor/position->point (:start range) document)
+                                          end ^int (editor/position->point (:end range) document)
+                                          name (.getText document (TextRange. start end))
+                                          file (editor/uri->psi-file uri project)]
+                                      (psi/->LSPPsiElement name project file start end)))))
+              usages (mapv (fn [^PsiElement element]
+                             (UsageInfo2UsageAdapter.
+                              (UsageInfo. element false))) elements)
+              options (FindUsagesOptions. project)]
+          (.showUsages (UsageViewManager/getInstance project)
+                       (into-array UsageTarget [])
+                       (into-array Usage usages)
+                       (doto (UsageViewPresentation.)
+                         (.setScopeText (.getDisplayName (.searchScope options)))
+                         (.setSearchString (.generateUsagesString options))
+                         (.setTabText (str (count references) " references"))
+                         (.setTabName "references")
+                         (.setShowCancelButton true)
+                         (.setOpenInNewTab false))))
+        (.showErrorHint (HintManager/getInstance)
+                        editor
+                        "No references found")))))
+
+(defn -actionPerformed [_ ^AnActionEvent event]
+  (when-let [editor ^Editor (.getData event CommonDataKeys/EDITOR)]
+    (let [[line character] (editor/editor->cursor-position editor)]
+      (show-references editor line character))))

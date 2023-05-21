@@ -38,20 +38,20 @@
 
 (defn ^:private refresh-status-bar [^Project project]
   ;; TODO Not properly refreshing status bar
-  (let [manager-service ^StatusBarWidgetsManager (.getService project StatusBarWidgetsManager)
-        settings-service ^StatusBarWidgetSettings (.getService project StatusBarWidgetSettings)
-        factory ^StatusBarWidgetFactory (.findWidgetFactory manager-service widget-id)]
-    (.setEnabled settings-service factory false)
-    (.updateWidget manager-service factory)))
+  #_(let [manager-service ^StatusBarWidgetsManager (.getService project StatusBarWidgetsManager)
+          settings-service ^StatusBarWidgetSettings (.getService project StatusBarWidgetSettings)
+          factory ^StatusBarWidgetFactory (.findWidgetFactory manager-service widget-id)]
+      (.setEnabled settings-service factory false)
+      (.updateWidget manager-service factory)))
 
 (defn ^:private restart-lsp-action [^Project project]
   (proxy+
    ["Restart server"]
-   AnAction
-   (update [_ _event])
+    AnAction
+    (update [_ _event])
 
-   (actionPerformed [_ _event]
-                    (server/spawn-server! project))))
+    (actionPerformed [_ _event]
+                     (server/spawn-server! project))))
 
 (defn -post-init [_this]
   (swap! db/db* update :on-status-changed-fns conj
@@ -61,26 +61,26 @@
 (defn -createWidget ^StatusBarWidget [_this ^Project project]
   (proxy+
    [project false]
-   EditorBasedStatusBarPopup
-   (ID [_this] widget-id)
-   (dispose [_this]
-            #_(reset! current-status-bar* nil))
-   (getWidgetState [_this ^VirtualFile _file]
-                   (let [_icon ^Icon (if (identical? :connected (:status @db/db*))
-                                       (Icons/StatusConnected)
-                                       (Icons/StatusDisconnected))
-                         widget-state ^EditorBasedStatusBarPopup$WidgetState (proxy+ ["Clojure LSP actions" "LSP" true] EditorBasedStatusBarPopup$WidgetState)]
+    EditorBasedStatusBarPopup
+    (ID [_this] widget-id)
+    (dispose [_this]
+             #_(reset! current-status-bar* nil))
+    (getWidgetState [_this ^VirtualFile _file]
+                    (let [_icon ^Icon (if (identical? :connected (:status @db/db*))
+                                        (Icons/StatusConnected)
+                                        (Icons/StatusDisconnected))
+                          widget-state ^EditorBasedStatusBarPopup$WidgetState (proxy+ ["Clojure LSP actions" "LSP" true] EditorBasedStatusBarPopup$WidgetState)]
                       ;; TODO check how add icon
                       ;; (.setIcon widget-state icon)
-                     widget-state))
+                      widget-state))
 
-   (createPopup [_this context]
-                (let [action-group (doto (DefaultActionGroup.)
-                                     (.add (restart-lsp-action project)))]
-                  (.createActionGroupPopup
-                   (JBPopupFactory/getInstance)
-                   (str "Clojure LSP: " (name (:status @db/db*)))
-                   action-group
-                   context
-                   (JBPopupFactory$ActionSelectionAid/SPEEDSEARCH)
-                   true)))))
+    (createPopup [_this context]
+                 (let [action-group (doto (DefaultActionGroup.)
+                                      (.add (restart-lsp-action project)))]
+                   (.createActionGroupPopup
+                    (JBPopupFactory/getInstance)
+                    (str "Clojure LSP: " (name (:status @db/db*)))
+                    action-group
+                    context
+                    (JBPopupFactory$ActionSelectionAid/SPEEDSEARCH)
+                    true)))))

@@ -67,8 +67,8 @@ Below are all the currently supported LSP capabilities and their implementation 
 | textDocument/documentSymbol            |      |                      |
 | textDocument/codeAction                |      |                      |
 | codeAction/resolve                     |      |                      |
-| textDocument/codeLens                  |      |                      |
-| codeLens/resolve                       |      |                      |
+| textDocument/codeLens                  | √    |                      |
+| codeLens/resolve                       | √    |                      |
 | textDocument/documentLink              |      |                      |
 | documentLink/resolve                   |      |                      |
 | textDocument/documentColor             |      |                      |

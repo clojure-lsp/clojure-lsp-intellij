@@ -33,8 +33,13 @@
         uri (.getUrl (.getVirtualFile file))]
     (reify AsyncDocumentFormattingService$FormattingTask
       (run [_]
-        (when-let [[{:keys [new-text]}] @(lsp-client/request! client [:textDocument/formatting
-                                                                      {:text-document {:uri uri}}])]
-          (.onTextReady request new-text)))
+        (try
+          (let [[{:keys [new-text]}] @(lsp-client/request! client [:textDocument/formatting
+                                                                   {:text-document {:uri uri}}])]
+            (if new-text
+              (.onTextReady request new-text)
+              (.onTextReady request (.getDocumentText request))))
+          (catch Exception e
+            (.onError request "LSP format error" (.getMessage e)))))
       (cancel [_] true)
       (isRunUnderProgress [_] true))))

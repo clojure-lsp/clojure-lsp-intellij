@@ -41,6 +41,11 @@
 
         <formattingService implementation="com.github.clojure_lsp.intellij.extension.Formatting"/>
 
+        <codeInsight.inlayProvider
+            language="Clojure"
+            isEnabledByDefault="true"
+            implementationClass="com.github.clojure_lsp.intellij.extension.CodeLensProvider"/>
+
         <spellchecker.bundledDictionaryProvider implementation="com.github.clojure_lsp.intellij.extension.BundledDictionaryProvider"/>
 
     </extensions>
