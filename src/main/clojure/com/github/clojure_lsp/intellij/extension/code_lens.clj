@@ -58,6 +58,7 @@
     (let [[line character] (rest arguments)]
       (action.references/show-references editor (dec line) (dec character)))))
 
+(set! *warn-on-reflection* false)
 (defn ^:private code-lens-presentation
   [^PresentationFactory factory title on-click-fn]
   (let [base (.text factory title)
@@ -79,6 +80,7 @@
                                         3 3 6 0)
                                 (reify Function0 (invoke [_] hover-button))
                                 (reify Function1 (invoke [_ _] true)))))
+(set! *warn-on-reflection* true)
 
 (defn -getCollectorFor [_ _file ^Editor editor _settings ^InlayHintsSink sink]
   (when-let [client (and (identical? :connected (:status @db/db*))

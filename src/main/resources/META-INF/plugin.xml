@@ -28,7 +28,7 @@
         <statusBarWidgetFactory
             id="ClojureLSPStatusBar"
             displayName="Clojure LSP"
-            order="before positionWidget"
+            order="first"
             implementation="com.github.clojure_lsp.intellij.extension.StatusBarFactory" />
 
         <editorFactoryDocumentListener
@@ -39,7 +39,7 @@
         <documentationProvider implementationClass="com.github.clojure_lsp.intellij.extension.Documentation"
                                language="Clojure" order="first"/>
 
-        <formattingService implementation="com.github.clojure_lsp.intellij.extension.Formatting"/>
+        <formattingService implementation="com.github.clojure_lsp.intellij.extension.formatting.Formatting"/>
 
         <codeInsight.inlayProvider
             language="Clojure"

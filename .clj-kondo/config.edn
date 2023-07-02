@@ -1,1 +1,2 @@
-{:lint-as {com.rpl.proxy-plus/proxy+ clojure.core/proxy}}
+{:lint-as {com.rpl.proxy-plus/proxy+ clojure.core/reify}
+ :linters {:unresolved-symbol {:exclude [(com.rpl.proxy-plus/proxy+)]}}}
