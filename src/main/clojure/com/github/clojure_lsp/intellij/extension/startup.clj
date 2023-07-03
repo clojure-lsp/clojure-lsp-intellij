@@ -1,10 +1,7 @@
 (ns com.github.clojure-lsp.intellij.extension.startup
   (:require
    [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.clojure-lsp.intellij.logger :as logger]
-   [com.github.clojure-lsp.intellij.lsp-client :as lsp-client]
-   [com.github.clojure-lsp.intellij.server :as server]
-   [com.github.clojure-lsp.intellij.tasks :as tasks])
+   [com.github.clojure-lsp.intellij.logger :as logger])
   (:gen-class
    :name com.github.clojure_lsp.intellij.extension.Startup
    :implements [com.intellij.openapi.startup.StartupActivity
@@ -28,7 +25,7 @@
   (logger/info "Starting clojure-lsp plugin...")
   (start-nrepl-server 6660)
   (swap! db/db* assoc :project project)
-  (server/spawn-server! project))
+  #_(server/spawn-server! project))
 
-(defmethod lsp-client/progress "lsp-startup" [{:keys [progress-indicator]} {{:keys [title percentage]} :value}]
+#_(defmethod lsp-client/progress "lsp-startup" [{:keys [progress-indicator]} {{:keys [title percentage]} :value}]
   (tasks/set-progress progress-indicator (str "LSP: " title) percentage))

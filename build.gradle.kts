@@ -6,7 +6,7 @@ fun properties(key: String) = project.findProperty(key).toString()
 plugins {
     `kotlin-dsl`
     id("dev.clojurephant.clojure") version "0.7.0"
-    id("org.jetbrains.intellij") version "1.13.3"
+    id("org.jetbrains.intellij") version "1.14.2"
     id("org.jetbrains.changelog") version "1.3.1"
 }
 
@@ -23,16 +23,16 @@ repositories {
 }
 
 dependencies {
-    // implementation ("org.clojure:clojure:1.11.1")
+    implementation ("org.clojure:clojure:1.11.1")
     // https://clojure.atlassian.net/browse/ASYNC-248
     implementation ("org.clojure:core.async:1.5.648")
-    implementation ("com.github.clojure-lsp:clojure-lsp-standalone:2023.05.04-19.38.01") {
-        exclude("org.clojure", "core.async")
-    }
-    implementation ("com.rpl:proxy-plus:0.0.9")
+    // implementation ("com.github.clojure-lsp:clojure-lsp-standalone:2023.07.01-22.35.41") {
+    //     exclude("org.clojure", "core.async")
+    // }
+    // implementation ("com.rpl:proxy-plus:0.0.9")
     // TODO Stop using clojure-kit and write own gramar for Clojure lang
-    implementation(files("libs/clojure-kit-2020-3.1-lib.jar"))
-    implementation ("markdown-clj:markdown-clj:1.11.4")
+    // implementation(files("libs/clojure-kit-2020-3.1-lib.jar"))
+    // implementation ("markdown-clj:markdown-clj:1.11.4")
     // devDeps
     implementation ("nrepl:nrepl:1.0.0")
 }

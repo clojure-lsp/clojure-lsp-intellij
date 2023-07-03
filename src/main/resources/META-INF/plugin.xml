@@ -6,55 +6,56 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <fileType name="Clojure" language="Clojure" extensions="clj;cljs;cljc;cljd;edn;bb;clj_kondo"
-                  implementationClass="org.intellij.clojure.lang.ClojureFileType" fieldName="INSTANCE"/>
+        <!-- <fileType name="Clojure" language="Clojure" extensions="clj;cljs;cljc;cljd;edn;bb;clj_kondo" -->
+        <!--           implementationClass="org.intellij.clojure.lang.ClojureFileType" fieldName="INSTANCE"/> -->
 
-        <!-- syntax parse -->
-        <projectService serviceImplementation="org.intellij.clojure.psi.impl.ClojureDefinitionService" />
-        <lang.ast.factory language="Clojure" implementationClass="org.intellij.clojure.parser.ClojureASTFactory" />
-        <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureNSIndex"/>
-        <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureDefIndex"/>
-        <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureDefFqnIndex"/>
-        <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureKeywordIndex"/>
-        <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureKeywordFqnIndex"/>
-        <lang.parserDefinition language="Clojure" implementationClass="org.intellij.clojure.parser.ClojureParserDefinition"/>
+        <!-- <!-\- syntax parse -\-> -->
+        <!-- <projectService serviceImplementation="org.intellij.clojure.psi.impl.ClojureDefinitionService" /> -->
+        <!-- <lang.ast.factory language="Clojure" implementationClass="org.intellij.clojure.parser.ClojureASTFactory" /> -->
+        <!-- <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureNSIndex"/> -->
+        <!-- <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureDefIndex"/> -->
+        <!-- <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureDefFqnIndex"/> -->
+        <!-- <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureKeywordIndex"/> -->
+        <!-- <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureKeywordFqnIndex"/> -->
+        <!-- <lang.parserDefinition language="Clojure" implementationClass="org.intellij.clojure.parser.ClojureParserDefinition"/> -->
 
-        <lang.syntaxHighlighterFactory language="Clojure" implementationClass="com.github.clojure-lsp.intellij.extension.SyntaxHighlighter"/>
+        <!-- <lang.syntaxHighlighterFactory language="Clojure" implementationClass="com.github.clojure-lsp.intellij.extension.SyntaxHighlighter"/> -->
 
         <!-- LSP -->
         <postStartupActivity
             implementation="com.github.clojure_lsp.intellij.extension.Startup"/>
 
-        <statusBarWidgetFactory
-            id="ClojureLSPStatusBar"
-            displayName="Clojure LSP"
-            order="first"
-            implementation="com.github.clojure_lsp.intellij.extension.StatusBarFactory" />
+        <!-- <statusBarWidgetFactory -->
+        <!--     id="ClojureLSPStatusBar" -->
+        <!--     displayName="Clojure LSP" -->
+        <!--     order="first" -->
+        <!--     implementation="com.github.clojure_lsp.intellij.extension.StatusBarFactory" /> -->
 
-        <editorFactoryDocumentListener
-            implementation="com.github.clojure_lsp.intellij.listener.FileListener"/>
+        <!-- <editorFactoryDocumentListener -->
+        <!--     implementation="com.github.clojure_lsp.intellij.listener.FileListener"/> -->
 
-        <externalAnnotator language="Clojure" implementationClass="com.github.clojure_lsp.intellij.extension.Annotator" />
+        <!-- <externalAnnotator language="Clojure" implementationClass="com.github.clojure_lsp.intellij.extension.Annotator" /> -->
 
-        <documentationProvider implementationClass="com.github.clojure_lsp.intellij.extension.Documentation"
-                               language="Clojure" order="first"/>
+        <!-- <documentationProvider implementationClass="com.github.clojure_lsp.intellij.extension.Documentation" -->
+        <!--                        language="Clojure" order="first"/> -->
 
-        <formattingService implementation="com.github.clojure_lsp.intellij.extension.formatting.Formatting"/>
+        <!-- <formattingService implementation="com.github.clojure_lsp.intellij.extension.formatting.Formatting"/> -->
 
-        <codeInsight.inlayProvider
-            language="Clojure"
-            isEnabledByDefault="true"
-            implementationClass="com.github.clojure_lsp.intellij.extension.CodeLensProvider"/>
+        <!-- <codeInsight.inlayProvider -->
+        <!--     language="Clojure" -->
+        <!--     isEnabledByDefault="true" -->
+        <!--     implementationClass="com.github.clojure_lsp.intellij.extension.CodeLensProvider"/> -->
 
-        <spellchecker.bundledDictionaryProvider implementation="com.github.clojure_lsp.intellij.extension.BundledDictionaryProvider"/>
+        <!-- <spellchecker.bundledDictionaryProvider implementation="com.github.clojure_lsp.intellij.extension.BundledDictionaryProvider"/> -->
 
+        <platform.lsp.serverSupportProvider implementation="com.github.clojure_lsp.intellij.extension.LspServerSupportProvider"/>
     </extensions>
 
     <actions>
-        <action class="com.github.clojure_lsp.intellij.action.ReferencesAction"
-                id="ClojureLSPFindReferences">
-            <keyboard-shortcut first-keystroke="shift alt F7" keymap="$default"/>
-        </action>
+        <!-- <action class="com.github.clojure_lsp.intellij.action.ReferencesAction" -->
+        <!--         id="ClojureLSPFindReferences"> -->
+        <!--     <keyboard-shortcut first-keystroke="shift alt F7" keymap="$default"/> -->
+        <!-- </action> -->
     </actions>
 
     <applicationListeners>
@@ -63,8 +64,8 @@
     </applicationListeners>
 
     <projectListeners>
-        <listener topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"
-                  class="com.github.clojure_lsp.intellij.listener.FileListener"/>
+        <!-- <listener topic="com.intellij.openapi.fileEditor.FileEditorManagerListener" -->
+        <!--           class="com.github.clojure_lsp.intellij.listener.FileListener"/> -->
         <!-- TODO listen to vfs events outside editor -->
         <!-- <listener topic="com.intellij.openapi.vfs.newvfs.BulkFileListener" -->
         <!--           class="com.github.clojure_lsp.intellij.listener.FileListener"/> -->
