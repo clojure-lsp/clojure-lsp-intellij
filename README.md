@@ -2,7 +2,10 @@
 
 ## IN DEVELOPMENT
 
-This plugin is still in development and it's not expect to be functional yet, when in a usable stage we should release alpha versions.
+This plugin is still in development and it's not expected to be functional yet, when in a usable stage we should release alpha versions.
+Also, it doesn't use IntelliJ's LSP support for 2 reasons:
+  - The LSP feature is only available for Ultimate Edition (paid edition), making this plugin only available for those editions
+  - The LSP feature is pretty alpha, missing some features yet.
 
 ---
 
