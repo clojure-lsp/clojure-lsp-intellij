@@ -52,6 +52,13 @@
 
     <actions>
         <group id="ClojureLSPGroup">
+            <action class="com.github.clojure_lsp.intellij.action.DefinitionAction"
+                    text="Find definition"
+                    desciprtion="Find the defintion of the element at cursor."
+                    id="ClojureLSPFindDefinition"
+                    icon="com.github.clojure_lsp.intellij.Icons.ClojureFile">
+                <keyboard-shortcut first-keystroke="shift alt F6" keymap="$default"/>
+            </action>
             <action class="com.github.clojure_lsp.intellij.action.ReferencesAction"
                     text="Find references"
                     desciprtion="Find all references of the element at cursor."
