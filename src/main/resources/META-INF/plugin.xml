@@ -39,7 +39,7 @@
         <documentationProvider implementationClass="com.github.clojure_lsp.intellij.extension.Documentation"
                                language="Clojure" order="first"/>
 
-        <formattingService implementation="com.github.clojure_lsp.intellij.extension.formatting.Formatting"/>
+        <formattingService implementation="com.github.clojure_lsp.intellij.extension.Formatting"/>
 
         <codeInsight.inlayProvider
             language="Clojure"
