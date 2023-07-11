@@ -51,10 +51,17 @@
     </extensions>
 
     <actions>
-        <action class="com.github.clojure_lsp.intellij.action.ReferencesAction"
-                id="ClojureLSPFindReferences">
-            <keyboard-shortcut first-keystroke="shift alt F7" keymap="$default"/>
-        </action>
+        <group id="ClojureLSPGroup">
+            <action class="com.github.clojure_lsp.intellij.action.ReferencesAction"
+                    text="Find references"
+                    desciprtion="Find all references of the element at cursor."
+                    id="ClojureLSPFindReferences"
+                    icon="com.github.clojure_lsp.intellij.Icons.ClojureFile">
+                <keyboard-shortcut first-keystroke="shift alt F7" keymap="$default"/>
+            </action>
+            <separator/>
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </group>
     </actions>
 
     <applicationListeners>
