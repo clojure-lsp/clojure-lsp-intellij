@@ -26,7 +26,7 @@ dependencies {
     // implementation ("org.clojure:clojure:1.11.1")
     // https://clojure.atlassian.net/browse/ASYNC-248
     implementation ("org.clojure:core.async:1.5.648")
-    implementation ("com.github.clojure-lsp:clojure-lsp-standalone:2023.05.04-19.38.01") {
+    implementation ("com.github.clojure-lsp:clojure-lsp-standalone:2023.07.01-22.35.41") {
         exclude("org.clojure", "core.async")
     }
     implementation ("com.rpl:proxy-plus:0.0.9")
