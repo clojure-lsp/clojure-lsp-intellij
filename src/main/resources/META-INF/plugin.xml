@@ -11,7 +11,6 @@
 
         <!-- syntax parse -->
         <!-- <projectService serviceImplementation="org.intellij.clojure.psi.impl.ClojureDefinitionService" /> -->
-        <!-- <lang.ast.factory language="Clojure" implementationClass="org.intellij.clojure.parser.ClojureASTFactory" /> -->
         <!-- <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureNSIndex"/> -->
         <!-- <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureDefIndex"/> -->
         <!-- <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureDefFqnIndex"/> -->
@@ -19,7 +18,9 @@
         <!-- <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureKeywordFqnIndex"/> -->
         <!-- <lang.parserDefinition language="Clojure" implementationClass="org.intellij.clojure.parser.ClojureParserDefinition"/> -->
 
-        <!-- <lang.syntaxHighlighterFactory language="Clojure" implementationClass="com.github.clojure-lsp.intellij.extension.SyntaxHighlighter"/> -->
+        <!-- <lang.ast.factory language="Clojure" implementationClass="com.github.clojure_lsp.intellij.language.parser.ClojureASTFactory" /> -->
+
+        <lang.syntaxHighlighterFactory language="Clojure" implementationClass="com.github.clojure_lsp.intellij.extension.SyntaxHighlighter"/>
 
         <!-- LSP -->
         <postStartupActivity

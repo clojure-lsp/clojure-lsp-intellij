@@ -8,7 +8,6 @@ import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.TokenType
 import com.intellij.psi.tree.TokenSet
 import com.github.clojure_lsp.intellij.Icons
-import com.github.clojure_lsp.intellij.language.ClojureConstants
 import com.github.clojure_lsp.intellij.language.psi.ClojureTypes.*
 
 object ClojureLanguage : Language("Clojure")
@@ -16,7 +15,7 @@ object ClojureLanguage : Language("Clojure")
 object ClojureFileType : LanguageFileType(ClojureLanguage) {
   override fun getIcon() = Icons.ClojureFile
   override fun getName() = "Clojure"
-  override fun getDefaultExtension() = ClojureConstants.CLJ
+  override fun getDefaultExtension() = "clj"
   override fun getDescription() = "Clojure, ClojureScript and ClojureDart"
 }
 

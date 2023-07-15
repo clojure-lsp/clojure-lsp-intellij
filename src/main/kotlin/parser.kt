@@ -13,78 +13,30 @@ import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import com.github.clojure_lsp.intellij.ClojureTokens
 import com.github.clojure_lsp.intellij.language.psi.ClojureTypes.*
-// import org.intellij.clojure.psi.impl.CFileImpl
-// import org.intellij.clojure.util.wsOrComment
 
-// /**
-//  * @author gregsh
-//  */
-// class ClojureLexer(language: Language) : LookAheadLexer(FlexAdapter(_ClojureLexer(language))) {
-//   override fun lookAhead(baseLexer: Lexer) {
-//     val tokenType0 = baseLexer.tokenType
-//     val tokenEnd0 = baseLexer.tokenEnd
-//     when (tokenType0) {
-//       in ClojureTokens.LITERALS -> {
-//         baseLexer.advance()
-//         val tokenType = baseLexer.tokenType
-//         if (tokenType0 == C_NUMBER && ClojureTokens.SYM_ALIKE.contains(tokenType) ||
-//             tokenType0 == C_CHAR && (tokenType == C_SYM || ClojureTokens.LITERALS.contains(tokenType))) {
-//           advanceAs(baseLexer, TokenType.BAD_CHARACTER)
-//         }
-//         else {
-//           addToken(tokenEnd0, tokenType0)
-//         }
-//       }
-//       else -> super.lookAhead(baseLexer)
-//     }
-//   }
-// }
-
-// class ClojureParserDefinition : ClojureParserDefinitionBase() {
-//   override fun getFileNodeType() = ClojureTokens.CLJ_FILE_TYPE
-// }
-
-// class ClojureScriptParserDefinition : ClojureParserDefinitionBase() {
-//   override fun getFileNodeType() = ClojureTokens.CLJS_FILE_TYPE
-// }
-
-// class ClojureASTFactory : ASTFactory() {
-//   override fun createComposite(type: IElementType): CompositeElement? = Factory.createElement(type)
-// }
-
-// abstract class ClojureParserDefinitionBase : ParserDefinition {
-
-//   override fun createLexer(project: Project?) = ClojureLexer(fileNodeType.language)
-//   override fun createParser(project: Project?) = ClojureParser()
-//   override fun createFile(viewProvider: FileViewProvider) = CFileImpl(viewProvider!!, fileNodeType.language)
-//   override fun createElement(node: ASTNode?) = throw UnsupportedOperationException(
-//       "$node" + (node?.elementType?.language ?: fileNodeType.language).let {
-//         "; ASTFactory(${it.id})=${LanguageASTFactory.INSTANCE.forLanguage(it)}"
-//       })
-
-//   override fun getStringLiteralElements() = ClojureTokens.STRINGS
-//   override fun getWhitespaceTokens() = ClojureTokens.WHITESPACES
-//   override fun getCommentTokens() = ClojureTokens.COMMENTS
-
-//   override fun spaceExistanceTypeBetweenTokens(left: ASTNode, right: ASTNode): ParserDefinition.SpaceRequirements {
-//     val lt = left.elementType
-//     val rt = right.elementType
-//     if (rt == C_COMMA || ClojureTokens.MACROS.contains(lt) || ClojureTokens.SHARPS.contains(lt)) {
-//       return ParserDefinition.SpaceRequirements.MUST_NOT
-//     }
-//     if (lt == C_DOT || rt == C_DOT || lt == C_DOTDASH ||
-//         lt == C_SLASH && rt == C_SYM ||
-//         lt == C_SYM && rt == C_SLASH) {
-//       return ParserDefinition.SpaceRequirements.MUST_NOT
-//     }
-//     for (p in ClojureTokens.BRACE_PAIRS) {
-//       if (lt == p.leftBraceType || rt == p.rightBraceType) {
-//         return ParserDefinition.SpaceRequirements.MAY
-//       }
-//     }
-//     return ParserDefinition.SpaceRequirements.MUST
-//   }
-// }
+/**
+ * @author gregsh
+ */
+class ClojureLexer(language: Language) : LookAheadLexer(FlexAdapter(_ClojureLexer(language))) {
+  override fun lookAhead(baseLexer: Lexer) {
+    val tokenType0 = baseLexer.tokenType
+    val tokenEnd0 = baseLexer.tokenEnd
+    when (tokenType0) {
+      in ClojureTokens.LITERALS -> {
+        baseLexer.advance()
+        val tokenType = baseLexer.tokenType
+        if (tokenType0 == C_NUMBER && ClojureTokens.SYM_ALIKE.contains(tokenType) ||
+            tokenType0 == C_CHAR && (tokenType == C_SYM || ClojureTokens.LITERALS.contains(tokenType))) {
+          advanceAs(baseLexer, TokenType.BAD_CHARACTER)
+        }
+        else {
+          addToken(tokenEnd0, tokenType0)
+        }
+      }
+      else -> super.lookAhead(baseLexer)
+    }
+  }
+}
 
 fun IElementType?.wsOrComment() = this != null && (ClojureTokens.WHITESPACES.contains(this) || ClojureTokens.COMMENTS.contains(this))
 

@@ -145,18 +145,18 @@ tasks {
         pathToPsiRoot.set("com/github/clojure_lsp/intellij/language/psi")
         purgeOldFiles.set(true)
     }
+
+    generateLexer {
+        sourceFile.set(file("src/main/gramar/_ClojureLexer.flex"))
+        targetDir.set("src/gen/com/github/clojure_lsp/intellij/language/parser")
+        targetClass.set("_ClojureLexer")
+    }
 }
 
 grammarKit {
   jflexRelease.set("1.7.0-1")
   grammarKitRelease.set("2021.1.2")
   intellijRelease.set("203.7717.81")
-}
-
-tasks.register<DefaultTask>("foo") {
-    doLast {
-        println(sourceSets.main.get().compileClasspath)
-    }
 }
 
 clojure.builds.named("main") {
