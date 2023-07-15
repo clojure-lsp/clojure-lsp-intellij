@@ -31,8 +31,6 @@ dependencies {
         exclude("org.clojure", "core.async")
     }
     implementation ("com.rpl:proxy-plus:0.0.9")
-    // TODO Stop using clojure-kit and write own gramar for Clojure lang
-    // implementation(files("libs/clojure-kit-2020-3.1-lib.jar"))
     implementation ("markdown-clj:markdown-clj:1.11.4")
     // devDeps
     implementation ("nrepl:nrepl:1.0.0")
