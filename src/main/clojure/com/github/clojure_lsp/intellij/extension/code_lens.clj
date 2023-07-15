@@ -9,6 +9,7 @@
    [com.github.clojure-lsp.intellij.lsp-client :as lsp-client]
    [com.rpl.proxy-plus :refer [proxy+]])
   (:import
+   [com.github.clojure_lsp.intellij ClojureLanguage]
    [com.intellij.codeInsight.hints
     FactoryInlayHintsCollector
     ImmediateConfigurable
@@ -22,8 +23,7 @@
    [com.intellij.lang Language]
    [com.intellij.openapi.editor Editor]
    [javax.swing JPanel]
-   [kotlin.jvm.functions Function0 Function1]
-   [org.intellij.clojure.lang ClojureLanguage]))
+   [kotlin.jvm.functions Function0 Function1]))
 
 (set! *warn-on-reflection* true)
 

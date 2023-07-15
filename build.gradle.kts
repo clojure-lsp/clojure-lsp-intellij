@@ -8,6 +8,7 @@ plugins {
     id("dev.clojurephant.clojure") version "0.7.0"
     id("org.jetbrains.intellij") version "1.13.3"
     id("org.jetbrains.changelog") version "1.3.1"
+    id("org.jetbrains.grammarkit") version "2022.3.1"
 }
 
 group = properties("pluginGroup")
@@ -31,10 +32,20 @@ dependencies {
     }
     implementation ("com.rpl:proxy-plus:0.0.9")
     // TODO Stop using clojure-kit and write own gramar for Clojure lang
-    implementation(files("libs/clojure-kit-2020-3.1-lib.jar"))
+    // implementation(files("libs/clojure-kit-2020-3.1-lib.jar"))
     implementation ("markdown-clj:markdown-clj:1.11.4")
     // devDeps
     implementation ("nrepl:nrepl:1.0.0")
+}
+
+sourceSets {
+    main {
+        java.srcDirs("src/main", "src/gen")
+        resources.srcDirs("resources")
+    }
+    test {
+        java.srcDirs("tests")
+    }
 }
 
 // Useful to override another IC platforms from env
@@ -126,9 +137,30 @@ tasks {
     buildSearchableOptions {
         enabled = false
     }
+
+    generateParser {
+        sourceFile.set(file("src/main/gramar/clojure.bnf"))
+        targetRoot.set("src/gen")
+        pathToParser.set("com/github/clojure_lsp/intellij/language/parser/ClojureParser.java")
+        pathToPsiRoot.set("com/github/clojure_lsp/intellij/language/psi")
+        purgeOldFiles.set(true)
+    }
+}
+
+grammarKit {
+  jflexRelease.set("1.7.0-1")
+  grammarKitRelease.set("2021.1.2")
+  intellijRelease.set("203.7717.81")
+}
+
+tasks.register<DefaultTask>("foo") {
+    doLast {
+        println(sourceSets.main.get().compileClasspath)
+    }
 }
 
 clojure.builds.named("main") {
+    classpath.from(sourceSets.main.get().runtimeClasspath.asPath)
     checkAll()
     aotAll()
     reflection.set("fail")

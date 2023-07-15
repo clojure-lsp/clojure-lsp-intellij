@@ -7,7 +7,6 @@
 (def ^:private initial-db
   {:status :disconnected
    :on-status-changed-fns []
-   :on-diagnostics-updated-fns []
    :client nil
    :server nil
    :project nil})

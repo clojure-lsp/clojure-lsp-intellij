@@ -8,7 +8,7 @@
   (:import
    [com.intellij.formatting.service AsyncDocumentFormattingService$FormattingTask AsyncFormattingRequest]
    [com.intellij.psi PsiFile]
-   [org.intellij.clojure.lang ClojureFileType]))
+   [com.github.clojure_lsp.intellij ClojureFileType]))
 
 (set! *warn-on-reflection* true)
 

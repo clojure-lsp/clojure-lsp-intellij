@@ -1,0 +1,132 @@
+{
+  generate=[tokenAccessors="no"]
+  parserClass='com.github.clojure_lsp.intellij.language.parser.ClojureParser'
+  parserImports=[
+    'static com.github.clojure_lsp.intellij.language.parser.ClojureParserUtil.adapt_builder_'
+    'static com.github.clojure_lsp.intellij.language.parser.ClojureParserUtil.*'
+  ]
+  psiPackage='com.github.clojure_lsp.intellij.language.psi'
+  psiImplPackage='com.github.clojure_lsp.intellij.language.psi.impl'
+  psiClassPrefix='C'
+  psiVisitorName='ClojureVisitor'
+
+
+  elementTypeHolderClass='com.github.clojure_lsp.intellij.language.psi.ClojureTypes'
+  elementTypeClass="com.github.clojure_lsp.intellij.language.psi.ClojureNodeType"
+  tokenTypeClass="com.github.clojure_lsp.intellij.language.psi.ClojureTokenType"
+  elementTypePrefix='C_'
+
+  tokens=[
+    whitespace='regexp:\s+'
+    //line_comment='regexp:;.*'
+    string='regexp:"([^"]|\\")*"'
+    number='regexp:\d\d?r[\da-zA-Z]+|M?\d+(\.\d*([eE]\d+)?)?'
+    ratio='regexp:\d+/\d+'
+    char='regexp:\\(u\d{4}|newline|space|backspace|return|.)'
+    bool="regexp:true|false"
+    nil='nil'
+    sym="regexp:[\w.<>$%&=*/+\-!?_'[^\d]][\w.<>$%&=*/+\-!?_']*((:[\w<>$%&=*/+\-!?_'])+)?"
+    sharp_hat="#^"
+    sharp_quote="#'"
+    sharp_comment="#_"
+    sharp_qmark="#?"
+    sharp_qmark_at="#?@"
+    sharp_eq="#="
+    sharp_ns="#:"
+    sharp_sym="##"
+
+    paren1='('
+    paren2=')'
+    bracket1='['
+    bracket2=']'
+    brace1='{'
+    brace2='}'
+    colon=':'
+    coloncolon='::'
+    comma=','
+    quote="'"
+    syntax_quote="`"
+    sharp="#"
+    hat="^"
+    tilde="~"
+    tilde_at="~@"
+    at="@"
+
+    dot='.'
+    dotdash='.-'
+    slash='/'
+  ]
+  extends("p_form|s_form")=form
+  extends("set|map|constructor|l_v_form")=p_form
+  extends("vec|list")=l_v_form
+  extends("fun")=list
+  extends("symbol|keyword|literal|access")=s_form
+  extends("regexp")=literal
+  extends("symbol_.*")=symbol
+  elementType("symbol_.*")=symbol
+  elementType("access_.*")=access
+  pin("list|set|vec|map|fun")="'[\(\[\{]'"
+  pin("constructor|reader_cond")=1
+  name("metadata|constructor|reader_.*")=form
+
+  methods("reader_macro|metadata")=[toString]
+  consumeTokenMethod("commented|symbol_nsq")="fast"
+}
+
+root ::= <<parseTree (root_entry)>>
+//root ::= entry * // for LivePreview
+private root_entry ::= not_eof (commented | form) {pin=1 recoverWhile=root_entry_recover}
+private external root_entry_recover ::= rootFormRecover
+private not_eof ::= !<<eof>>
+
+form ::= form_prefix form_prefix * form_upper | form_inner
+  {pin(".*")=1 methods=[form="" commented="" metas="metadata" readerMacros="reader_macro" toString]}
+private form_prefix ::= metadata | reader_macro | commented
+private external form_recover ::= formRecover
+commented ::=  "#_" form {pin=1}
+private skip ::= commented *
+
+upper form_upper ::= form_inner {elementType=form name=form}
+private form_inner ::= p_forms | s_forms | constructor
+private p_forms ::= list | set | vec | map | fun
+private s_forms ::= symbol access_left? | keyword | literal | regexp | access
+
+fake p_form ::= form * {methods=[forms="form"]}
+fake l_v_form ::=
+fake s_form ::=
+list ::= '(' list_body ')'
+  {methods=[getTextOffset getFirst]}
+set ::= '#' <<nospace>> '{' set_body '}'
+vec ::= '[' vec_body ']'
+map ::= '{' map_body '}'
+fun ::= '#' <<nospace>> '(' list_body ')'
+symbol ::= symbol_qualified
+  {methods=[getName getQualifiedName getQualifier getTextOffset getReference]}
+keyword ::= (':' | '::') <<nospace>> symbol_qualified
+  {methods=[getName getNamespace getQualifiedName getTextOffset]}
+private symbol_qualified ::= symbol_plain symbol_nsq?
+symbol_plain ::= sym
+left symbol_nsq ::= '/' sym
+literal ::= number | hexnum | rdxnum | ratio | bool | nil | string | char
+  {methods=[getLiteralType getLiteralText]}
+regexp ::= '#' <<nospace>> string {extends=literal}
+access ::= ('.' | '.-') symbol
+left access_left ::= !<<space>> '.'
+constructor ::= '#' skip symbol skip form
+metadata ::= ("^" | "#^") (string | symbol | keyword | map)
+reader_macro ::= "'" | "~" | "~@" | "@" | "`" | "#'" | "#=" | symbolic_value | reader_cond | map_ns_prefix
+private symbolic_value ::= '##' &sym {pin=1}
+private reader_cond ::= ('#?' | '#?@') &'(' {pin(".*")=1}
+private map_ns_prefix ::= "#:" (':' <<nospace>> symbol_plain
+  | alias_condition '::' <<nospace>> symbol_plain
+  | '::' ) &'{'
+  {pin(".*")=1}
+private alias_condition ::= &('::' sym)
+
+private meta items ::= <<items_entry <<recover>> <<param>>>> * {recoverWhile="<<recover>>"}
+private meta items_entry ::= (not_eof <<recover>>) (commented | <<param>>) {pin=1 recoverWhile=form_recover}
+private list_body ::= <<items !')' form>>
+private set_body ::= <<items !'}' form>>
+private vec_body ::= <<items !']' form>>
+private map_body ::= <<items !'}' map_entry>>
+private map_entry ::=  form skip form {pin=2}
