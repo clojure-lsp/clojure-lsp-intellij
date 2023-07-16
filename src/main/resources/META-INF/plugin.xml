@@ -10,16 +10,7 @@
                   implementationClass="com.github.clojure_lsp.intellij.ClojureFileType" fieldName="INSTANCE"/>
 
         <!-- syntax parse -->
-        <!-- <projectService serviceImplementation="org.intellij.clojure.psi.impl.ClojureDefinitionService" /> -->
-        <!-- <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureNSIndex"/> -->
-        <!-- <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureDefIndex"/> -->
-        <!-- <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureDefFqnIndex"/> -->
-        <!-- <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureKeywordIndex"/> -->
-        <!-- <fileBasedIndex implementation="org.intellij.clojure.psi.impl.ClojureKeywordFqnIndex"/> -->
-        <!-- <lang.parserDefinition language="Clojure" implementationClass="org.intellij.clojure.parser.ClojureParserDefinition"/> -->
-
-        <!-- <lang.ast.factory language="Clojure" implementationClass="com.github.clojure_lsp.intellij.language.parser.ClojureASTFactory" /> -->
-
+        <lang.parserDefinition language="Clojure" implementationClass="com.github.clojure_lsp.intellij.language.parser.ClojureParserDefinition"/>
         <lang.syntaxHighlighterFactory language="Clojure" implementationClass="com.github.clojure_lsp.intellij.extension.SyntaxHighlighter"/>
 
         <!-- LSP -->

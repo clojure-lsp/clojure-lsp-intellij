@@ -17,10 +17,14 @@
 
 package com.github.clojure_lsp.intellij.language.psi
 
+import com.intellij.extapi.psi.PsiFileBase
+import com.intellij.lang.Language
+import com.intellij.psi.*
 import com.intellij.psi.impl.source.tree.LeafPsiElement
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.ILeafElementType
 import com.github.clojure_lsp.intellij.ClojureLanguage
+import com.github.clojure_lsp.intellij.ClojureFileType
 
 interface ClojureElementType
 class ClojureTokenType(name: String) : IElementType(name, ClojureLanguage), ILeafElementType {
@@ -28,3 +32,12 @@ class ClojureTokenType(name: String) : IElementType(name, ClojureLanguage), ILea
 }
 class ClojureNodeType(name: String) : IElementType(name, ClojureLanguage), ClojureElementType
 class CToken(tokenType: ClojureTokenType, text: CharSequence) : LeafPsiElement(tokenType, text)
+
+open class CFileImpl(viewProvider: FileViewProvider, language: Language) :
+    PsiFileBase(viewProvider, language), PsiFile {
+
+  override fun getFileType() = ClojureFileType
+  override fun toString() = "${javaClass.simpleName}:$name"
+}
+
+interface CElement : NavigatablePsiElement {}

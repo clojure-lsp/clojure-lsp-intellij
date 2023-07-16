@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface CForm extends PsiElement {
+public interface CForm extends CElement {
 
   //WARNING: form(...) is skipped
   //matching form(CForm, ...)

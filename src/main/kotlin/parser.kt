@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016-present Greg Shrago
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.github.clojure_lsp.intellij.language.parser
 
 import com.intellij.lang.*
@@ -13,10 +30,8 @@ import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.TokenSet
 import com.github.clojure_lsp.intellij.ClojureTokens
 import com.github.clojure_lsp.intellij.language.psi.ClojureTypes.*
+import com.github.clojure_lsp.intellij.language.psi.CFileImpl
 
-/**
- * @author gregsh
- */
 class ClojureLexer(language: Language) : LookAheadLexer(FlexAdapter(_ClojureLexer(language))) {
   override fun lookAhead(baseLexer: Lexer) {
     val tokenType0 = baseLexer.tokenType
@@ -82,5 +97,40 @@ class ClojureParserUtil {
       val type = b.tokenType
       return ClojureTokens.PAREN2_ALIKE.contains(type) || !RECOVER_SET.contains(type)
     }
+  }
+}
+
+class ClojureParserDefinition : ClojureParserDefinitionBase() {
+  override fun getFileNodeType() = ClojureTokens.CLJ_FILE_TYPE
+}
+
+abstract class ClojureParserDefinitionBase : ParserDefinition {
+
+  override fun createLexer(project: Project?) = ClojureLexer(fileNodeType.language)
+  override fun createParser(project: Project?) = ClojureParser()
+  override fun createFile(viewProvider: FileViewProvider) = CFileImpl(viewProvider, fileNodeType.language)
+  override fun createElement(node: ASTNode?) = Factory.createElement(node)
+
+  override fun getStringLiteralElements() = ClojureTokens.STRINGS
+  override fun getWhitespaceTokens() = ClojureTokens.WHITESPACES
+  override fun getCommentTokens() = ClojureTokens.COMMENTS
+
+  override fun spaceExistanceTypeBetweenTokens(left: ASTNode, right: ASTNode): ParserDefinition.SpaceRequirements {
+    val lt = left.elementType
+    val rt = right.elementType
+    if (rt == C_COMMA || ClojureTokens.MACROS.contains(lt) || ClojureTokens.SHARPS.contains(lt)) {
+      return ParserDefinition.SpaceRequirements.MUST_NOT
+    }
+    if (lt == C_DOT || rt == C_DOT || lt == C_DOTDASH ||
+        lt == C_SLASH && rt == C_SYM ||
+        lt == C_SYM && rt == C_SLASH) {
+      return ParserDefinition.SpaceRequirements.MUST_NOT
+    }
+    for (p in ClojureTokens.BRACE_PAIRS) {
+      if (lt == p.leftBraceType || rt == p.rightBraceType) {
+        return ParserDefinition.SpaceRequirements.MAY
+      }
+    }
+    return ParserDefinition.SpaceRequirements.MUST
   }
 }

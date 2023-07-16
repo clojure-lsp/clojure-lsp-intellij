@@ -10,6 +10,7 @@
   psiClassPrefix='C'
   psiVisitorName='ClojureVisitor'
 
+  implements='com.github.clojure_lsp.intellij.language.psi.CElement'
 
   elementTypeHolderClass='com.github.clojure_lsp.intellij.language.psi.ClojureTypes'
   elementTypeClass="com.github.clojure_lsp.intellij.language.psi.ClojureNodeType"
