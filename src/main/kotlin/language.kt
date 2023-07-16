@@ -30,7 +30,7 @@ import com.github.clojure_lsp.intellij.language.psi.ClojureTypes.*
 object ClojureLanguage : Language("Clojure")
 
 object ClojureFileType : LanguageFileType(ClojureLanguage) {
-  override fun getIcon() = Icons.ClojureFile
+  override fun getIcon() = Icons.CLOJURE
   override fun getName() = "Clojure"
   override fun getDefaultExtension() = "clj"
   override fun getDescription() = "Clojure, ClojureScript and ClojureDart"

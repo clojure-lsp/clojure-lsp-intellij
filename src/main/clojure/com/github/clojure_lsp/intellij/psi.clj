@@ -82,7 +82,7 @@
         nil)
       (putUserData [_ _ _])
 
-      (getIcon [_ _] Icons/ClojureFile)
+      (getIcon [_ _] Icons/CLOJURE)
 
       NavigationItem
       (getName [_] name)

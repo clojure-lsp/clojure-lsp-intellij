@@ -13,10 +13,8 @@
    [com.intellij.openapi.project Project]
    [com.intellij.openapi.ui.popup JBPopupFactory JBPopupFactory$ActionSelectionAid]
    [com.intellij.openapi.vfs VirtualFile]
-   [com.intellij.openapi.wm StatusBarWidgetFactory]
    [com.intellij.openapi.wm StatusBarWidget]
-   [com.intellij.openapi.wm.impl.status EditorBasedStatusBarPopup EditorBasedStatusBarPopup$WidgetState]
-   [com.intellij.openapi.wm.impl.status.widget StatusBarWidgetSettings StatusBarWidgetsManager]))
+   [com.intellij.openapi.wm.impl.status EditorBasedStatusBarPopup EditorBasedStatusBarPopup$WidgetState]))
 
 (set! *warn-on-reflection* true)
 
@@ -36,7 +34,7 @@
 
 (defn -disposeWidget [_ _])
 
-(defn ^:private refresh-status-bar [^Project project]
+(defn ^:private refresh-status-bar [^Project _project]
   ;; TODO Not properly refreshing status bar
   #_(let [manager-service ^StatusBarWidgetsManager (.getService project StatusBarWidgetsManager)
           settings-service ^StatusBarWidgetSettings (.getService project StatusBarWidgetSettings)
@@ -67,8 +65,8 @@
              #_(reset! current-status-bar* nil))
     (getWidgetState [_this ^VirtualFile _file]
                     (let [_icon ^Icon (if (identical? :connected (:status @db/db*))
-                                        (Icons/StatusConnected)
-                                        (Icons/StatusDisconnected))
+                                        (Icons/STATUS_CONNECTED)
+                                        (Icons/STATUS_DISCONNECTED))
                           widget-state ^EditorBasedStatusBarPopup$WidgetState (proxy+ ["Clojure LSP actions" "LSP" true] EditorBasedStatusBarPopup$WidgetState)]
                       ;; TODO check how add icon
                       ;; (.setIcon widget-state icon)
