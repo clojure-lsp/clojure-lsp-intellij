@@ -12,6 +12,7 @@
         <!-- syntax parse -->
         <lang.parserDefinition language="Clojure" implementationClass="com.github.clojure_lsp.intellij.language.parser.ClojureParserDefinition"/>
         <lang.syntaxHighlighterFactory language="Clojure" implementationClass="com.github.clojure_lsp.intellij.extension.SyntaxHighlighter"/>
+        <colorSettingsPage implementation="com.github.clojure_lsp.intellij.extension.ColorSettingsPage"/>
 
         <!-- LSP -->
         <postStartupActivity
