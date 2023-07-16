@@ -44,30 +44,31 @@ import com.github.clojure_lsp.intellij.ClojureLanguage
 import com.github.clojure_lsp.intellij.language.parser.ClojureLexer
 import com.github.clojure_lsp.intellij.language.psi.ClojureTypes.*
 
+// TODO migrate to clojure extension in com.github.clojure-lsp.intellij.extension.syntax-highlighter
 object ClojureColors {
   @JvmField val LINE_COMMENT = createTextAttributesKey("C_LINE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
   @JvmField val FORM_COMMENT = createTextAttributesKey("C_FORM_COMMENT")
   @JvmField val STRING = createTextAttributesKey("C_STRING", DefaultLanguageHighlighterColors.STRING)
   @JvmField val CHARACTER = createTextAttributesKey("C_CHARACTER", DefaultLanguageHighlighterColors.STRING)
-  @JvmField val NUMBER = createTextAttributesKey("C_NUMBER", DefaultLanguageHighlighterColors.NUMBER)
-  @JvmField val KEYWORD = createTextAttributesKey("C_KEYWORD", DefaultLanguageHighlighterColors.METADATA)
+  @JvmField val NUMBER = createTextAttributesKey("C_NUMBER", DefaultLanguageHighlighterColors.METADATA)
+  @JvmField val KEYWORD = createTextAttributesKey("C_KEYWORD", DefaultLanguageHighlighterColors.NUMBER)
   @JvmField val SYMBOL = createTextAttributesKey("C_SYMBOL", DefaultLanguageHighlighterColors.IDENTIFIER)
-  @JvmField val BOOLEAN = createTextAttributesKey("C_BOOLEAN", DefaultLanguageHighlighterColors.KEYWORD)
-  @JvmField val NIL = createTextAttributesKey("C_NIL", DefaultLanguageHighlighterColors.KEYWORD)
+  @JvmField val BOOLEAN = createTextAttributesKey("C_BOOLEAN", DefaultLanguageHighlighterColors.NUMBER)
+  @JvmField val NIL = createTextAttributesKey("C_NIL", DefaultLanguageHighlighterColors.NUMBER)
   @JvmField val CALLABLE = createTextAttributesKey("C_CALLABLE", DefaultLanguageHighlighterColors.KEYWORD)
 
   @JvmField val COMMA = createTextAttributesKey("C_COMMA", DefaultLanguageHighlighterColors.COMMA)
-  @JvmField val DOT = createTextAttributesKey("C_DOT", DefaultLanguageHighlighterColors.KEYWORD)
-  @JvmField val SLASH = createTextAttributesKey("C_SLASH", DefaultLanguageHighlighterColors.DOT)
-  @JvmField val QUOTE = createTextAttributesKey("C_QUOTE", DefaultLanguageHighlighterColors.STRING)
-  @JvmField val SYNTAX_QUOTE = createTextAttributesKey("C_SYNTAX_QUOTE", DefaultLanguageHighlighterColors.OPERATION_SIGN)
+  @JvmField val DOT = createTextAttributesKey("C_DOT", DefaultLanguageHighlighterColors.COMMA)
+  @JvmField val SLASH = createTextAttributesKey("C_SLASH", DefaultLanguageHighlighterColors.COMMA)
+  @JvmField val QUOTE = createTextAttributesKey("C_QUOTE", DefaultLanguageHighlighterColors.IDENTIFIER)
+  @JvmField val SYNTAX_QUOTE = createTextAttributesKey("C_SYNTAX_QUOTE", DefaultLanguageHighlighterColors.IDENTIFIER)
   @JvmField val UNQUOTE = createTextAttributesKey("C_UNQUOTE", DefaultLanguageHighlighterColors.OPERATION_SIGN)
   @JvmField val DEREF = createTextAttributesKey("C_DEREF", DefaultLanguageHighlighterColors.OPERATION_SIGN)
   @JvmField val PARENS = createTextAttributesKey("C_PARENS", DefaultLanguageHighlighterColors.PARENTHESES)
   @JvmField val BRACES = createTextAttributesKey("C_BRACES", DefaultLanguageHighlighterColors.BRACES)
   @JvmField val BRACKETS = createTextAttributesKey("C_BRACKETS", DefaultLanguageHighlighterColors.BRACKETS)
 
-  @JvmField val QUOTED_SYM = createTextAttributesKey("C_QUOTED_SYM", DefaultLanguageHighlighterColors.STRING)
+  @JvmField val QUOTED_SYM = createTextAttributesKey("C_QUOTED_SYM", DefaultLanguageHighlighterColors.IDENTIFIER)
   @JvmField val METADATA = createTextAttributesKey("C_METADATA")
   @JvmField val READER_MACRO = createTextAttributesKey("C_READER_MACRO")
   @JvmField val DATA_READER = createTextAttributesKey("C_DATA_READER", DefaultLanguageHighlighterColors.LABEL)
@@ -76,14 +77,14 @@ object ClojureColors {
   @JvmField val LET_BINDING = createTextAttributesKey("C_LET_BINDING", DefaultLanguageHighlighterColors.LOCAL_VARIABLE)
   @JvmField val TYPE_FIELD = createTextAttributesKey("C_TYPE_FIELD", DefaultLanguageHighlighterColors.INSTANCE_FIELD)
   @JvmField val NAMESPACE = createTextAttributesKey("C_NAMESPACE", DefaultLanguageHighlighterColors.IDENTIFIER)
-  @JvmField val ALIAS = createTextAttributesKey("C_ALIAS", DefaultLanguageHighlighterColors.IDENTIFIER)
+  @JvmField val ALIAS = createTextAttributesKey("C_ALIAS", DefaultLanguageHighlighterColors.INSTANCE_FIELD)
   @JvmField val DYNAMIC = createTextAttributesKey("C_DYNAMIC", DefaultLanguageHighlighterColors.PREDEFINED_SYMBOL)
 
-  @JvmField val JAVA_CLASS = createTextAttributesKey("C_JAVA_CLASS", DefaultLanguageHighlighterColors.CLASS_NAME)
-  @JvmField val JAVA_STATIC_METHOD = createTextAttributesKey("C_JAVA_STATIC_METHOD", DefaultLanguageHighlighterColors.STATIC_METHOD)
-  @JvmField val JAVA_STATIC_FIELD = createTextAttributesKey("C_JAVA_STATIC_FIELD", DefaultLanguageHighlighterColors.STATIC_FIELD)
-  @JvmField val JAVA_INSTANCE_FIELD = createTextAttributesKey("C_JAVA_INSTANCE_FIELD", DefaultLanguageHighlighterColors.INSTANCE_FIELD)
-  @JvmField val JAVA_INSTANCE_METHOD = createTextAttributesKey("C_JAVA_INSTANCE_METHOD", DefaultLanguageHighlighterColors.INSTANCE_METHOD)
+  @JvmField val JAVA_CLASS = createTextAttributesKey("C_JAVA_CLASS", DefaultLanguageHighlighterColors.INSTANCE_FIELD)
+  @JvmField val JAVA_STATIC_METHOD = createTextAttributesKey("C_JAVA_STATIC_METHOD", DefaultLanguageHighlighterColors.IDENTIFIER)
+  @JvmField val JAVA_STATIC_FIELD = createTextAttributesKey("C_JAVA_STATIC_FIELD", DefaultLanguageHighlighterColors.IDENTIFIER)
+  @JvmField val JAVA_INSTANCE_FIELD = createTextAttributesKey("C_JAVA_INSTANCE_FIELD", DefaultLanguageHighlighterColors.IDENTIFIER)
+  @JvmField val JAVA_INSTANCE_METHOD = createTextAttributesKey("C_JAVA_INSTANCE_METHOD", DefaultLanguageHighlighterColors.IDENTIFIER)
 
   @JvmField val NS_COLORS: Map<String, TextAttributes> = ConcurrentHashMap()
 }

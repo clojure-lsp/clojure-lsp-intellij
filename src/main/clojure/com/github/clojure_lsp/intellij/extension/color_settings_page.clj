@@ -108,7 +108,7 @@ nil
 :keyword
 
 <form-comment>(<call>comment</call>
-  (<call>some-function</call> 1 <keyword>:foo</keyword> <str>\"bar\"</str>)</form-comment>
+  (<call>some-function</call> 1 <keyword>:foo</keyword> <str>\"bar\"</str>))</form-comment>
 
 (defn ^{<keyword>:deprecated</keyword> <str>\"2.0\"</str>} <def>do-something</def>
   [<fn-arg>local-a</fn-arg> <fn-arg>local-b</fn-arg>]
