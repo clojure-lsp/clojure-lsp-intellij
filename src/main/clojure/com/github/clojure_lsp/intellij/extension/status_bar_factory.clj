@@ -65,8 +65,8 @@
              #_(reset! current-status-bar* nil))
     (getWidgetState [_this ^VirtualFile _file]
                     (let [_icon ^Icon (if (identical? :connected (:status @db/db*))
-                                        (Icons/STATUS_CONNECTED)
-                                        (Icons/STATUS_DISCONNECTED))
+                                        Icons/STATUS_CONNECTED
+                                        Icons/STATUS_DISCONNECTED)
                           widget-state ^EditorBasedStatusBarPopup$WidgetState (proxy+ ["Clojure LSP actions" "LSP" true] EditorBasedStatusBarPopup$WidgetState)]
                       ;; TODO check how add icon
                       ;; (.setIcon widget-state icon)
