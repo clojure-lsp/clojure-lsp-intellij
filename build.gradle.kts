@@ -1,12 +1,11 @@
 import org.jetbrains.changelog.markdownToHTML
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
-    `kotlin-dsl`
+    id("org.jetbrains.kotlin.jvm") version "1.9.0"
     id("dev.clojurephant.clojure") version "0.7.0"
-    id("org.jetbrains.intellij") version "1.13.3"
+    id("org.jetbrains.intellij") version "1.15.0"
     id("org.jetbrains.changelog") version "1.3.1"
     id("org.jetbrains.grammarkit") version "2022.3.1"
 }
@@ -69,10 +68,19 @@ tasks.register("classpath") {
     println(clojureClasspath.plus(classpath).joinToString(":"))
 }
 
+java {
+    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_17
+}
+
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = properties("javaVersion")
-        kotlinOptions.freeCompilerArgs = listOf("-Xjvm-default=all")
+        kotlinOptions {
+            jvmTarget = "17"
+            apiVersion = "1.5"
+            languageVersion = "1.5"
+            freeCompilerArgs = listOf("-Xjvm-default=all")
+        }
     }
 
     wrapper {
