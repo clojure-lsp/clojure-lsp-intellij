@@ -27,11 +27,11 @@ import com.intellij.psi.tree.TokenSet
 import com.github.clojure_lsp.intellij.Icons
 import com.github.clojure_lsp.intellij.language.psi.ClojureTypes.*
 
-object ClojureLanguage : Language("Clojure")
+object ClojureLanguage : Language("clojure")
 
 object ClojureFileType : LanguageFileType(ClojureLanguage) {
   override fun getIcon() = Icons.CLOJURE
-  override fun getName() = "Clojure"
+  override fun getName() = "clojure"
   override fun getDefaultExtension() = "clj"
   override fun getDescription() = "Clojure, ClojureScript and ClojureDart"
 }
