@@ -1,18 +1,16 @@
 # clojure-lsp-intellij
 
-## IN DEVELOPMENT
+Free OpenSource Intellij plugin which has the LSP server [clojure-lsp](https://clojure-lsp.io/) built-in to provide features using static analysis.
 
-This plugin is still in development and it's not expected to be functional yet, when in a usable stage we should release alpha versions.
-
-Also, it doesn't use IntelliJ's LSP support for 2 reasons:
-  - The LSP feature is only available for Ultimate Edition (paid edition), making this plugin only available for those editions
+It doesn't use IntelliJ's LSP support for 2 reasons:
+  - The LSP feature is only available for Ultimate Edition (paid edition), making this plugin only available for those editions.
   - The LSP feature is pretty alpha, missing some features yet, some that were already implemented in this plugin.
 
 ---
 
 <!-- Plugin description -->
 
-Plugin with support for Clojure & ClojureScript development via Language Server (LSP)
+Free OpenSource Plugin with support for Clojure & ClojureScript development via Language Server (LSP)
 
 <!-- Plugin description end -->
 
@@ -106,8 +104,8 @@ or
 `./gradlew buildPlugin` to build the plugin, then install it from disk in Intellij, the zip should be on `./build/distributions/*.zip`.
 
 
-## NREPL
+### NREPL
 
-Unless you need to edit some generated extension or java class, mostly clojure code is editable via repl while your plugin is running.
+Unless you need to edit some generated extension file or kotlin file, mostly clojure code is editable via repl while your plugin is running.
 
 NREPL is included in the plugin during development, so you can jack in and edit most of the plugin behavior while running it.
