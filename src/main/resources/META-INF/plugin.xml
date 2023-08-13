@@ -14,33 +14,33 @@
         <lang.syntaxHighlighterFactory language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.SyntaxHighlighter"/>
         <colorSettingsPage implementation="com.github.clojure_lsp.intellij.extension.ColorSettingsPage"/>
 
-        <!-- LSP -->
+        <!-- LSP features -->
         <postStartupActivity
             implementation="com.github.clojure_lsp.intellij.extension.Startup"/>
-
         <statusBarWidgetFactory
             id="ClojureLSPStatusBar"
             displayName="Clojure LSP"
             order="first"
             implementation="com.github.clojure_lsp.intellij.extension.StatusBarFactory" />
-
         <editorFactoryDocumentListener
             implementation="com.github.clojure_lsp.intellij.listener.FileListener"/>
-
         <externalAnnotator language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.Annotator" />
-
         <documentationProvider implementationClass="com.github.clojure_lsp.intellij.extension.Documentation"
                                language="clojure" order="first"/>
-
         <formattingService implementation="com.github.clojure_lsp.intellij.extension.Formatting"/>
-
         <codeInsight.inlayProvider
             language="clojure"
             isEnabledByDefault="true"
             implementationClass="com.github.clojure_lsp.intellij.extension.CodeLensProvider"/>
 
+        <!-- misc -->
         <spellchecker.bundledDictionaryProvider implementation="com.github.clojure_lsp.intellij.extension.BundledDictionaryProvider"/>
-
+        <applicationService serviceImplementation="com.github.clojure_lsp.intellij.extension.SettingsState"/>
+        <applicationConfigurable
+            parentId="tools"
+            instance="com.github.clojure_lsp.intellij.extension.GeneralSettingsConfigurable"
+            id="com.github.clojure_lsp.intellij.extension.GeneralSettingsConfigurable"
+            displayName="Clojure LSP"/>
     </extensions>
 
     <actions>

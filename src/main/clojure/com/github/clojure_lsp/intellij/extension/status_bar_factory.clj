@@ -49,6 +49,7 @@
     (update [_ _event])
 
     (actionPerformed [_ _event]
+                     (server/shutdown!)
                      (server/spawn-server! project))))
 
 (defn -post-init [_this]

@@ -24,7 +24,7 @@
                                             :output-ch output-ch
                                             :log-ch log-ch
                                             :trace-ch log-ch
-                                            :trace-level "verbose"})
+                                            :trace-level (-> @db/db* :settings :trace-level)})
         client (lsp-client/client server)]
     (swap! db/db* assoc
            :server server
@@ -49,3 +49,6 @@
        (swap! db/db* assoc :status :connected)
        (run! #(% :connected) (:on-status-changed-fns @db/db*))
        (logger/info "Initialized LSP server...")))))
+
+(defn shutdown! []
+  @(lsp-client/request! (:client @db/db*) [:shutdown {}]))

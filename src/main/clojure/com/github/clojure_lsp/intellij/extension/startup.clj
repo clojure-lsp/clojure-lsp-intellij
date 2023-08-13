@@ -10,8 +10,9 @@
    :implements [com.intellij.openapi.startup.StartupActivity
                 com.intellij.openapi.project.DumbAware])
   (:import
-   (com.github.clojure_lsp.intellij WithLoader)
-   (com.intellij.openapi.project Project)))
+   [com.github.clojure_lsp.intellij WithLoader]
+   [com.github.clojure_lsp.intellij.extension SettingsState]
+   [com.intellij.openapi.project Project]))
 
 (set! *warn-on-reflection* true)
 
@@ -28,6 +29,7 @@
   (logger/info "Starting clojure-lsp plugin...")
   (start-nrepl-server 6660)
   (swap! db/db* assoc :project project)
+  (db/load-settings-from-state! (SettingsState/get))
   (server/spawn-server! project))
 
 (defmethod lsp-client/progress "lsp-startup" [{:keys [progress-indicator]} {{:keys [title percentage]} :value}]

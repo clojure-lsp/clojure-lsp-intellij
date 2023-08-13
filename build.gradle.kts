@@ -23,15 +23,15 @@ repositories {
 }
 
 dependencies {
-    // implementation ("org.clojure:clojure:1.11.1")
-    // https://clojure.atlassian.net/browse/ASYNC-248
-    implementation ("org.clojure:core.async:1.5.648")
+    implementation ("org.clojure:core.async:1.5.648") {
+        because("issue https://clojure.atlassian.net/browse/ASYNC-248")
+    }
     implementation ("com.github.clojure-lsp:clojure-lsp-standalone:2023.08.06-00.28.06") {
         exclude("org.clojure", "core.async")
     }
     implementation ("com.rpl:proxy-plus:0.0.9")
     implementation ("markdown-clj:markdown-clj:1.11.4")
-    // devDeps
+    // TODO how to add only for development?
     implementation ("nrepl:nrepl:1.0.0")
 }
 
