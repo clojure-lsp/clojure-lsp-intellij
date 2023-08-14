@@ -16,7 +16,7 @@
   (case severity
     1 HighlightSeverity/ERROR
     2 HighlightSeverity/WARNING
-    3 HighlightSeverity/INFO))
+    3 HighlightSeverity/WEAK_WARNING))
 
 (defn -collectInformation
   ([_ psi-file] psi-file)

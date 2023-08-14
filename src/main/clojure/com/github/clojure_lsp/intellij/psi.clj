@@ -81,11 +81,14 @@
       (getUserData [_ _]
         nil)
       (putUserData [_ _ _])
+      (getCopyableUserData [_ _])
+      (putCopyableUserData [_ _ _])
 
       (getIcon [_ _] Icons/CLOJURE)
 
       NavigationItem
       (getName [_] name)
+      (setName [_ _])
       (getPresentation [this]
         (proxy+ [] ItemPresentation
                 (getPresentableText [_] (.getName this))

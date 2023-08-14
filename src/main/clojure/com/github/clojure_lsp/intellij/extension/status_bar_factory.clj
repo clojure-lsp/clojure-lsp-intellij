@@ -52,19 +52,19 @@
                      (server/shutdown!)
                      (server/spawn-server! project))))
 
-(defn -post-init [_this]
+(defn -post-init [_]
   (swap! db/db* update :on-status-changed-fns conj
          (fn [_status]
            (refresh-status-bar (:project @db/db*)))))
 
-(defn -createWidget ^StatusBarWidget [_this ^Project project]
+(defn -createWidget ^StatusBarWidget [this ^Project project]
   (proxy+
    [project false]
     EditorBasedStatusBarPopup
-    (ID [_this] widget-id)
-    (dispose [_this]
+    (ID [_] widget-id)
+    (dispose [_]
              #_(reset! current-status-bar* nil))
-    (getWidgetState [_this ^VirtualFile _file]
+    (getWidgetState [_ ^VirtualFile _file]
                     (let [_icon ^Icon (if (identical? :connected (:status @db/db*))
                                         Icons/STATUS_CONNECTED
                                         Icons/STATUS_DISCONNECTED)
@@ -73,7 +73,7 @@
                       ;; (.setIcon widget-state icon)
                       widget-state))
 
-    (createPopup [_this context]
+    (createPopup [_ context]
                  (let [action-group (doto (DefaultActionGroup.)
                                       (.add (restart-lsp-action project)))]
                    (.createActionGroupPopup
@@ -82,4 +82,6 @@
                     action-group
                     context
                     (JBPopupFactory$ActionSelectionAid/SPEEDSEARCH)
-                    true)))))
+                    true)))
+    (createInstance [_ project]
+                    (-createWidget this project))))
