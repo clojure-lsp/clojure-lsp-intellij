@@ -2,17 +2,15 @@
 
 # clojure-lsp-intellij
 
-Free OpenSource Intellij plugin which has the LSP server [clojure-lsp](https://clojure-lsp.io/) built-in to provide features using static analysis.
+<!-- Plugin description -->
+
+Free OpenSource Intellij plugin with support for Clojure & ClojureScript development via the built-in Language Server (LSP) [clojure-lsp](https://clojure-lsp.io/) providing features via static analysis
+
+<!-- Plugin description end -->
 
 ![Clojure LSP Intellij](images/clojure-lsp-intellij-1.png)
 
 ---
-
-<!-- Plugin description -->
-
-Free OpenSource Plugin with support for Clojure & ClojureScript development via Language Server (LSP)
-
-<!-- Plugin description end -->
 
 ## Rationale
 
