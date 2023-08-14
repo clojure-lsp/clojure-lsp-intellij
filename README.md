@@ -14,11 +14,11 @@ Free OpenSource Plugin with support for Clojure & ClojureScript development via 
 
 <!-- Plugin description end -->
 
-# Rationale
+## Rationale
 
 Intellij is the only mainstream editor with no good, free and dedicated support for LSP, there are already excelent plugins for Clojure like [Cursive](https://cursive-ide.com/) which provides lots of features with REPL support or [ClojureKit](https://github.com/gregsh/Clojure-Kit) which adds basic Clojure support for the language, but none uses clojure-lsp or follows the LSP standard which some users may prefer as some features are only available in clojure-lsp.
 
-Keep in mind that this plugin provides only LSP features which relies on clojure-lsp (and clj-kondo under the hood) static analysis, so no runtime features exists, like REPL integration or support, for that a separated plugin is needed.
+Keep in mind that this plugin provides only LSP features which relies on clojure-lsp (and clj-kondo under the hood) static analysis, so no runtime features exists, like REPL integration or support, for that a separated plugin is needed as it's not possible to use only the REPL part of other plugins like Cursive together with this plugin.
 
 ---
 
