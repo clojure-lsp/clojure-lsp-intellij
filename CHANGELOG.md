@@ -1,6 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## 0.1.1
+
+- Improvements to plugin compatibility
+
+## 0.1.0
 
 - Support `initialize` and subsequent requests.
 - Support `textDocument/didChange`, `textDocument/didClose`, `textDocument/didOpen`.
