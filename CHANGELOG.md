@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-- Support more intellij versions until 2020.
+- Support more intellij versions until 2021.3
 
 ## 0.1.1
 

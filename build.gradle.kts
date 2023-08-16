@@ -7,7 +7,7 @@ plugins {
     id("dev.clojurephant.clojure") version "0.7.0"
     id("org.jetbrains.intellij") version "1.15.0"
     id("org.jetbrains.changelog") version "1.3.1"
-    id("org.jetbrains.grammarkit") version "2022.3.1"
+    id("org.jetbrains.grammarkit") version "2021.2.2"
 }
 
 group = properties("pluginGroup")
@@ -145,7 +145,7 @@ tasks {
     }
 
     generateParser {
-        sourceFile.set(file("src/main/gramar/clojure.bnf"))
+        source.set("src/main/gramar/clojure.bnf")
         targetRoot.set("src/gen")
         pathToParser.set("com/github/clojure_lsp/intellij/language/parser/ClojureParser.java")
         pathToPsiRoot.set("com/github/clojure_lsp/intellij/language/psi")
@@ -153,7 +153,7 @@ tasks {
     }
 
     generateLexer {
-        sourceFile.set(file("src/main/gramar/_ClojureLexer.flex"))
+        source.set("src/main/gramar/_ClojureLexer.flex")
         targetDir.set("src/gen/com/github/clojure_lsp/intellij/language/parser")
         targetClass.set("_ClojureLexer")
     }
