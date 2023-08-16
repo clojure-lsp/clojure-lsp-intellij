@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Support more intellij versions until 2020.
+
 ## 0.1.1
 
 - Improvements to plugin compatibility
