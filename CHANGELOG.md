@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## 0.1.2
 
 - Support more intellij versions until 2021.3
 
