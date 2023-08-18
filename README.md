@@ -103,6 +103,10 @@ Below are all the currently supported LSP capabilities and their implementation 
 
 ---
 
+## Contributing
+
+Contributions are very welcome, check the [issues page](https://github.com/clojure-lsp/clojure-lsp-intellij/issues) for more information about what are good first issues or open an issue describing the desired support.
+
 ## Developing
 
 `./gradlew runIde` to spawn a new Intellij session with the plugin.
@@ -111,14 +115,13 @@ or
 
 `./gradlew buildPlugin` to build the plugin, then install it from disk in Intellij, the zip should be on `./build/distributions/*.zip`.
 
-
 ### NREPL
 
-Unless you need to edit some generated extension file or kotlin file, mostly clojure code is editable via repl while your plugin is running.
+Unless you need to edit some generated extension file or kotlin file, mostly clojure code is editable via repl while your plugin is running!
 
 NREPL is included in the plugin during development, so you can jack in and edit most of the plugin behavior while running it.
 
-## Support the project
+## Support the project 💙
 
-You can help us keep going and improving clojure-lsp-intellij by **[supporting the project](https://github.com/sponsors/clojure-lsp)**, the support helps to keep the project going and being updated and maintained.
+You can help us keep going and improving clojure-lsp-intellij by **[supporting the project](https://github.com/sponsors/clojure-lsp)**, the support helps to keep the project going, updated, and maintained.
 
