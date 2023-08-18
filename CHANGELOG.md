@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.1.4
+
 - Fix LSP startup messages to properly mention the task being done
 
 ## 0.1.3
