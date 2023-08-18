@@ -1,6 +1,5 @@
 (ns com.github.clojure-lsp.intellij.lsp-client
   (:require
-   [borkdude.dynaload :refer [dynaload]]
    [clojure.core.async :as async]
    [clojure.string :as string]
    [com.github.clojure-lsp.intellij.db :as db]
@@ -10,8 +9,6 @@
    [lsp4clj.protocols.endpoint :as protocols.endpoint]))
 
 (set! *warn-on-reflection* true)
-
-(def start-server! (dynaload 'clojure-lsp.server/start-server!))
 
 (defmulti progress (fn [_context {:keys [token]}] token))
 
@@ -127,7 +124,7 @@
     :sent-requests (atom {})}))
 
 (defn start-server-and-client! [server client context]
-  (start-server! server)
+  ((requiring-resolve 'clojure-lsp.server/start-server!) server)
   (logger/info "Finished starting call")
   (protocols.endpoint/start client context)
   (async/go-loop []

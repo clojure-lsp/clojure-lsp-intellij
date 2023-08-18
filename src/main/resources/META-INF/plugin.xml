@@ -1,4 +1,4 @@
-<idea-plugin>
+<idea-plugin require-restart="true">
     <id>com.github.clojure-lsp</id>
     <name>Clojure LSP</name>
     <vendor url="https://github.com/clojure-lsp/clojure-lsp-intellij">clojure-lsp</vendor>

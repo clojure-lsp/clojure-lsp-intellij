@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+## 0.1.3
+
+- Require plugin restart after install because of Clojure load in Classloader.
+
 ## 0.1.2
 
 - Support more intellij versions until 2021.3
