@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix LSP startup messages to properly mention the task being done
+
 ## 0.1.3
 
 - Require plugin restart after install because of Clojure load in Classloader.

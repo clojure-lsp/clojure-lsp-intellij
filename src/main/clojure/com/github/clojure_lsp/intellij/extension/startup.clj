@@ -32,5 +32,5 @@
   (db/load-settings-from-state! (SettingsState/get))
   (server/spawn-server! project))
 
-(defmethod lsp-client/progress "lsp-startup" [{:keys [progress-indicator]} {{:keys [title percentage]} :value}]
-  (tasks/set-progress progress-indicator (str "LSP: " title) percentage))
+(defmethod lsp-client/progress "lsp-startup" [{:keys [progress-indicator]} {{:keys [title message percentage]} :value}]
+  (tasks/set-progress progress-indicator (str "LSP: " (or title message)) percentage))
