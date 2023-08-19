@@ -12,9 +12,7 @@
    [com.intellij.openapi.project Project]))
 
 (def ^:private client-capabilities
-  {:initialization-options {:dependency-scheme "jar"
-                            :hover {:arity-on-same-line? true}}
-   :text-document {:hover {:content-format ["markdown"]}}})
+  {:text-document {:hover {:content-format ["markdown"]}}})
 
 (defn spawn-server! [^Project project]
   (let [log-ch (async/chan (async/sliding-buffer 20))
@@ -44,6 +42,8 @@
        @(lsp-client/request! client [:initialize
                                      {:root-uri (-> (.getBasePath project) io/file .toPath .toUri str)
                                       :work-done-token "lsp-startup"
+                                      :initialization-options {:dependency-scheme "jar"
+                                                               :hover {:arity-on-same-line? true}}
                                       :capabilities client-capabilities}])
        (lsp-client/notify! client [:initialized {}])
        (swap! db/db* assoc :status :connected)

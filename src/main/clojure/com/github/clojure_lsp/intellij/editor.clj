@@ -9,6 +9,7 @@
    [com.intellij.openapi.util TextRange]
    [com.intellij.openapi.util.text StringUtil]
    [com.intellij.openapi.vfs LocalFileSystem]
+   [com.intellij.openapi.vfs VirtualFile]
    [com.intellij.psi PsiManager]))
 
 (set! *warn-on-reflection* true)
@@ -44,3 +45,6 @@
   (.findFile (PsiManager/getInstance project)
              (.findFileByIoFile (LocalFileSystem/getInstance)
                                 (io/file (lsp.shared/uri->filename uri)))))
+
+(defn virtual->psi-file [^VirtualFile v-file ^Project project]
+  (.findFile (PsiManager/getInstance project) v-file))

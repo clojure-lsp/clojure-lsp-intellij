@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Support find defintion of external dependencies. #1
+
 ## 0.1.4
 
 - Fix LSP startup messages to properly mention the task being done
