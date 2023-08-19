@@ -26,7 +26,7 @@
           (reify Computable
             (compute [_]
               (io/make-parents temp-file-path)
-              (let [dir (.findFileByNioPath virtual-file-manager (-> temp-file .getParentFile .toPath))
+              (let [dir (.refreshAndFindFileByNioPath virtual-file-manager (-> temp-file .getParentFile .toPath))
                     file (.createChildData dir nil (.getName temp-file))]
                 (.setBinaryContent file (.getBytes text))
                 true))))))
