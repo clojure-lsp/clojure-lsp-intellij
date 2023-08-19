@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.2.0
+
 - Support find defintion of external dependencies. #1
 
 ## 0.1.4
