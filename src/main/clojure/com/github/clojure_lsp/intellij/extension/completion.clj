@@ -25,20 +25,47 @@
 
 (defn ^:private completion-kind->icon [kind]
   (case (get completion-kinds kind)
-    ;; TODO use proper icons from LSP
-    :function Icons/CLOJURE
-    nil))
+    :class Icons/SYMBOL_CLASS
+    :color Icons/SYMBOL_COLOR
+    :constant Icons/SYMBOL_CONSTANT
+    :constructor Icons/SYMBOL_METHOD
+    :enum-mber Icons/SYMBOL_ENUMERATOR_MEMBER
+    :enum Icons/SYMBOL_ENUMERATOR
+    :event Icons/SYMBOL_EVENT
+    :field Icons/SYMBOL_FIELD
+    :file Icons/SYMBOL_FILE
+    :interface Icons/SYMBOL_INTERFACE
+    :keyword Icons/SYMBOL_KEYWORD
+    :method Icons/SYMBOL_METHOD
+    :function Icons/SYMBOL_METHOD
+    :module Icons/SYMBOL_NAMESPACE
+    :numeric Icons/SYMBOL_NUMERIC
+    :operator Icons/SYMBOL_OPERATOR
+    :property Icons/SYMBOL_PROPERTY
+    :reference Icons/SYMBOL_REFERENCES
+    :snippet Icons/SYMBOL_SNIPPET
+    :string Icons/SYMBOL_STRING
+    :struct Icons/SYMBOL_STRUCTURE
+    :text Icons/SYMBOL_KEY
+    :type-parameter Icons/SYMBOL_PARAMETER
+    :unit Icons/SYMBOL_RULER
+    :value Icons/SYMBOL_ENUMERATOR
+    :variable Icons/SYMBOL_VARIABLE
+    Icons/SYMBOL_MISC))
 
-(defn ^:private completion-item->lookup-element [{:keys [label kind detail]}]
-  (-> (LookupElementBuilder/create label)
-      (.withTypeText (or detail "") true)
-      ;; (.bold)
-      ;; (.strikeout)
-      (.withIcon (completion-kind->icon kind))
-      ;; TODO underline when deprecated
-      ;; (.withItemTextUnderlined true)
-      ;; (.withItemTextItalic true)
-      (.withAutoCompletionPolicy AutoCompletionPolicy/SETTINGS_DEPENDENT)))
+(def tag-number->tag {1 :deprecated})
+
+(defn ^:private completion-item->lookup-element [{:keys [label kind detail tags]}]
+  (cond-> (LookupElementBuilder/create label)
+
+    (some #(identical? :deprecated %) (mapv tag-number->tag tags))
+    (.strikeout)
+
+    :always
+    (->
+     (.withTypeText (or detail "") true)
+     (.withIcon (completion-kind->icon kind))
+     (.withAutoCompletionPolicy AutoCompletionPolicy/SETTINGS_DEPENDENT))))
 
 (defn -fillCompletionVariants [_ ^CompletionParameters params ^CompletionResultSet result]
   (when-let [client (and (identical? :connected (:status @db/db*))
