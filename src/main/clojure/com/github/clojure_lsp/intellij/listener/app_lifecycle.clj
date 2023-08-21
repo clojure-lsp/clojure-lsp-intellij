@@ -10,6 +10,7 @@
 
 (defn -welcomeScreenDisplayed [_])
 (defn -appStarted [_])
+(defn -appStarting [_ _])
 (defn -projectFrameClosed [_])
 (defn -projectOpenFailed [_])
 (defn -appClosing [_])
