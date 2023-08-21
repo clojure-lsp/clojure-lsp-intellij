@@ -38,6 +38,7 @@
         <spellchecker.bundledDictionaryProvider implementation="com.github.clojure_lsp.intellij.extension.BundledDictionaryProvider"/>
         <lang.commenter language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.Commenter"/>
         <lang.quoteHandler language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.QuoteHandler"/>
+        <lang.braceMatcher language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.BraceMatcher"/>
         <applicationService serviceImplementation="com.github.clojure_lsp.intellij.extension.SettingsState"/>
         <applicationConfigurable
             parentId="tools"

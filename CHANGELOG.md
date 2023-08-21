@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add brace matcher for `[]`, `{}` and `()`.
+
 ## 0.3.0
 
 - Add support for comments.
