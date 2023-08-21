@@ -4,6 +4,7 @@
 
 - Add support for comments.
 - Add support for quote handlers.
+- Add support for completion. #2
 
 ## 0.2.0
 

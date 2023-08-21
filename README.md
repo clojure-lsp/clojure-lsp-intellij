@@ -64,7 +64,7 @@ Below are all the currently supported LSP capabilities and their implementation 
 | textDocument/didSave                   |      |                                     |
 | textDocument/didClose                  | √    |                                     |
 | textDocument/publishDiagnostics        | √    |                                     |
-| textDocument/completion                |      |                                     |
+| textDocument/completion                | √    |                                     |
 | completionItem/resolve                 |      |                                     |
 | textDocument/hover                     | √    |                                     |
 | textDocument/signatureHelp             |      |                                     |
