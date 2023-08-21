@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.3.0
+
 - Add support for comments.
 - Add support for quote handlers.
 - Add support for completion. #2
