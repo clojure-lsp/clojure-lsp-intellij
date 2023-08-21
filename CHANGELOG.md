@@ -2,7 +2,8 @@
 
 ## [Unreleased]
 
-- Add brace matcher for `[]`, `{}` and `()`.
+- Add brace matcher for `[]`, `{}` and `()`
+- Fix completion of items with `/`
 
 ## 0.3.0
 

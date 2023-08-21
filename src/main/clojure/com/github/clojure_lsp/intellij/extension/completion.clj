@@ -1,10 +1,10 @@
 (ns com.github.clojure-lsp.intellij.extension.completion
   (:gen-class
-   ;; :post-init post-init
    :name com.github.clojure_lsp.intellij.extension.CompletionContributor
    :extends com.intellij.codeInsight.completion.CompletionContributor
    :exposes-methods {fillCompletionVariants fillCompletionVariantsSuper})
   (:require
+   [clojure.string :as string]
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.clojure-lsp.intellij.logger :as logger]
@@ -56,16 +56,20 @@
 (def tag-number->tag {1 :deprecated})
 
 (defn ^:private completion-item->lookup-element [{:keys [label kind detail tags]}]
-  (cond-> (LookupElementBuilder/create label)
+  (let [normalized-label (if-let [i (string/index-of label "/")]
+                           (subs label (inc i))
+                           label)]
+    (cond-> (LookupElementBuilder/create normalized-label)
 
-    (some #(identical? :deprecated %) (mapv tag-number->tag tags))
-    (.strikeout)
+      (some #(identical? :deprecated %) (mapv tag-number->tag tags))
+      (.strikeout)
 
-    :always
-    (->
-     (.withTypeText (or detail "") true)
-     (.withIcon (completion-kind->icon kind))
-     (.withAutoCompletionPolicy AutoCompletionPolicy/SETTINGS_DEPENDENT))))
+      :always
+      (->
+       (.withTypeText (or detail "") true)
+       (.withPresentableText label)
+       (.withIcon (completion-kind->icon kind))
+       (.withAutoCompletionPolicy AutoCompletionPolicy/SETTINGS_DEPENDENT)))))
 
 (defn -fillCompletionVariants [_ ^CompletionParameters params ^CompletionResultSet result]
   (when-let [client (and (identical? :connected (:status @db/db*))
