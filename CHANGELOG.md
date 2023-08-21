@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- Add support for comments.
+- Add support for quote handlers.
+
 ## 0.2.0
 
 - Support find defintion of external dependencies. #1
