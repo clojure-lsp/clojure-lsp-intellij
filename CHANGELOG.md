@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.5.0
+
 - Add troubleshooting section to 'Tools > Clojure LSP'
 
 ## 0.4.0
