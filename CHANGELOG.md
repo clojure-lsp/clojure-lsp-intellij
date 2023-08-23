@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add troubleshooting section to 'Tools > Clojure LSP'
+
 ## 0.4.0
 
 - Add brace matcher for `[]`, `{}` and `()`

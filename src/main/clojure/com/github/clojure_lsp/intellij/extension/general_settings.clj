@@ -3,50 +3,66 @@
    :name com.github.clojure_lsp.intellij.extension.GeneralSettingsConfigurable
    :implements [com.intellij.openapi.options.Configurable])
   (:require
-   [com.github.clojure-lsp.intellij.db :as db])
+   [clojure.pprint :as pprint]
+   [clojure.walk :as walk]
+   [com.github.clojure-lsp.intellij.db :as db]
+   [com.github.clojure-lsp.intellij.lsp-client :as lsp-client]
+   [seesaw.core :as see]
+   [seesaw.mig :as mig])
   (:import
    [com.github.clojure_lsp.intellij.extension SettingsState]
-   [com.intellij.util.ui FormBuilder]
-   [java.awt Component FlowLayout]
-   [javax.swing JComboBox JLabel JPanel]))
+   [com.intellij.ui IdeBorderFactory]
+   [java.awt Toolkit]
+   [java.awt.datatransfer StringSelection]
+   [javax.swing JComboBox]))
 
 (set! *warn-on-reflection* true)
 
 (defonce ^:private component* (atom nil))
 
-(def ^:private trace-level-id "trace-level")
-(def ^:private settings {trace-level-id ["off" "messages" "verbose"]})
+(def ^:private server-not-started-message "Server not started")
 
-(defn ^:private build-component []
-  (let [trace-combo-box (JComboBox. ^"[Ljava.lang.String;" (into-array String (get settings trace-level-id)))
-        trace-panel (doto (JPanel. (FlowLayout. FlowLayout/LEFT))
-                      (.setAlignmentX Component/LEFT_ALIGNMENT)
-                      (.add (JLabel. "Server trace level"))
-                      (.add trace-combo-box))
-        panel (.getPanel
-               (doto (FormBuilder/createFormBuilder)
-                 (.addComponent trace-panel)
-                 (.addComponentFillVertically (JPanel.) 2)))]
-    (.putClientProperty panel trace-level-id trace-combo-box)
-    panel))
+(defn ^:private build-component [{:keys [server-version log-path] :as server-info}]
+  (mig/mig-panel
+   :items [[(mig/mig-panel :border (IdeBorderFactory/createTitledBorder "Troubleshooting")
+                           :items [[(see/label "Server log path") ""]
+                                   [(see/text :id :server-log
+                                              :columns 30
+                                              :editable? false
+                                              :text (or log-path server-not-started-message)) "wrap"]
+                                   [(see/label "Server version") ""]
+                                   [(see/text :id :server-log
+                                              :columns 30
+                                              :editable? false
+                                              :text (or server-version server-not-started-message)) "wrap"]
+                                   [(see/label "Server trace level (Requires LSP restart)") ""]
+                                   [(see/combobox :id :trace-level :model ["off" "messages" "verbose"]) "wrap"]
+                                   [(see/button :text "Copy server info to clipboard"
+                                                :listen [:action (fn [e]
+                                                                   (.setContents (.getSystemClipboard (Toolkit/getDefaultToolkit))
+                                                                                 (StringSelection. (with-out-str (pprint/pprint server-info)))
+                                                                                 nil)
+                                                                   (see/alert e "Server info copied to clipboard"))]) ""]]) "span"]]))
 
 (defn -createComponent [_]
-  (let [component (build-component)]
+  (let [server-info (when (identical? :connected (:status @db/db*))
+                      (some-> (lsp-client/request! (:client @db/db*) [":clojure/serverInfo/raw" {}])
+                              deref
+                              walk/keywordize-keys))
+        component (build-component server-info)]
     (reset! component* component)
     component))
 
 (defn -getPreferredFocusedComponent [_]
-  (.getClientProperty ^JLabel @component* trace-level-id))
+  (see/select @component* [:#trace-level]))
 
 (defn -isModified [_]
   (let [settings-state (SettingsState/get)
-        component ^JLabel @component*
-        trace-level-combo-box ^JComboBox (.getClientProperty component trace-level-id)]
+        trace-level-combo-box ^JComboBox (see/select @component* [:#trace-level])]
     (not= (.getSelectedItem trace-level-combo-box) (.getTraceLevel settings-state))))
 
 (defn -reset [_]
-  (let [component ^JLabel @component*
-        trace-level-combo-box ^JComboBox (.getClientProperty component trace-level-id)]
+  (let [trace-level-combo-box ^JComboBox (see/select @component* [:#trace-level])]
     (.setSelectedItem trace-level-combo-box (-> @db/db* :settings :trace-level))))
 
 (defn -disposeUIResources [_]
@@ -54,8 +70,7 @@
 
 (defn -apply [_]
   (let [settings-state (SettingsState/get)
-        component ^JLabel @component*
-        trace-level-combo-box ^JComboBox (.getClientProperty component trace-level-id)]
+        trace-level-combo-box ^JComboBox (see/select @component* [:#trace-level])]
     (db/set-trace-level-setting! settings-state (.getSelectedItem trace-level-combo-box))))
 
 (defn -cancel [_])
