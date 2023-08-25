@@ -8,7 +8,7 @@
    [com.github.clojure-lsp.intellij.tasks :as tasks]
    [lsp4clj.server :as lsp4clj.server])
   (:import
-   [com.github.clojure_lsp.intellij WithLoader]
+   [com.github.clojure_lsp.intellij ClojureClassLoader]
    [com.intellij.openapi.project Project]))
 
 (def ^:private client-capabilities
@@ -34,7 +34,7 @@
      project
      "Clojure LSP startup"
      (fn [indicator]
-       (WithLoader/bind)
+       (ClojureClassLoader/bind)
        (tasks/set-progress indicator "LSP: Starting server")
        (lsp-client/start-server-and-client! server client {:progress-indicator indicator})
        (logger/info "Initializing LSP server...")

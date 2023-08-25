@@ -11,7 +11,7 @@
    :implements [com.intellij.openapi.startup.StartupActivity
                 com.intellij.openapi.project.DumbAware])
   (:import
-   [com.github.clojure_lsp.intellij WithLoader]
+   [com.github.clojure_lsp.intellij ClojureClassLoader]
    [com.github.clojure_lsp.intellij.extension SettingsState]
    [com.intellij.openapi.project Project]))
 
@@ -26,7 +26,7 @@
       (logger/warn "No debug nrepl found %s" e))))
 
 (defn -runActivity [_this ^Project project]
-  (WithLoader/bind)
+  (ClojureClassLoader/bind)
   (logger/info "Starting clojure-lsp plugin...")
   (start-nrepl-server 6660)
   (swap! db/db* assoc :project project)

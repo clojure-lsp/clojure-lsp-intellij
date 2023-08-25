@@ -1,6 +1,6 @@
 package com.github.clojure_lsp.intellij
 
-open class WithLoader {
+open class ClojureClassLoader {
     companion object {
         init {
             bind()
@@ -8,7 +8,7 @@ open class WithLoader {
 
         @JvmStatic
         fun bind() {
-            Thread.currentThread().setContextClassLoader(WithLoader::class.java.getClassLoader())
+            Thread.currentThread().setContextClassLoader(ClojureClassLoader::class.java.getClassLoader())
         }
     }
 }

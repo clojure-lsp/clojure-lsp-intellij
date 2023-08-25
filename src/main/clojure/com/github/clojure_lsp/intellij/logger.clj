@@ -1,11 +1,11 @@
 (ns com.github.clojure-lsp.intellij.logger
   (:import
-   (com.github.clojure_lsp.intellij WithLoader)
+   (com.github.clojure_lsp.intellij ClojureClassLoader)
    (com.intellij.openapi.diagnostic Logger)))
 
 (set! *warn-on-reflection* true)
 
-(defonce ^Logger logger (Logger/getInstance WithLoader))
+(defonce ^Logger logger (Logger/getInstance ClojureClassLoader))
 
 (defn ^:private build-msg ^String [messages]
   (str "[CLOJURE-LSP] " (apply format (map str messages))))
