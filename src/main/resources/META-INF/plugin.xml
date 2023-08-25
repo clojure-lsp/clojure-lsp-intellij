@@ -33,6 +33,8 @@
             isEnabledByDefault="true"
             implementationClass="com.github.clojure_lsp.intellij.extension.CodeLensProvider"/>
         <completion.contributor language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.CompletionContributor"/>
+        <notificationGroup id="Clojure LSP notifications"
+                           displayType="BALLOON"/>
 
         <!-- misc -->
         <spellchecker.bundledDictionaryProvider implementation="com.github.clojure_lsp.intellij.extension.BundledDictionaryProvider"/>

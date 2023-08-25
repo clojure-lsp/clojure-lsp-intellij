@@ -7,7 +7,7 @@
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.clojure-lsp.intellij.file-system :as file-system]
-   [com.github.clojure-lsp.intellij.lsp-client :as lsp-client]
+   [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.psi :as psi])
   (:import
    [com.intellij.codeInsight.hint HintManager]

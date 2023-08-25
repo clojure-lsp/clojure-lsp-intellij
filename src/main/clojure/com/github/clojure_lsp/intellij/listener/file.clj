@@ -1,7 +1,7 @@
 (ns com.github.clojure-lsp.intellij.listener.file
   (:require
    [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.clojure-lsp.intellij.lsp-client :as lsp-client])
+   [com.github.clojure-lsp.intellij.client :as lsp-client])
   (:import
    [com.intellij.openapi.editor.event DocumentEvent]
    [com.intellij.openapi.fileEditor FileDocumentManager]

@@ -1,4 +1,4 @@
-(ns com.github.clojure-lsp.intellij.lsp-client
+(ns com.github.clojure-lsp.intellij.client
   (:require
    [clojure.core.async :as async]
    [clojure.string :as string]
@@ -6,14 +6,14 @@
    [com.github.clojure-lsp.intellij.logger :as logger]
    [lsp4clj.coercer :as coercer]
    [lsp4clj.lsp.requests :as lsp.requests]
+   [lsp4clj.lsp.responses :as lsp.responses]
    [lsp4clj.protocols.endpoint :as protocols.endpoint]))
 
 (set! *warn-on-reflection* true)
 
+(defmulti show-message identity)
+(defmulti show-message-request identity)
 (defmulti progress (fn [_context {:keys [token]}] token))
-
-(defmethod progress :default [_ progress]
-  (logger/warn "Unknown progress token %s" progress))
 
 (defn ^:private publish-diagnostics [{:keys [uri diagnostics]}]
   (swap! db/db* assoc-in [:diagnostics uri] diagnostics))
@@ -45,8 +45,7 @@
                    log-ch
                    join
                    request-id
-                   sent-requests
-                   mock-responses]
+                   sent-requests]
   protocols.endpoint/IEndpoint
   (start [this context]
     (protocols.endpoint/log this :white "lifecycle:" "starting")
@@ -102,12 +101,18 @@
                            resp
                            (:result resp))))
       (protocols.endpoint/log this :red "received response for unmatched request:" resp)))
-  (receive-request [this _ req]
-    ;; TODO support receive request
-    (protocols.endpoint/log this :magenta "received request:" req))
+  (receive-request [this _ {:keys [id method params] :as req}]
+    (protocols.endpoint/log this :magenta "received request:" req)
+    (when-let [response-body (case method
+                               "window/showMessageRequest" (show-message-request params)
+                               (logger/warn "Unknown LSP request method %s" method))]
+      (let [resp (lsp.responses/response id response-body)]
+        (protocols.endpoint/log this :magenta "sending response:" resp)
+        resp)))
   (receive-notification [this context {:keys [method params] :as notif}]
     (protocols.endpoint/log this :blue "received notification:" notif)
     (case method
+      "window/showMessage" (show-message params)
       "$/progress" (progress context params)
       "textDocument/publishDiagnostics" (publish-diagnostics params)
 
@@ -120,12 +125,11 @@
     :output (:input-ch server)
     :log-ch (async/chan (async/sliding-buffer 20))
     :join (promise)
-    :request-id (atom 0)
-    :sent-requests (atom {})}))
+    :sent-requests (atom {})
+    :request-id (atom 0)}))
 
 (defn start-server-and-client! [server client context]
   ((requiring-resolve 'clojure-lsp.server/start-server!) server)
-  (logger/info "Finished starting call")
   (protocols.endpoint/start client context)
   (async/go-loop []
     (when-let [log-args (async/<! (:log-ch client))]

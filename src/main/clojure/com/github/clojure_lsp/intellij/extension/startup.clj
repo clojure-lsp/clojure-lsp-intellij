@@ -1,8 +1,9 @@
 (ns com.github.clojure-lsp.intellij.extension.startup
   (:require
+   [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.logger :as logger]
-   [com.github.clojure-lsp.intellij.lsp-client :as lsp-client]
+   [com.github.clojure-lsp.intellij.notification]
    [com.github.clojure-lsp.intellij.server :as server]
    [com.github.clojure-lsp.intellij.tasks :as tasks])
   (:gen-class

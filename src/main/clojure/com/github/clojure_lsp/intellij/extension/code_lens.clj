@@ -6,7 +6,7 @@
    [com.github.clojure-lsp.intellij.action.references :as action.references]
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.editor :as editor]
-   [com.github.clojure-lsp.intellij.lsp-client :as lsp-client]
+   [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.rpl.proxy-plus :refer [proxy+]])
   (:import
    [com.github.clojure_lsp.intellij ClojureLanguage]

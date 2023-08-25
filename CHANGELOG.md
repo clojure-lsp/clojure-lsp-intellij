@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add support for LSP notification window/showMessage and request window/showMessageRequest.
+
 ## 0.5.0
 
 - Add troubleshooting section to 'Tools > Clojure LSP'

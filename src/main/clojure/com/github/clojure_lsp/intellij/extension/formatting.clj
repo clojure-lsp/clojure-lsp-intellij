@@ -4,7 +4,7 @@
    :extends com.intellij.formatting.service.AsyncDocumentFormattingService)
   (:require
    [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.clojure-lsp.intellij.lsp-client :as lsp-client])
+   [com.github.clojure-lsp.intellij.client :as lsp-client])
   (:import
    [com.intellij.formatting.service AsyncDocumentFormattingService$FormattingTask AsyncFormattingRequest]
    [com.intellij.psi PsiFile]

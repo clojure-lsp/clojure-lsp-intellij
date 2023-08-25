@@ -8,7 +8,7 @@
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.clojure-lsp.intellij.logger :as logger]
-   [com.github.clojure-lsp.intellij.lsp-client :as lsp-client])
+   [com.github.clojure-lsp.intellij.client :as lsp-client])
   (:import
    [com.github.clojure_lsp.intellij Icons]
    [com.intellij.codeInsight.completion CompletionParameters CompletionResultSet]
