@@ -5,8 +5,8 @@
   (:require
    [clojure.pprint :as pprint]
    [clojure.walk :as walk]
-   [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
+   [com.github.clojure-lsp.intellij.db :as db]
    [seesaw.core :as see]
    [seesaw.mig :as mig])
   (:import

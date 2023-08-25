@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Add support for LSP notification window/showMessage and request window/showMessageRequest.
+- Improve status bar to show icon instead of text.
 
 ## 0.5.0
 
