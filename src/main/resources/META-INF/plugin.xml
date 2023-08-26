@@ -28,6 +28,8 @@
         <documentationProvider implementationClass="com.github.clojure_lsp.intellij.extension.Documentation"
                                language="clojure" order="first"/>
         <formattingService implementation="com.github.clojure_lsp.intellij.extension.Formatting"/>
+        <renamePsiElementProcessor implementation="com.github.clojure_lsp.intellij.extension.RenameProcessor"/>
+        <renameHandler implementation="com.github.clojure_lsp.intellij.extension.RenameHandler"/>
         <codeInsight.inlayProvider
             language="clojure"
             isEnabledByDefault="true"

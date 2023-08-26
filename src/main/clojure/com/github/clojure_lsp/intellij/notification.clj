@@ -1,5 +1,6 @@
 (ns com.github.clojure-lsp.intellij.notification
   (:require
+   [com.github.clojure-lsp.intellij.application-manager :as app-manager]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.logger :as logger]
@@ -25,19 +26,14 @@
       (.notify ^Project (:project @db/db*))))
 
 (defmethod lsp-client/show-message-request :default [{:keys [_type message actions]}]
-  (let [p (promise)]
-    (.invokeLater
-     (ApplicationManager/getApplication)
-     (reify Runnable
-       (run [_]
-         (deliver p (see/input message
-                               :title "Clojure LSP"
-                               :type :question
-                               :icon Icons/CLOJURE
-                               :choices actions
-                               :to-string :title))))
-     (ModalityState/any))
-    @p))
+  @(app-manager/invoke-later!
+    (fn []
+      (see/input message
+                 :title "Clojure LSP"
+                 :type :question
+                 :icon Icons/CLOJURE
+                 :choices actions
+                 :to-string :title))))
 
 (comment
   (lsp-client/show-message-request {:type 1 :message "some really long message here to expand the screen and break\nasd\nas"

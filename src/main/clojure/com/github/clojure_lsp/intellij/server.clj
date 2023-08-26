@@ -12,7 +12,8 @@
    [com.intellij.openapi.project Project]))
 
 (def ^:private client-capabilities
-  {:text-document {:hover {:content-format ["markdown"]}}})
+  {:text-document {:hover {:content-format ["markdown"]}}
+   :workspace {:workspace-edit {:document-changes true}}})
 
 (defn spawn-server! [^Project project]
   (let [log-ch (async/chan (async/sliding-buffer 20))

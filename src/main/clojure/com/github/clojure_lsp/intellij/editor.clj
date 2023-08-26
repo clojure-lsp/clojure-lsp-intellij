@@ -1,7 +1,8 @@
 (ns com.github.clojure-lsp.intellij.editor
   (:require
    [clojure-lsp.shared :as lsp.shared]
-   [clojure.java.io :as io])
+   [clojure.java.io :as io]
+   [com.github.clojure-lsp.intellij.application-manager :as app-manager])
   (:import
    [com.intellij.openapi.editor Document Editor]
    [com.intellij.openapi.fileEditor FileDocumentManager]
@@ -51,3 +52,19 @@
 
 (defn virtual->psi-file [^VirtualFile v-file ^Project project]
   (.findFile (PsiManager/getInstance project) v-file))
+
+(defn apply-workspace-edit ^boolean
+  [^Project project {:keys [document-changes]}]
+  ;; TODO Handle resourceOperations like creating, renaming and deleting files
+  ;; TODO Improve to check version to known if file changed
+  (doseq [{{:keys [uri]} :text-document
+           :keys [edits]} document-changes])
+
+  (app-manager/invoke-later!
+   (fn []
+     (app-manager/write-action!
+      (fn []
+        (app-manager/execute-command!
+         "Workspace edits apply"
+         project
+         (fn [])))))))
