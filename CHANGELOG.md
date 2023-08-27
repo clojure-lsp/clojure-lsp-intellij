@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add support for rename feature. #6
+
 ## 0.6.0
 
 - Add support for LSP notification window/showMessage and request window/showMessageRequest.

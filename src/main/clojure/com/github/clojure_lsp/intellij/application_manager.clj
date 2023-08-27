@@ -10,10 +10,9 @@
   (let [p (promise)]
     (.invokeLater
      (ApplicationManager/getApplication)
-     (reify Runnable
-       (run [_]
-         (deliver p (invoke-fn))))
-     (ModalityState/any))
+     (fn []
+       (deliver p (invoke-fn)))
+     (ModalityState/defaultModalityState))
     p))
 
 (defn write-action! [run-fn]
@@ -32,11 +31,10 @@
     (.executeCommand
      (CommandProcessor/getInstance)
      project
-     (reify Runnable
-       (run [_]
-         (let [result (command-fn)]
-           (deliver p result)
-           result)))
+     (fn []
+       (let [result (command-fn)]
+         (deliver p result)
+         result))
      name
      "Clojure LSP"
      UndoConfirmationPolicy/DEFAULT

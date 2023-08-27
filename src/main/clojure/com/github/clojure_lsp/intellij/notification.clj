@@ -8,7 +8,6 @@
   (:import
    [com.github.clojure_lsp.intellij Icons]
    [com.intellij.notification NotificationGroupManager NotificationType]
-   [com.intellij.openapi.application ApplicationManager ModalityState]
    [com.intellij.openapi.project Project]))
 
 (set! *warn-on-reflection* true)
