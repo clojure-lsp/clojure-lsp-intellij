@@ -63,7 +63,7 @@
   (.findFile (PsiManager/getInstance project) v-file))
 
 (defn apply-workspace-edit ^Boolean
-  [^Project project {:keys [document-changes]}]
+  [^Project project label {:keys [document-changes]}]
   ;; TODO Handle resourceOperations like creating, renaming and deleting files
   ;; TODO Improve to check version to known if file changed
   (app-manager/invoke-later!
@@ -71,7 +71,7 @@
      (app-manager/write-action!
       (fn []
         (app-manager/execute-command!
-         "Workspace edits apply"
+         label
          project
          (fn []
            (doseq [{{:keys [uri]} :text-document

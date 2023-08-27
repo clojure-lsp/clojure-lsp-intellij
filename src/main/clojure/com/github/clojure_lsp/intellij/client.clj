@@ -14,6 +14,7 @@
 (defmulti show-message identity)
 (defmulti show-message-request identity)
 (defmulti progress (fn [_context {:keys [token]}] token))
+(defmulti workspace-apply-edit (fn [{:keys [label]}] label))
 
 (defn ^:private publish-diagnostics [{:keys [uri diagnostics]}]
   (swap! db/db* assoc-in [:diagnostics uri] diagnostics))
@@ -105,6 +106,7 @@
     (protocols.endpoint/log this :magenta "received request:" req)
     (when-let [response-body (case method
                                "window/showMessageRequest" (show-message-request params)
+                               "workspace/applyEdit" (workspace-apply-edit params)
                                (logger/warn "Unknown LSP request method %s" method))]
       (let [resp (lsp.responses/response id response-body)]
         (protocols.endpoint/log this :magenta "sending response:" resp)

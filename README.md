@@ -50,7 +50,7 @@ Below are all the currently supported LSP capabilities and their implementation 
 | workspace/didChangeWatchedFiles        |      |                                     |
 | workspace/symbol                       |      |                                     |
 | workspace/executeCommand               |      |                                     |
-| workspace/applyEdit                    |      |                                     |
+| workspace/applyEdit                    | √    |                                     |
 | workspace/willRenameFiles              |      |                                     |
 | workspace/didRenameFiles               |      |                                     |
 | workspace/willCreateFiles              |      |                                     |

@@ -2,7 +2,8 @@
 
 ## [Unreleased]
 
-- Add support for rename feature. #6
+- Add support for textDocument/rename feature. #6
+- Add support for workspace/applyEdit. #7
 
 ## 0.6.0
 

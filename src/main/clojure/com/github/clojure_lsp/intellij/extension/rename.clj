@@ -50,4 +50,4 @@
                                                :position {:line line
                                                           :character character}
                                                :new-name new-name}])
-                (editor/apply-workspace-edit project))))))))
+                (editor/apply-workspace-edit project "LSP Rename"))))))))

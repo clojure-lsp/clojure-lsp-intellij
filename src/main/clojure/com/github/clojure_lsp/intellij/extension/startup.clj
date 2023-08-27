@@ -1,15 +1,14 @@
 (ns com.github.clojure-lsp.intellij.extension.startup
-  (:require
-   [com.github.clojure-lsp.intellij.client :as lsp-client]
-   [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.clojure-lsp.intellij.logger :as logger]
-   [com.github.clojure-lsp.intellij.notification]
-   [com.github.clojure-lsp.intellij.server :as server]
-   [com.github.clojure-lsp.intellij.tasks :as tasks])
   (:gen-class
    :name com.github.clojure_lsp.intellij.extension.Startup
    :implements [com.intellij.openapi.startup.StartupActivity
                 com.intellij.openapi.project.DumbAware])
+  (:require
+   [com.github.clojure-lsp.intellij.client :as lsp-client]
+   [com.github.clojure-lsp.intellij.db :as db]
+   [com.github.clojure-lsp.intellij.logger :as logger]
+   [com.github.clojure-lsp.intellij.server :as server]
+   [com.github.clojure-lsp.intellij.tasks :as tasks])
   (:import
    [com.github.clojure_lsp.intellij ClojureClassLoader]
    [com.github.clojure_lsp.intellij.extension SettingsState]

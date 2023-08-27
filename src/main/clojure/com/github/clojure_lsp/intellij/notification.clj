@@ -34,10 +34,5 @@
                  :choices actions
                  :to-string :title))))
 
-(comment
-  (lsp-client/show-message-request {:type 1 :message "some really long message here to expand the screen and break\nasd\nas"
-                                    :actions [{:title "some action"}
-                                              {:title "another cool action"}]}))
-
 (defmethod lsp-client/progress :default [_ progress]
   (logger/warn "Unknown progress token %s" progress))
