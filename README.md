@@ -86,8 +86,8 @@ Below are all the currently supported LSP capabilities and their implementation 
 | textDocument/formatting                | √    |                                     |
 | textDocument/rangeFormatting           |      |                                     |
 | textDocument/onTypeFormatting          |      |                                     |
-| textDocument/rename                    |      |                                     |
-| textDocument/prepareRename             |      |                                     |
+| textDocument/rename                    | √    |                                     |
+| textDocument/prepareRename             | √    |                                     |
 | textDocument/foldingRange              |      |                                     |
 | textDocument/selectionRange            |      |                                     |
 | textDocument/semanticTokens/full       |      |                                     |
