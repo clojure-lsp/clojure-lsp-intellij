@@ -18,10 +18,11 @@
 (set! *warn-on-reflection* true)
 
 (defn -isAvailableOnDataContext [_ ^DataContext data-context]
-  (let [element (PsiElementRenameHandler/getElement data-context)]
-    (and (.getData data-context CommonDataKeys/EDITOR)
-         (.getData data-context CommonDataKeys/PSI_FILE)
-         (instance? PsiFile element))))
+  (boolean
+   (let [element (PsiElementRenameHandler/getElement data-context)]
+     (and (.getData data-context CommonDataKeys/EDITOR)
+          (.getData data-context CommonDataKeys/PSI_FILE)
+          (instance? PsiFile element)))))
 
 (defn -isRenaming [this data-context]
   (-isAvailableOnDataContext this data-context))
@@ -50,4 +51,4 @@
                                                :position {:line line
                                                           :character character}
                                                :new-name new-name}])
-                (editor/apply-workspace-edit project "LSP Rename"))))))))
+                (editor/apply-workspace-edit project "LSP Rename" true))))))))

@@ -25,6 +25,7 @@ repositories {
 dependencies {
     implementation ("org.clojure:clojure:1.11.1")
     implementation ("seesaw:seesaw:1.5.0")
+    implementation ("camel-snake-kebab:camel-snake-kebab:0.4.3")
     implementation ("org.clojure:core.async:1.5.648") {
         because("issue https://clojure.atlassian.net/browse/ASYNC-248")
     }

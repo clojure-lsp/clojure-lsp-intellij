@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add support for refactorings via workspace/executeCommand. #4
+
 ## 0.7.0
 
 - Add support for textDocument/rename feature. #6

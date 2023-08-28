@@ -69,10 +69,10 @@ Below are all the currently supported LSP capabilities and their implementation 
 | textDocument/hover                     | √    |                                     |
 | textDocument/signatureHelp             |      |                                     |
 | textDocument/declaration               |      |                                     |
-| textDocument/definition                | √    | Custom action: Via Alt + Shift + F6 |
+| textDocument/definition                | √    | Custom action: Via Alt + Shift + F7 |
 | textDocument/typeDefinition            |      |                                     |
 | textDocument/implementation            |      |                                     |
-| textDocument/references                | √    | Custom action: Via Alt + Shift + F7 |
+| textDocument/references                | √    |                                     |
 | textDocument/documentHighlight         |      |                                     |
 | textDocument/documentSymbol            |      |                                     |
 | textDocument/codeAction                |      |                                     |

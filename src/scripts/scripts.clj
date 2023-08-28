@@ -31,3 +31,7 @@
   (shell (str "git tag " tag))
   (shell "git push origin HEAD")
   (shell "git push origin --tags"))
+
+#_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
+(defn build-plugin []
+  (shell "./gradlew buildPlugin"))

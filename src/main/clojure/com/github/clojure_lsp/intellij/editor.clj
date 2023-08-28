@@ -63,7 +63,7 @@
   (.findFile (PsiManager/getInstance project) v-file))
 
 (defn apply-workspace-edit ^Boolean
-  [^Project project label {:keys [document-changes]}]
+  [^Project project label move-caret? {:keys [document-changes]}]
   ;; TODO Handle resourceOperations like creating, renaming and deleting files
   ;; TODO Improve to check version to known if file changed
   (app-manager/invoke-later!
@@ -96,6 +96,7 @@
 
                  :else
                  nil)
-               (.moveToOffset (.getCaretModel editor)
-                              (+ (count new-text) start)))
+               (when move-caret?
+                 (.moveToOffset (.getCaretModel editor)
+                                (+ (count new-text) start))))
              (.saveDocument (FileDocumentManager/getInstance) document)))))))))

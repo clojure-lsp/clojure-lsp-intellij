@@ -5,5 +5,5 @@
    [com.github.clojure-lsp.intellij.editor :as editor]))
 
 (defmethod lsp-client/workspace-apply-edit :default [{:keys [label edit]}]
-  @(editor/apply-workspace-edit (:project @db/db*) label edit)
+  @(editor/apply-workspace-edit (:project @db/db*) label false edit)
   {:applied true})
