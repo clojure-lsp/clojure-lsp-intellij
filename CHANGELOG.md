@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Avoid noisy exception after startup
+
 ## 0.8.0
 
 - Add support for refactorings via workspace/executeCommand. #4

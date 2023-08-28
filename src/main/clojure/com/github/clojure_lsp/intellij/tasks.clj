@@ -16,9 +16,10 @@
               (run-fn indicator)))))
 
 (defn set-progress
-  ([^ProgressIndicator indicator text1]
-   (.setText indicator text1))
-  ([^ProgressIndicator indicator text1 percentage]
-   (.setText indicator text1)
+  ([^ProgressIndicator indicator text]
+   (.setText indicator text)
+   (.setIndeterminate indicator true))
+  ([^ProgressIndicator indicator text percentage]
+   (.setText indicator text)
    (.setIndeterminate indicator false)
    (.setFraction indicator (double (/ percentage 100)))))
