@@ -58,7 +58,7 @@
                 description="Find the defintion of the element at cursor."
                 icon="com.github.clojure_lsp.intellij.Icons.CLOJURE"
                 use-shortcut-of="GotoDeclaration">
-            <!-- TODO why Control+B doesnt work? -->
+            <!-- TODO why Control+B doesnt work/override find declaration? -->
             <keyboard-shortcut first-keystroke="shift alt F7" keymap="$default"/>
             <mouse-shortcut keystroke="ctrl shift button1" keymap="$default"/>
         </action>
@@ -270,14 +270,14 @@
         <!-- groups -->
         <group>
             <add-to-group group-id="EditorPopupMenu.GoTo" anchor="first"/>
+            <add-to-group group-id="GoToMenu" anchor="before" relative-to-action="GotoDeclaration"/>
             <reference ref="ClojureLSP.FindDefinition"/>
             <reference ref="ClojureLSP.FindReferences"/>
             <separator/>
         </group>
 
         <group id="ClojureLSP.Refactors" popup="true" text="Clojure refactors" icon="com.github.clojure_lsp.intellij.Icons.CLOJURE">
-            <!-- TODO not working, why is not added after refactoring menu? -->
-            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="RefactoringMenu"/>
+            <add-to-group group-id="RefactoringMenu" anchor="first"/>
             <reference ref="ClojureLSP.AddMissingImport"/>
             <reference ref="ClojureLSP.AddMissingLibspec"/>
             <reference ref="ClojureLSP.AddRequireSuggestion"/>
