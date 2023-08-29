@@ -35,5 +35,5 @@
 (defmethod lsp-client/progress "lsp-startup" [{:keys [progress-indicator]} {{:keys [title message percentage]} :value}]
   (let [msg (str "LSP: " (or title message))]
     (if percentage
-      (tasks/set-progress progress-indicator msg)
-      (tasks/set-progress progress-indicator msg percentage))))
+      (tasks/set-progress progress-indicator msg percentage)
+      (tasks/set-progress progress-indicator msg))))

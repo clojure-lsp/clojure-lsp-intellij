@@ -49,7 +49,7 @@ Below are all the currently supported LSP capabilities and their implementation 
 | workspace/configuration                |      |                                     |
 | workspace/didChangeWatchedFiles        |      |                                     |
 | workspace/symbol                       |      |                                     |
-| workspace/executeCommand               |      |                                     |
+| workspace/executeCommand               | √    |                                     |
 | workspace/applyEdit                    | √    |                                     |
 | workspace/willRenameFiles              |      |                                     |
 | workspace/didRenameFiles               |      |                                     |
@@ -75,7 +75,7 @@ Below are all the currently supported LSP capabilities and their implementation 
 | textDocument/references                | √    |                                     |
 | textDocument/documentHighlight         |      |                                     |
 | textDocument/documentSymbol            |      |                                     |
-| textDocument/codeAction                |      |                                     |
+| textDocument/codeAction                | √    |                                     |
 | codeAction/resolve                     |      |                                     |
 | textDocument/codeLens                  | √    |                                     |
 | codeLens/resolve                       | √    |                                     |

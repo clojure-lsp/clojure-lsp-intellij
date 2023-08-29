@@ -12,6 +12,7 @@
    :client nil
    :server nil
    :project nil
+   :diagnostics {}
    :settings {:trace-level "off"}})
 
 (defonce db* (atom initial-db))

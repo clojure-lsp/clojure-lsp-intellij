@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Avoid noisy exception after startup
+- Add `textDocument/codeAction` support. #3
 
 ## 0.8.0
 
