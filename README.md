@@ -15,7 +15,6 @@
 
 ---
 
-<hr>
 <p align="center">
   <a href="https://clojure-lsp.io"><strong>homepage</strong></a> •
   <a href="doc/capabilities.md"><strong>capabilities</strong></a> •
