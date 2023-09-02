@@ -19,22 +19,24 @@
 
 (defn -isAvailableOnDataContext [_ ^DataContext data-context]
   (boolean
-   (let [element (PsiElementRenameHandler/getElement data-context)]
-     (and (.getData data-context CommonDataKeys/EDITOR)
-          (.getData data-context CommonDataKeys/PSI_FILE)
-          (instance? PsiFile element)))))
+   (or (and (.getData data-context CommonDataKeys/EDITOR)
+            (.getData data-context CommonDataKeys/PSI_FILE))
+       (let [element (PsiElementRenameHandler/getElement data-context)]
+         (instance? PsiFile element)))))
 
 (defn -isRenaming [this data-context]
   (-isAvailableOnDataContext this data-context))
 
 (defn ^:private prepare-rename-current-name [client ^Editor editor line character]
-  (let [document (.getDocument editor)]
-    (when-let [range @(lsp-client/request! client [:textDocument/prepareRename
-                                                   {:text-document {:uri (editor/editor->uri editor)}
-                                                    :position {:line line
-                                                               :character character}}])]
-      (let [start ^int (editor/position->point (:start range) document)
-            end ^int (editor/position->point (:end range) document)]
+  (let [document (.getDocument editor)
+        response @(lsp-client/request! client [:textDocument/prepareRename
+                                               {:text-document {:uri (editor/editor->uri editor)}
+                                                :position {:line line
+                                                           :character character}}])]
+    (if-let [{:keys [message]} (:error response)]
+      (lsp-client/show-message {:type 1 :message message})
+      (let [start ^int (editor/position->point (:start response) document)
+            end ^int (editor/position->point (:end response) document)]
         (.getText document (TextRange. start end))))))
 
 (defn -invoke

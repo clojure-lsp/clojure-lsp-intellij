@@ -3,6 +3,7 @@
    [clojure-lsp.shared :as lsp.shared]
    [clojure.java.io :as io]
    [com.github.clojure-lsp.intellij.application-manager :as app-manager]
+   [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.editor :as editor])
   (:import
    [com.intellij.openapi.editor Document Editor]
@@ -52,8 +53,12 @@
              (uri->v-file uri)))
 
 (defn uri->editor ^Editor [^String uri ^Project project]
-  (.getEditor ^TextEditor (first (.getAllEditors (FileEditorManager/getInstance project)
-                                                 (uri->v-file uri)))))
+  (let [v-file (uri->v-file uri)
+        file-manager (FileEditorManager/getInstance project)
+        file-editor (if (.isFileOpen file-manager v-file)
+                      (first (.getAllEditors file-manager v-file))
+                      (first (.openFile file-manager v-file false)))]
+    (.getEditor ^TextEditor file-editor)))
 
 (defn editor->uri [^Editor editor]
   ;; TODO sanitize URL, encode, etc
