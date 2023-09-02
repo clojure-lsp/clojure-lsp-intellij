@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add support for `textDocument/didSave` notification.
+
 ## 0.9.0
 
 - Avoid noisy exception after startup

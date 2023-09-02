@@ -36,6 +36,7 @@
         <completion.contributor language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.CompletionContributor"/>
         <notificationGroup id="Clojure LSP notifications"
                            displayType="BALLOON"/>
+        <fileDocumentManagerListener implementation="com.github.clojure_lsp.intellij.extension.FileDocumentManagerListener"/>
         <intentionAction language="clojure"><className>com.github.clojure_lsp.intellij.extension.code_action.AddMissingImport</className></intentionAction>
         <intentionAction language="clojure"><className>com.github.clojure_lsp.intellij.extension.code_action.AddMissingLibspec</className></intentionAction>
         <intentionAction language="clojure"><className>com.github.clojure_lsp.intellij.extension.code_action.AddRequireSuggestion</className></intentionAction>

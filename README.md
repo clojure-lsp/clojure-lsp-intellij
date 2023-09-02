@@ -61,7 +61,7 @@ Below are all the currently supported LSP capabilities and their implementation 
 | textDocument/didChange                 | √    |                                     |
 | textDocument/willSave                  |      |                                     |
 | textDocument/willSaveWaitUntil         |      |                                     |
-| textDocument/didSave                   |      |                                     |
+| textDocument/didSave                   | √    |                                     |
 | textDocument/didClose                  | √    |                                     |
 | textDocument/publishDiagnostics        | √    |                                     |
 | textDocument/completion                | √    |                                     |
