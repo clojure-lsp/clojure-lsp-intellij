@@ -1,16 +1,31 @@
 <img src="images/logo-dark.svg" width="180" align="right">
 
+![JetBrains Plugin Version](https://img.shields.io/jetbrains/plugin/v/com.github.clojure-lsp?style=flat-square&labelColor=0984e3&color=00b894&link=https%3A%2F%2Fplugins.jetbrains.com%2Fplugin%2F22489-clojure-lsp)
+[![Slack community](https://img.shields.io/badge/Slack-chat-blue?style=flat-square)](https://clojurians.slack.com/archives/CPABC1H61)
+
 # clojure-lsp-intellij
 
 <!-- Plugin description -->
 
-Free OpenSource Intellij plugin with support for Clojure & ClojureScript development via the built-in Language Server (LSP) [clojure-lsp](https://clojure-lsp.io/) providing features via static analysis
+[Free OpenSource Intellij plugin](https://github.com/clojure-lsp/clojure-lsp-intellij) with support for Clojure & ClojureScript development via the built-in Language Server (LSP) [clojure-lsp](https://clojure-lsp.io/) providing features via static analysis
 
 <!-- Plugin description end -->
 
 ![Clojure LSP Intellij](images/clojure-lsp-intellij-1.png)
 
 ---
+
+<hr>
+<p align="center">
+  <a href="https://clojure-lsp.io"><strong>homepage</strong></a> •
+  <a href="doc/capabilities.md"><strong>capabilities</strong></a> •
+  <a href="doc/developing.md"><strong>developing</strong></a> •
+  <!-- <a href="https://clojure-lsp.io/features/"><strong>features</strong></a> • -->
+  <!-- <a href="https://clojure-lsp.io/settings"><strong>settings</strong></a> • -->
+  <!-- <a href="https://clojure-lsp.io/troubleshooting"><strong>troubleshooting</strong></a> • -->
+  <a href="https://github.com/sponsors/clojure-lsp"><strong>support us</strong></a>
+</p>
+<hr>
 
 ## Rationale
 
@@ -22,104 +37,11 @@ Also, this plugin does not use IntelliJ's LSP support yet for 2 reasons:
   - The LSP feature is only available for Ultimate Edition (paid edition), making this plugin only available for those editions.
   - The LSP feature is pretty alpha, missing some features yet, some that were already implemented in this plugin.
 
-## LSP implemented capabilities
-
-Below are all the currently supported LSP capabilities and their implementation status:
-
-| capability                             | done | notes                               |
-|----------------------------------------|------|-------------------------------------|
-| initialize                             | √    |                                     |
-| initialized                            | √    |                                     |
-| shutdown                               | √    |                                     |
-| exit                                   |      |                                     |
-| $/cancelRequest                        |      |                                     |
-| $/progress                             | √    |                                     |
-| window/showDocument                    |      |                                     |
-| window/showMessage                     | √    |                                     |
-| window/showMessageRequest              | √    |                                     |
-| window/logMessage                      |      |                                     |
-| window/workDoneProgress/create         |      |                                     |
-| window/workDoneProgress/cancel         |      |                                     |
-| telemetry/event                        |      |                                     |
-| client/registerCapability              |      |                                     |
-| client/unregisterCapability            |      |                                     |
-| workspace/workspaceFolders             |      |                                     |
-| workspace/didChangeWorkspaceFolders    |      |                                     |
-| workspace/didChangeConfiguration       |      |                                     |
-| workspace/configuration                |      |                                     |
-| workspace/didChangeWatchedFiles        |      |                                     |
-| workspace/symbol                       |      |                                     |
-| workspace/executeCommand               | √    |                                     |
-| workspace/applyEdit                    | √    |                                     |
-| workspace/willRenameFiles              |      |                                     |
-| workspace/didRenameFiles               |      |                                     |
-| workspace/willCreateFiles              |      |                                     |
-| workspace/didCreateFiles               |      |                                     |
-| workspace/willDeleteFiles              |      |                                     |
-| workspace/didDeleteFiles               |      |                                     |
-| textDocument/didOpen                   | √    |                                     |
-| textDocument/didChange                 | √    |                                     |
-| textDocument/willSave                  |      |                                     |
-| textDocument/willSaveWaitUntil         |      |                                     |
-| textDocument/didSave                   | √    |                                     |
-| textDocument/didClose                  | √    |                                     |
-| textDocument/publishDiagnostics        | √    |                                     |
-| textDocument/completion                | √    |                                     |
-| completionItem/resolve                 |      |                                     |
-| textDocument/hover                     | √    |                                     |
-| textDocument/signatureHelp             |      |                                     |
-| textDocument/declaration               |      |                                     |
-| textDocument/definition                | √    | Custom action: Via Alt + Shift + F7 |
-| textDocument/typeDefinition            |      |                                     |
-| textDocument/implementation            |      |                                     |
-| textDocument/references                | √    |                                     |
-| textDocument/documentHighlight         |      |                                     |
-| textDocument/documentSymbol            |      |                                     |
-| textDocument/codeAction                | √    |                                     |
-| codeAction/resolve                     |      |                                     |
-| textDocument/codeLens                  | √    |                                     |
-| codeLens/resolve                       | √    |                                     |
-| textDocument/documentLink              |      |                                     |
-| documentLink/resolve                   |      |                                     |
-| textDocument/documentColor             |      |                                     |
-| textDocument/colorPresentation         |      |                                     |
-| textDocument/formatting                | √    |                                     |
-| textDocument/rangeFormatting           |      |                                     |
-| textDocument/onTypeFormatting          |      |                                     |
-| textDocument/rename                    | √    |                                     |
-| textDocument/prepareRename             | √    |                                     |
-| textDocument/foldingRange              |      |                                     |
-| textDocument/selectionRange            |      |                                     |
-| textDocument/semanticTokens/full       |      |                                     |
-| textDocument/semanticTokens/full/delta |      |                                     |
-| textDocument/semanticTokens/range      |      |                                     |
-| workspace/semanticTokens/refresh       |      |                                     |
-| workspace/codeLens/refresh             |      |                                     |
-| textDocument/linkedEditingRange        |      |                                     |
-| textDocument/prepareCallHierarchy      |      |                                     |
-| callHierarchy/incomingCalls            |      |                                     |
-| callHierarchy/outgoingCalls            |      |                                     |
-| textDocument/moniker                   |      |                                     |
-
 ---
 
 ## Contributing
 
 Contributions are very welcome, check the [issues page](https://github.com/clojure-lsp/clojure-lsp-intellij/issues) for more information about what are good first issues or open an issue describing the desired support.
-
-## Developing
-
-`./gradlew runIde` to spawn a new Intellij session with the plugin.
-
-or
-
-`./gradlew buildPlugin` to build the plugin, then install it from disk in Intellij, the zip should be on `./build/distributions/*.zip`.
-
-### NREPL
-
-Unless you need to edit some generated extension file or kotlin file, mostly clojure code is editable via repl while your plugin is running!
-
-NREPL is included in the plugin during development, so you can jack in and edit most of the plugin behavior while running it.
 
 ## Support the project 💙
 
