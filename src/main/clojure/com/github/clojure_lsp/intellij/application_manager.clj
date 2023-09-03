@@ -6,9 +6,11 @@
    [com.intellij.openapi.project Project]
    [com.intellij.openapi.util Computable]))
 
+(set! *warn-on-reflection* true)
+
 (defn invoke-later!
   ([invoke-fn] (invoke-later! (ModalityState/defaultModalityState) invoke-fn))
-  ([modality-state invoke-fn]
+  ([^ModalityState modality-state invoke-fn]
    (let [p (promise)]
      (.invokeLater
       (ApplicationManager/getApplication)
