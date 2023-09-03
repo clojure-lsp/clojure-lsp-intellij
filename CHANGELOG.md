@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix Find definition to work with Ctrl+B + Ctrl+click.
+
 ## 0.10.0
 
 - Add support for `textDocument/didSave` notification.

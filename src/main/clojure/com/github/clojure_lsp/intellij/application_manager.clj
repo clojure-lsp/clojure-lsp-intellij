@@ -6,13 +6,26 @@
    [com.intellij.openapi.project Project]
    [com.intellij.openapi.util Computable]))
 
-(defn invoke-later! [invoke-fn]
+(defn invoke-later!
+  ([invoke-fn] (invoke-later! (ModalityState/defaultModalityState) invoke-fn))
+  ([modality-state invoke-fn]
+   (let [p (promise)]
+     (.invokeLater
+      (ApplicationManager/getApplication)
+      (fn []
+        (deliver p (invoke-fn)))
+      modality-state)
+     p)))
+
+(defn read-action! [run-fn]
   (let [p (promise)]
-    (.invokeLater
+    (.runReadAction
      (ApplicationManager/getApplication)
-     (fn []
-       (deliver p (invoke-fn)))
-     (ModalityState/defaultModalityState))
+     (reify Computable
+       (compute [_]
+         (let [result (run-fn)]
+           (deliver p result)
+           result))))
     p))
 
 (defn write-action! [run-fn]

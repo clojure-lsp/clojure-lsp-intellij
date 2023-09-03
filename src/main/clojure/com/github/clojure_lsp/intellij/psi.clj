@@ -1,12 +1,9 @@
 (ns com.github.clojure-lsp.intellij.psi
   (:require
-   [clojure.string :as string]
-   [com.rpl.proxy-plus :refer [proxy+]])
+   [clojure.string :as string])
   (:import
    [com.github.clojure_lsp.intellij ClojureLanguage]
    [com.github.clojure_lsp.intellij Icons]
-   [com.intellij.navigation NavigationItem]
-   [com.intellij.navigation ItemPresentation]
    [com.intellij.openapi.project Project]
    [com.intellij.openapi.util TextRange]
    [com.intellij.psi
@@ -23,10 +20,12 @@
   (let [manager (PsiManager/getInstance project)]
     (reify
       PsiNameIdentifierOwner
+      (getName [_] name)
+      (setName [_ _])
       (getNameIdentifier [this] this)
+      (getIdentifyingElement [this] this)
       (getProject [_] project)
-      (getTextOffset [_] start)
-      (getLanguage [_] (ClojureLanguage/INSTANCE))
+      (getLanguage [_] ClojureLanguage/INSTANCE)
       (getManager [_] manager)
       (getChildren [_] (into-array PsiElement []))
       (getParent [this] (.getContainingFile this))
@@ -35,13 +34,14 @@
       (getNextSibling [_])
       (getPrevSibling [_])
       (getTextRange [_] (TextRange. start end))
+      (getTextOffset [_] start)
       (getStartOffsetInParent [_] start)
       (getTextLength [_] (- end start))
       (findElementAt [_ _])
       (findReferenceAt [_ _])
       (textToCharArray [_] (char-array name))
       (getNavigationElement [this] this)
-      (getOriginalElement [_])
+      (getOriginalElement [this] this)
       (^boolean textMatches [this ^CharSequence text]
         (= (.getText this) text))
       (^boolean textMatches [this ^PsiElement element]
@@ -84,18 +84,4 @@
       (getCopyableUserData [_ _])
       (putCopyableUserData [_ _ _])
 
-      (getIcon [_ _] Icons/CLOJURE)
-
-      NavigationItem
-      (getName [_] name)
-      (setName [_ _])
-      (getPresentation [this]
-        (proxy+ [] ItemPresentation
-                (getPresentableText [_] (.getName this))
-                (getLocationString [_] (.getName (.getContainingFile this)))
-                (getIcon [_ _])))
-      (canNavigate [_] true)
-      (canNavigateToSource [_] true)
-      (navigate [_ _]
-        ;; TODO is this required?
-        ))))
+      (getIcon [_ _] Icons/CLOJURE))))

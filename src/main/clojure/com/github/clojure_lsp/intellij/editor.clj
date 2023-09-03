@@ -3,7 +3,6 @@
    [clojure-lsp.shared :as lsp.shared]
    [clojure.java.io :as io]
    [com.github.clojure-lsp.intellij.application-manager :as app-manager]
-   [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.editor :as editor])
   (:import
    [com.intellij.openapi.editor Document Editor]
@@ -44,6 +43,10 @@
   (TextRange/create (position->point (:start range) document)
                     (position->point (:end range) document)))
 
+(defn text-range->range [^TextRange range ^Editor editor]
+  {:start (offset->cursor-position editor (.getStartOffset range))
+   :end (offset->cursor-position editor (.getEndOffset range))})
+
 (defn uri->v-file ^VirtualFile [^String uri]
   (.findFileByIoFile (LocalFileSystem/getInstance)
                      (io/file (lsp.shared/uri->filename uri))))
@@ -52,19 +55,25 @@
   (.findFile (PsiManager/getInstance project)
              (uri->v-file uri)))
 
-(defn uri->editor ^Editor [^String uri ^Project project]
-  (let [v-file (uri->v-file uri)
-        file-manager (FileEditorManager/getInstance project)
+(defn v-file->editor ^Editor [^VirtualFile v-file ^Project project]
+  (let [file-manager (FileEditorManager/getInstance project)
         file-editor (if (.isFileOpen file-manager v-file)
                       (first (.getAllEditors file-manager v-file))
-                      (first (.openFile file-manager v-file false)))]
+                      (let [text-editor (first (.openFile file-manager v-file false false))]
+                        ;; TODO For some reason openFile always focus on the editor, so we close it to avoid navigating to the file
+                        (.closeFile file-manager v-file)
+                        text-editor))]
     (.getEditor ^TextEditor file-editor)))
+
+(defn uri->editor ^Editor [^String uri ^Project project]
+  (let [v-file (uri->v-file uri)]
+    (v-file->editor v-file project)))
 
 (defn editor->uri [^Editor editor]
   ;; TODO sanitize URL, encode, etc
   (.getUrl (.getFile (FileDocumentManager/getInstance) (.getDocument editor))))
 
-(defn virtual->psi-file [^VirtualFile v-file ^Project project]
+(defn virtual->psi-file ^PsiFile [^VirtualFile v-file ^Project project]
   (.findFile (PsiManager/getInstance project) v-file))
 
 (defn apply-workspace-edit ^Boolean

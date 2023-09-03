@@ -24,6 +24,7 @@
             implementation="com.github.clojure_lsp.intellij.extension.StatusBarFactory" />
         <editorFactoryDocumentListener
             implementation="com.github.clojure_lsp.intellij.listener.FileListener"/>
+        <gotoDeclarationHandler language="clojure" implementation="com.github.clojure_lsp.intellij.extension.Definition"/>
         <externalAnnotator language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.Annotator" />
         <documentationProvider implementationClass="com.github.clojure_lsp.intellij.extension.Documentation"
                                language="clojure" order="first"/>
