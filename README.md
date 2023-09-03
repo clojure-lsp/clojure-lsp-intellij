@@ -11,15 +11,15 @@
 
 <!-- Plugin description end -->
 
-![Clojure LSP Intellij](images/clojure-lsp-intellij-1.png)
+![Clojure LSP Intellij](images/demo.png)
 
 ---
 
 <p align="center">
   <a href="https://clojure-lsp.io"><strong>homepage</strong></a> •
-  <a href="doc/capabilities.md"><strong>capabilities</strong></a> •
-  <a href="doc/developing.md"><strong>developing</strong></a> •
-  <!-- <a href="https://clojure-lsp.io/features/"><strong>features</strong></a> • -->
+  <a href="docs/features.md"><strong>features</strong></a> •
+  <a href="docs/capabilities.md"><strong>capabilities</strong></a> •
+  <a href="docs/developing.md"><strong>developing</strong></a> •
   <!-- <a href="https://clojure-lsp.io/settings"><strong>settings</strong></a> • -->
   <!-- <a href="https://clojure-lsp.io/troubleshooting"><strong>troubleshooting</strong></a> • -->
   <a href="https://github.com/sponsors/clojure-lsp"><strong>support us</strong></a>
