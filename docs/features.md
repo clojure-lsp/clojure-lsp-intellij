@@ -4,35 +4,35 @@ This plugin relies on clojure-lsp features, so most work is done there, for more
 
 ### Find a function/var definition
 
-![](images/find-definition.png)
+![](../images/find-definition.png)
 
 ### Find all references of a function, var, keyword or namespace alias
 
-![](images/find-references.png)
+![](../images/find-references.png)
 
 ### Rename
 
-![](images/rename.png)
+![](../images/rename.png)
 
 ### Documentation and clojuredocs integration
 
-![](images/hover.png)
+![](../images/hover.png)
 
 ### Completion
 
-![](images/completion.png)
+![](../images/completion.png)
 
 ### Code actions
 
-![](images/code-actions.png)
+![](../images/code-actions.png)
 
 ### Code lenses showing symbol references
 
-![](images/code-lens.png)
+![](../images/code-lens.png)
 
 ### Diagnostics (linter)
 
-![](images/diagnostics.png)
+![](../images/diagnostics.png)
 
 ### Format a whole file or range
 
