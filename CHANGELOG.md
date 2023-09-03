@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.10.1
+
 - Fix Find definition to work with Ctrl+B + Ctrl+click.
 
 ## 0.10.0
