@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.10.0
+
 - Add support for `textDocument/didSave` notification.
 - Fix rename refactor when file is not opened.
 
