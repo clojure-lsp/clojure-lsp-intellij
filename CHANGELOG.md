@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Fix language attribute in intentionAction from plugin.xml. #18
+- Fix documentationProvider plugin.xml. #19
 
 ## 0.10.1
 

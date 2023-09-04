@@ -26,7 +26,7 @@
             implementation="com.github.clojure_lsp.intellij.listener.FileListener"/>
         <gotoDeclarationHandler language="clojure" implementation="com.github.clojure_lsp.intellij.extension.Definition"/>
         <externalAnnotator language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.Annotator" />
-        <documentationProvider implementationClass="com.github.clojure_lsp.intellij.extension.Documentation"
+        <lang.documentationProvider implementationClass="com.github.clojure_lsp.intellij.extension.Documentation"
                                language="clojure" order="first"/>
         <formattingService implementation="com.github.clojure_lsp.intellij.extension.Formatting"/>
         <renameHandler implementation="com.github.clojure_lsp.intellij.extension.RenameHandler"/>
