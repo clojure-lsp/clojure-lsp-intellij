@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix language attribute in intentionAction from plugin.xml. #18
+
 ## 0.10.1
 
 - Fix Find definition to work with Ctrl+B + Ctrl+click.
