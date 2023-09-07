@@ -4,6 +4,7 @@
 
 - Fix language attribute in intentionAction from plugin.xml. #18
 - Fix documentationProvider plugin.xml. #19
+- Extract Clojure intellij integration to separated lib clj4intellij.
 
 ## 0.10.1
 

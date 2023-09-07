@@ -10,7 +10,7 @@
    [com.github.clojure-lsp.intellij.server :as server]
    [com.github.clojure-lsp.intellij.tasks :as tasks])
   (:import
-   [com.github.clojure_lsp.intellij ClojureClassLoader]
+   [com.github.ericdallo.clj4intellij ClojureClassLoader]
    [com.github.clojure_lsp.intellij.extension SettingsState]
    [com.intellij.openapi.project Project]))
 

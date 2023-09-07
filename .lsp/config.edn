@@ -1,3 +1,1 @@
-{:project-specs [{:project-path "build.gradle.kts"
-                  :classpath-cmd ["./gradlew" "classpath" "--quiet"]}]
- :cljfmt {:indents {proxy+  [[:block 2] [:inner 1]]}}}
+{:cljfmt {:indents {proxy+  [[:block 2] [:inner 1]]}}}

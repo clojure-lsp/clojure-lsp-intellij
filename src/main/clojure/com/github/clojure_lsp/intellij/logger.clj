@@ -1,6 +1,6 @@
 (ns com.github.clojure-lsp.intellij.logger
   (:import
-   (com.github.clojure_lsp.intellij ClojureClassLoader)
+   (com.github.ericdallo.clj4intellij ClojureClassLoader)
    (com.intellij.openapi.diagnostic Logger)))
 
 (set! *warn-on-reflection* true)

@@ -24,6 +24,7 @@ repositories {
 
 dependencies {
     implementation ("org.clojure:clojure:1.11.1")
+    implementation ("com.github.ericdallo:clj4intellij:0.1.3")
     implementation ("seesaw:seesaw:1.5.0")
     implementation ("camel-snake-kebab:camel-snake-kebab:0.4.3")
     implementation ("org.clojure:core.async:1.5.648") {
@@ -63,12 +64,6 @@ intellij {
 changelog {
     version.set(properties("pluginVersion"))
     groups.set(emptyList())
-}
-
-tasks.register("classpath") {
-    val classpath = project.configurations.getByName("runtimeClasspath").files
-    val clojureClasspath = clojure.builds.named("main").get().sourceRoots.files
-    println(clojureClasspath.plus(classpath).joinToString(":"))
 }
 
 java {

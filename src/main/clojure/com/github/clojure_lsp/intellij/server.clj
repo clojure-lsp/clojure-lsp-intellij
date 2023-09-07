@@ -10,7 +10,7 @@
    [com.github.clojure-lsp.intellij.tasks :as tasks]
    [lsp4clj.server :as lsp4clj.server])
   (:import
-   [com.github.clojure_lsp.intellij ClojureClassLoader]
+   [com.github.ericdallo.clj4intellij ClojureClassLoader]
    [com.intellij.openapi.project Project]))
 
 (def ^:private client-capabilities
