@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.11.1
+
 - Bump clj4intellij to `0.2.1`.
 
 ## 0.11.0
