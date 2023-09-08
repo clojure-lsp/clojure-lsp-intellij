@@ -1,0 +1,27 @@
+{:paths ["src/main/clojure"]
+ :mvn/repos {"intellij-1" {:url "https://cache-redirector.jetbrains.com/intellij-dependencies"}
+             "intellij-2" {:url "https://www.jetbrains.com/intellij-repository/releases"}}
+ :deps {org.clojure/clojure {:mvn/version "1.11.1"}
+        com.github.ericdallo/clj4intellij {:mvn/version "0.2.1"}
+        seesaw/seesaw {:mvn/version "1.5.0"}
+        camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.3"}
+        com.github.clojure-lsp/clojure-lsp-standalone {:mvn/version "2023.08.06-00.28.06"}
+        markdown-clj/markdown-clj {:mvn/version "1.11.4"}
+        com.rpl/proxy-plus {:mvn/version "0.0.9"}}
+ :aliases {:dev {:deps {nrepl/nrepl {:mvn/version "1.0.0"}
+                        com.jetbrains.intellij.platform/ide-impl {:mvn/version "213.7172.48"
+                                                                  :exclusions [org.jetbrains.kotlin/kotlin-stdlib-jdk8
+                                                                               org.jetbrains.kotlin/kotlin-reflect
+                                                                               org.jetbrains.kotlinx/kotlinx-coroutines-jdk8
+                                                                               org.jetbrains.kotlinx/kotlinx-serialization-json-jvm
+                                                                               org.jetbrains.kotlinx/kotlinx-serialization-core-jvm
+
+                                                                               com.jetbrains.intellij.platform/external-system-impl
+                                                                               com.jetbrains.intellij.platform/service-container
+                                                                               com.jetbrains.intellij.platform/statistics-devkit
+                                                                               com.jetbrains.infra/download-pgp-verifier]}}}
+           :build {:extra-paths ["src/main/resources"]
+                   :deps {io.github.clojure/tools.build {:git/tag "v0.8.1"
+                                                         :git/sha "7d40500"}
+                          slipset/deps-deploy {:mvn/version "0.2.0"}}
+                   :ns-default build}}}

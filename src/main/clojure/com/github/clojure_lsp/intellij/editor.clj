@@ -2,8 +2,8 @@
   (:require
    [clojure-lsp.shared :as lsp.shared]
    [clojure.java.io :as io]
-   [com.github.clojure-lsp.intellij.application-manager :as app-manager]
-   [com.github.clojure-lsp.intellij.editor :as editor])
+   [com.github.clojure-lsp.intellij.editor :as editor]
+   [com.github.ericdallo.clj4intellij.app-manager :as app-manager])
   (:import
    [com.intellij.openapi.editor Document Editor]
    [com.intellij.openapi.fileEditor FileDocumentManager FileEditorManager TextEditor]
@@ -81,36 +81,39 @@
   ;; TODO Handle resourceOperations like creating, renaming and deleting files
   ;; TODO Improve to check version to known if file changed
   (app-manager/invoke-later!
-   (fn []
-     (app-manager/write-action!
-      (fn []
-        (app-manager/execute-command!
-         label
-         project
-         (fn []
-           (doseq [{{:keys [uri]} :text-document
-                    :keys [edits]} document-changes
-                   :let [editor (uri->editor uri project)
-                         document (.getDocument editor)
-                         sorted-edits (sort-by (comp #(position->point % document) :start :range) > edits)]]
-             (doseq [{:keys [new-text range]} sorted-edits
-                     :let [start (position->point (:start range) document)
-                           end (position->point (:end range) document)]]
-               (cond
-                 (>= end 0)
-                 (if (<= (- end start) 0)
-                   (.insertString document start new-text)
-                   (.replaceString document start end new-text))
+   {:invoke-fn
+    (fn []
+      (app-manager/write-action!
+       {:run-fn
+        (fn []
+          (app-manager/execute-command!
+           {:name label
+            :project project
+            :command-fn
+            (fn []
+              (doseq [{{:keys [uri]} :text-document
+                       :keys [edits]} document-changes
+                      :let [editor (uri->editor uri project)
+                            document (.getDocument editor)
+                            sorted-edits (sort-by (comp #(position->point % document) :start :range) > edits)]]
+                (doseq [{:keys [new-text range]} sorted-edits
+                        :let [start (position->point (:start range) document)
+                              end (position->point (:end range) document)]]
+                  (cond
+                    (>= end 0)
+                    (if (<= (- end start) 0)
+                      (.insertString document start new-text)
+                      (.replaceString document start end new-text))
 
-                 (= 0 start)
-                 (.setText document new-text)
+                    (= 0 start)
+                    (.setText document new-text)
 
-                 (> start 0)
-                 (.insertString document start new-text)
+                    (> start 0)
+                    (.insertString document start new-text)
 
-                 :else
-                 nil)
-               (when move-caret?
-                 (.moveToOffset (.getCaretModel editor)
-                                (+ (count new-text) start))))
-             (.saveDocument (FileDocumentManager/getInstance) document)))))))))
+                    :else
+                    nil)
+                  (when move-caret?
+                    (.moveToOffset (.getCaretModel editor)
+                                   (+ (count new-text) start))))
+                (.saveDocument (FileDocumentManager/getInstance) document)))}))}))}))

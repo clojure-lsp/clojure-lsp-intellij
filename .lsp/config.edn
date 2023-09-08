@@ -1,1 +1,1 @@
-{:cljfmt {:indents {proxy+  [[:block 2] [:inner 1]]}}}
+{:cljfmt {:indents {proxy+ [[:block 2] [:inner 1]]}}}

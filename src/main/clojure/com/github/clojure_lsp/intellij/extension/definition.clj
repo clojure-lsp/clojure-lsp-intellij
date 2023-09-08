@@ -4,12 +4,12 @@
    :extends com.intellij.codeInsight.navigation.actions.GotoDeclarationHandlerBase)
   (:require
    [clojure.string :as string]
-   [com.github.clojure-lsp.intellij.application-manager :as app-manager]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.clojure-lsp.intellij.file-system :as file-system]
-   [com.github.clojure-lsp.intellij.psi :as psi])
+   [com.github.clojure-lsp.intellij.psi :as psi]
+   [com.github.ericdallo.clj4intellij.app-manager :as app-manager])
   (:import
    [com.intellij.openapi.editor Document Editor]
    [com.intellij.openapi.project Project]
@@ -23,14 +23,15 @@
 (defn ^:private definition->psi-element
   [^VirtualFile v-file ^Project project definition]
   @(app-manager/invoke-later!
-    (fn []
-      (let [editor ^Editor (editor/v-file->editor v-file project)
-            document ^Document (.getDocument editor)
-            {:keys [range]} definition
-            start ^int (editor/position->point (:start range) document)
-            end ^int (editor/position->point (:end range) document)
-            name (.getText document (TextRange. start end))]
-        (psi/->LSPPsiElement name project (editor/virtual->psi-file v-file project) start end)))))
+    {:invoke-fn
+     (fn []
+       (let [editor ^Editor (editor/v-file->editor v-file project)
+             document ^Document (.getDocument editor)
+             {:keys [range]} definition
+             start ^int (editor/position->point (:start range) document)
+             end ^int (editor/position->point (:end range) document)
+             name (.getText document (TextRange. start end))]
+         (psi/->LSPPsiElement name project (editor/virtual->psi-file v-file project) start end)))}))
 
 (defn -getGotoDeclarationTarget [_ ^PsiElement element ^Editor editor]
   (when-let [client (and (= :connected (:status @db/db*))
