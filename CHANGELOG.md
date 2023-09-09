@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.11.2
+
 - Start LSP server only when opening clojure files, avoiding starting on non Clojure projects. #20
 - Fix LSP not being disconnected on project close/switch.
 
