@@ -7,6 +7,7 @@
    [clojure.walk :as walk]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
+   [com.github.clojure-lsp.intellij.server :as server]
    [seesaw.core :as see]
    [seesaw.mig :as mig])
   (:import
@@ -45,8 +46,8 @@
                                                                    (see/alert e "Server info copied to clipboard"))]) ""]]) "span"]]))
 
 (defn -createComponent [_]
-  (let [server-info (when (identical? :connected (:status @db/db*))
-                      (some-> (lsp-client/request! (:client @db/db*) [":clojure/serverInfo/raw" {}])
+  (let [server-info (when-let [client (server/connected-client)]
+                      (some-> (lsp-client/request! client [":clojure/serverInfo/raw" {}])
                               deref
                               walk/keywordize-keys))
         component (build-component server-info)]

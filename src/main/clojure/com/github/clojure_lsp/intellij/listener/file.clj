@@ -1,32 +1,51 @@
 (ns com.github.clojure-lsp.intellij.listener.file
-  (:require
-   [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.clojure-lsp.intellij.client :as lsp-client])
-  (:import
-   [com.intellij.openapi.editor.event DocumentEvent]
-   [com.intellij.openapi.fileEditor FileDocumentManager]
-   [com.intellij.openapi.vfs VirtualFile])
   (:gen-class
    :name com.github.clojure_lsp.intellij.listener.FileListener
    :implements [com.intellij.openapi.fileEditor.FileEditorManagerListener
-                com.intellij.openapi.editor.event.DocumentListener]))
+                com.intellij.openapi.editor.event.DocumentListener])
+  (:require
+   [com.github.clojure-lsp.intellij.client :as lsp-client]
+   [com.github.clojure-lsp.intellij.db :as db]
+   [com.github.clojure-lsp.intellij.project :as project]
+   [com.github.clojure-lsp.intellij.server :as server])
+  (:import
+   [com.intellij.openapi.editor.event DocumentEvent]
+   [com.intellij.openapi.fileEditor FileDocumentManager FileEditorManager]
+   [com.intellij.openapi.project Project]
+   [com.intellij.openapi.vfs VirtualFile]))
+
+(set! *warn-on-reflection* true)
+
 (def ^:private valid-extensions #{"clj" "cljs" "cljc" "cljd" "edn" "bb" "clj_kondo"})
 
-(defn -fileOpened [_this _source ^VirtualFile file]
-  (db/await-init
-   :client
-   (when (contains? valid-extensions (.getExtension file))
-     (let [url (.getUrl file)
-           text (slurp (.getInputStream file))]
-       (lsp-client/notify!
-        (:client @db/db*)
-        [:textDocument/didOpen
-         {:text-document {:uri url
-                          :language-id "clojure"
-                          :version 0
-                          :text text}}])
-       (swap! db/db* assoc-in [:documents url] {:version 0
-                                                :text text})))))
+(:project @db/db*)
+
+(defn ^:private ensure-server-up!
+  "If server was not started before, check if it's a Clojure file and starts it."
+  [^VirtualFile file ^Project project]
+  (or (not (identical? :disconnected (:status @db/db*)))
+      (and (or (contains? valid-extensions (.getExtension file))
+               (project/clojure-project? project @db/db*))
+           (do
+             (swap! db/db* assoc :project project)
+             (server/spawn-server! project)))))
+
+(defn -fileOpened [_this ^FileEditorManager source ^VirtualFile file]
+  (when (ensure-server-up! file (.getProject source))
+    (db/await-init
+     :client
+     (when (contains? valid-extensions (.getExtension file))
+       (let [url (.getUrl file)
+             text (slurp (.getInputStream file))]
+         (lsp-client/notify!
+          (:client @db/db*)
+          [:textDocument/didOpen
+           {:text-document {:uri url
+                            :language-id "clojure"
+                            :version 0
+                            :text text}}])
+         (swap! db/db* assoc-in [:documents url] {:version 0
+                                                  :text text}))))))
 
 (defn -fileClosed [_ _ ^VirtualFile file]
   (db/await-init

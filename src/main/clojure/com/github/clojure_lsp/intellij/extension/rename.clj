@@ -19,10 +19,10 @@
 
 (defn -isAvailableOnDataContext [_ ^DataContext data-context]
   (boolean
-   (or (and (.getData data-context CommonDataKeys/EDITOR)
-            (.getData data-context CommonDataKeys/PSI_FILE))
-       (let [element (PsiElementRenameHandler/getElement data-context)]
-         (instance? PsiFile element)))))
+   (and (.getData data-context CommonDataKeys/EDITOR)
+        (.getData data-context CommonDataKeys/PSI_FILE)
+        (let [element (PsiElementRenameHandler/getElement data-context)]
+          (instance? PsiFile element)))))
 
 (defn -isRenaming [this data-context]
   (-isAvailableOnDataContext this data-context))

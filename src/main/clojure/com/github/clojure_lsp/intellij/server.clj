@@ -1,13 +1,13 @@
 (ns com.github.clojure-lsp.intellij.server
   (:require
    [clojure.core.async :as async]
-   [clojure.java.io :as io]
+   [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.logger :as logger]
-   [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.notification]
-   [com.github.clojure-lsp.intellij.workspace-edit]
+   [com.github.clojure-lsp.intellij.project :as project]
    [com.github.clojure-lsp.intellij.tasks :as tasks]
+   [com.github.clojure-lsp.intellij.workspace-edit]
    [lsp4clj.server :as lsp4clj.server])
   (:import
    [com.github.ericdallo.clj4intellij ClojureClassLoader]
@@ -18,6 +18,8 @@
    :workspace {:workspace-edit {:document-changes true}}})
 
 (defn spawn-server! [^Project project]
+  (swap! db/db* assoc :status :connecting)
+  (run! #(% :connecting) (:on-status-changed-fns @db/db*))
   (let [log-ch (async/chan (async/sliding-buffer 20))
         input-ch (async/chan 1)
         output-ch (async/chan 1)
@@ -29,9 +31,7 @@
         client (lsp-client/client server)]
     (swap! db/db* assoc
            :server server
-           :client client
-           :status :disconnected)
-    (run! #(% :disconnected) (:on-status-changed-fns @db/db*))
+           :client client)
     (logger/info "Starting LSP server and client...")
     (tasks/run-background-task!
      project
@@ -43,7 +43,7 @@
        (logger/info "Initializing LSP server...")
        (tasks/set-progress indicator "LSP: Initializing")
        @(lsp-client/request! client [:initialize
-                                     {:root-uri (-> (.getBasePath project) io/file .toPath .toUri str)
+                                     {:root-uri (project/project->root-uri project)
                                       :work-done-token "lsp-startup"
                                       :initialization-options {:dependency-scheme "jar"
                                                                :hover {:arity-on-same-line? true}}
@@ -51,7 +51,18 @@
        (lsp-client/notify! client [:initialized {}])
        (swap! db/db* assoc :status :connected)
        (run! #(% :connected) (:on-status-changed-fns @db/db*))
-       (logger/info "Initialized LSP server...")))))
+       (logger/info "Initialized LSP server...")))
+    true))
+
+(defn connected-client []
+  (when (identical? :connected (:status @db/db*))
+    (:client @db/db*)))
 
 (defn shutdown! []
-  @(lsp-client/request! (:client @db/db*) [:shutdown {}]))
+  (when-let [client (connected-client)]
+    @(lsp-client/request! client [:shutdown {}])
+    (swap! db/db* assoc :status :disconnected
+           :client nil
+           :server nil
+           :diagnostics {})
+    (run! #(% :disconnected) (:on-status-changed-fns @db/db*))))

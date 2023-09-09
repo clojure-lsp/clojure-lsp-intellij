@@ -4,9 +4,9 @@
    :implements [com.intellij.codeInsight.hints.InlayHintsProvider])
   (:require
    [com.github.clojure-lsp.intellij.action.references :as action.references]
-   [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
+   [com.github.clojure-lsp.intellij.editor :as editor]
+   [com.github.clojure-lsp.intellij.server :as server]
    [com.rpl.proxy-plus :refer [proxy+]])
   (:import
    [com.github.clojure_lsp.intellij ClojureLanguage]
@@ -83,28 +83,27 @@
 (set! *warn-on-reflection* true)
 
 (defn -getCollectorFor [_ _file ^Editor editor _settings ^InlayHintsSink sink]
-  (when-let [client (and (identical? :connected (:status @db/db*))
-                         (:client @db/db*))]
+  (when-let [client (server/connected-client)]
     ;; For some reason `(PresentationFactory. editor)` does not work
     (let [lens-added* (atom false)]
       (proxy+ [editor]
-        FactoryInlayHintsCollector
+              FactoryInlayHintsCollector
         (collect [^FactoryInlayHintsCollector this _ _ _]
-                 (when-not @lens-added*
-                   (let [document (.getDocument editor)
-                         code-lens @(lsp-client/request! client [:textDocument/codeLens
-                                                                 {:text-document {:uri (editor/editor->uri editor)}}])
-                         factory (.getFactory ^FactoryInlayHintsCollector this)]
-                     (doseq [code-len code-lens]
-                       (let [{:keys [range] {:keys [title command arguments]} :command} @(lsp-client/request! client [:codeLens/resolve code-len])]
-                         (.addInlineElement sink
-                                            (editor/position->point (:start range) document)
-                                            true
-                                            (code-lens-presentation
-                                             factory
-                                             title
-                                             (fn onClick []
-                                               (handle-command editor command arguments)))
-                                            true)))
-                     (reset! lens-added* true)))
-                 false)))))
+          (when-not @lens-added*
+            (let [document (.getDocument editor)
+                  code-lens @(lsp-client/request! client [:textDocument/codeLens
+                                                          {:text-document {:uri (editor/editor->uri editor)}}])
+                  factory (.getFactory ^FactoryInlayHintsCollector this)]
+              (doseq [code-len code-lens]
+                (let [{:keys [range] {:keys [title command arguments]} :command} @(lsp-client/request! client [:codeLens/resolve code-len])]
+                  (.addInlineElement sink
+                                     (editor/position->point (:start range) document)
+                                     true
+                                     (code-lens-presentation
+                                      factory
+                                      title
+                                      (fn onClick []
+                                        (handle-command editor command arguments)))
+                                     true)))
+              (reset! lens-added* true)))
+          false)))))

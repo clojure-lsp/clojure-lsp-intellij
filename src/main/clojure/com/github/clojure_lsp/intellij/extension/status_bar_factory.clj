@@ -5,6 +5,7 @@
    :implements [com.intellij.openapi.wm.StatusBarWidgetFactory])
   (:require
    [com.github.clojure-lsp.intellij.db :as db]
+   [com.github.clojure-lsp.intellij.project :as project]
    [com.github.clojure-lsp.intellij.server :as server]
    [com.rpl.proxy-plus :refer [proxy+]])
   (:import
@@ -12,7 +13,12 @@
    [com.intellij.openapi.actionSystem AnAction DataContext DefaultActionGroup]
    [com.intellij.openapi.project Project]
    [com.intellij.openapi.ui.popup JBPopupFactory JBPopupFactory$ActionSelectionAid]
-   [com.intellij.openapi.wm StatusBarWidget StatusBarWidget$IconPresentation WindowManager]
+   [com.intellij.openapi.wm
+    StatusBarWidget
+    StatusBarWidget$IconPresentation
+    StatusBarWidgetFactory
+    WindowManager]
+   [com.intellij.openapi.wm.impl.status.widget StatusBarWidgetsManager]
    [com.intellij.ui.awt RelativePoint]
    [com.intellij.util Consumer]
    [java.awt Point]
@@ -26,7 +32,8 @@
 
 (defn -getDisplayName [_] "Clojure LSP")
 
-(defn -isAvailable [_ _] true)
+(defn -isAvailable [_ project]
+  (project/clojure-project? project @db/db*))
 
 (defn -canBeEnabledOn [_ _] true)
 
@@ -36,14 +43,15 @@
 
 (defn -disposeWidget [_ _])
 
-(defn ^:private refresh-status-bar [^Project project]
+(defn ^:private refresh-status-bar [^StatusBarWidgetFactory factory ^Project project]
   (when-let [status-bar (.getStatusBar (WindowManager/getInstance) project)]
-    (.updateWidget status-bar widget-id)))
+    (.updateWidget status-bar widget-id)
+    (.updateWidget (StatusBarWidgetsManager. project) factory)))
 
-(defn -post-init [_]
+(defn -post-init [this]
   (swap! db/db* update :on-status-changed-fns conj
          (fn [_status]
-           (refresh-status-bar (:project @db/db*)))))
+           (refresh-status-bar this (:project @db/db*)))))
 
 (defn ^:private restart-lsp-action [^Project project]
   (proxy+
@@ -80,6 +88,6 @@
           true)))
     (getTooltipText [_] (status-bar-title))
     (getIcon [_]
-      (if (identical? :connected (:status @db/db*))
+      (if (server/connected-client)
         Icons/STATUS_CONNECTED
         Icons/STATUS_DISCONNECTED))))

@@ -3,12 +3,13 @@
    :name com.github.clojure_lsp.intellij.extension.Formatting
    :extends com.intellij.formatting.service.AsyncDocumentFormattingService)
   (:require
+   [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.clojure-lsp.intellij.client :as lsp-client])
+   [com.github.clojure-lsp.intellij.server :as server])
   (:import
+   [com.github.clojure_lsp.intellij ClojureFileType]
    [com.intellij.formatting.service AsyncDocumentFormattingService$FormattingTask AsyncFormattingRequest]
-   [com.intellij.psi PsiFile]
-   [com.github.clojure_lsp.intellij ClojureFileType]))
+   [com.intellij.psi PsiFile]))
 
 (set! *warn-on-reflection* true)
 
@@ -17,7 +18,7 @@
   #{})
 
 (defn -canFormat [_ ^PsiFile psi-file]
-  (and (identical? :connected (:status @db/db*))
+  (and (server/connected-client)
        (instance? ClojureFileType (.getFileType psi-file))))
 
 (defn -getName [_]

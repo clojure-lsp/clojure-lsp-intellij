@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- Start LSP server only when opening clojure files, avoiding starting on non Clojure projects. #20
+- Fix LSP not being disconnected on project close/switch.
+
 ## 0.11.1
 
 - Bump clj4intellij to `0.2.1`.

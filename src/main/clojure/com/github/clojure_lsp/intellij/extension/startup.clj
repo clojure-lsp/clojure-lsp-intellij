@@ -4,14 +4,11 @@
    :implements [com.intellij.openapi.startup.StartupActivity
                 com.intellij.openapi.project.DumbAware])
   (:require
-   [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.clojure-lsp.intellij.logger :as logger]
-   [com.github.clojure-lsp.intellij.server :as server]
-   [com.github.clojure-lsp.intellij.tasks :as tasks])
+   [com.github.clojure-lsp.intellij.logger :as logger])
   (:import
-   [com.github.ericdallo.clj4intellij ClojureClassLoader]
    [com.github.clojure_lsp.intellij.extension SettingsState]
+   [com.github.ericdallo.clj4intellij ClojureClassLoader]
    [com.intellij.openapi.project Project]))
 
 (set! *warn-on-reflection* true)
@@ -27,13 +24,6 @@
 (defn -runActivity [_this ^Project project]
   (ClojureClassLoader/bind)
   (logger/info "Starting clojure-lsp plugin...")
-  (start-nrepl-server 6660)
   (swap! db/db* assoc :project project)
-  (db/load-settings-from-state! (SettingsState/get))
-  (server/spawn-server! project))
-
-(defmethod lsp-client/progress "lsp-startup" [{:keys [progress-indicator]} {{:keys [title message percentage]} :value}]
-  (let [msg (str "LSP: " (or title message))]
-    (if percentage
-      (tasks/set-progress progress-indicator msg percentage)
-      (tasks/set-progress progress-indicator msg))))
+  (start-nrepl-server 6660)
+  (db/load-settings-from-state! (SettingsState/get)))

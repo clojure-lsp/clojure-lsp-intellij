@@ -5,10 +5,10 @@
    :exposes-methods {fillCompletionVariants fillCompletionVariantsSuper})
   (:require
    [clojure.string :as string]
-   [com.github.clojure-lsp.intellij.db :as db]
+   [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.clojure-lsp.intellij.logger :as logger]
-   [com.github.clojure-lsp.intellij.client :as lsp-client])
+   [com.github.clojure-lsp.intellij.server :as server])
   (:import
    [com.github.clojure_lsp.intellij Icons]
    [com.intellij.codeInsight.completion CompletionParameters CompletionResultSet]
@@ -72,8 +72,7 @@
        (.withAutoCompletionPolicy AutoCompletionPolicy/SETTINGS_DEPENDENT)))))
 
 (defn -fillCompletionVariants [_ ^CompletionParameters params ^CompletionResultSet result]
-  (when-let [client (and (identical? :connected (:status @db/db*))
-                         (:client @db/db*))]
+  (when-let [client (server/connected-client)]
     (try
       (let [file (.getOriginalFile params)
             uri (.getUrl (.getVirtualFile file))

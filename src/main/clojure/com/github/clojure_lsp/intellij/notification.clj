@@ -3,6 +3,7 @@
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.logger :as logger]
+   [com.github.clojure-lsp.intellij.tasks :as tasks]
    [com.github.ericdallo.clj4intellij.app-manager :as app-manager]
    [seesaw.core :as see])
   (:import
@@ -37,3 +38,9 @@
 
 (defmethod lsp-client/progress :default [_ progress]
   (logger/warn "Unknown progress token %s" progress))
+
+(defmethod lsp-client/progress "lsp-startup" [{:keys [progress-indicator]} {{:keys [title message percentage]} :value}]
+  (let [msg (str "LSP: " (or title message))]
+    (if percentage
+      (tasks/set-progress progress-indicator msg percentage)
+      (tasks/set-progress progress-indicator msg))))
