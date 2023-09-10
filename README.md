@@ -1,6 +1,6 @@
 <img src="images/logo-dark.svg" width="180" align="right">
 
-![JetBrains Plugin Version](https://img.shields.io/jetbrains/plugin/v/com.github.clojure-lsp?style=flat-square&labelColor=91B6FB&color=93DA52&link=https%3A%2F%2Fplugins.jetbrains.com%2Fplugin%2F22489-clojure-lsp)
+[![JetBrains Plugin Version](https://img.shields.io/jetbrains/plugin/v/com.github.clojure-lsp?style=flat-square&labelColor=91B6FB&color=93DA52&link=https%3A%2F%2Fplugins.jetbrains.com%2Fplugin%2F22489-clojure-lsp)](https://plugins.jetbrains.com/plugin/22489-clojure-lsp)
 [![Slack community](https://img.shields.io/badge/Slack-chat-blue?style=flat-square&labelColor=91B6FB&color=93DA52)](https://clojurians.slack.com/archives/CPABC1H61)
 
 # clojure-lsp-intellij
