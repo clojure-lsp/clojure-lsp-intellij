@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.12.0
+
 - Implement lineIdentProvider to handle enters and move cursor to correct position.
 
 ## 0.11.2
