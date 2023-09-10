@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Implement lineIdentProvider to handle enters and move cursor to correct position.
+
 ## 0.11.2
 
 - Start LSP server only when opening clojure files, avoiding starting on non Clojure projects. #20

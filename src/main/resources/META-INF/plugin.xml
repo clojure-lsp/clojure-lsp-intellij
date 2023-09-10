@@ -86,6 +86,7 @@
             instance="com.github.clojure_lsp.intellij.extension.GeneralSettingsConfigurable"
             id="com.github.clojure_lsp.intellij.extension.GeneralSettingsConfigurable"
             displayName="Clojure LSP"/>
+        <lineIndentProvider implementation="com.github.clojure_lsp.intellij.extension.LineIndentProvider"/>
     </extensions>
 
     <actions>
