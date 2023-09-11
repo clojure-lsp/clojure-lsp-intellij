@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-- Use nrepl and logger from clj4intellij
+- Use nrepl and logger from clj4intellij.
 
 ## 0.12.1
 
