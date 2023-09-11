@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     implementation ("org.clojure:clojure:1.11.1")
-    implementation ("com.github.ericdallo:clj4intellij:0.2.1")
+    implementation ("com.github.ericdallo:clj4intellij:0.3.0")
     implementation ("seesaw:seesaw:1.5.0")
     implementation ("camel-snake-kebab:camel-snake-kebab:0.4.3")
     implementation ("org.clojure:core.async:1.5.648") {
@@ -35,8 +35,6 @@ dependencies {
     }
     implementation ("com.rpl:proxy-plus:0.0.9")
     implementation ("markdown-clj:markdown-clj:1.11.4")
-    // TODO how to add only for development?
-    implementation ("nrepl:nrepl:1.0.0")
 }
 
 sourceSets {

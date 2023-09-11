@@ -15,8 +15,8 @@
         <colorSettingsPage implementation="com.github.clojure_lsp.intellij.extension.ColorSettingsPage"/>
 
         <!-- LSP features -->
-        <postStartupActivity
-            implementation="com.github.clojure_lsp.intellij.extension.Startup"/>
+        <postStartupActivity implementation="com.github.ericdallo.clj4intellij.extension.NREPLStartup"/>
+        <postStartupActivity implementation="com.github.clojure_lsp.intellij.extension.Startup"/>
         <statusBarWidgetFactory
             id="ClojureLSPStatusBar"
             displayName="Clojure LSP"

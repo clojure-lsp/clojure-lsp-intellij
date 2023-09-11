@@ -3,7 +3,7 @@
    [clojure.core.async :as async]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.clojure-lsp.intellij.logger :as logger]
+   [com.github.ericdallo.clj4intellij.logger :as logger]
    [com.github.clojure-lsp.intellij.notification]
    [com.github.clojure-lsp.intellij.project :as project]
    [com.github.clojure-lsp.intellij.tasks :as tasks]
@@ -40,7 +40,6 @@
        (ClojureClassLoader/bind)
        (tasks/set-progress indicator "LSP: Starting server")
        (lsp-client/start-server-and-client! server client {:progress-indicator indicator})
-       (logger/info "Initializing LSP server...")
        (tasks/set-progress indicator "LSP: Initializing")
        @(lsp-client/request! client [:initialize
                                      {:root-uri (project/project->root-uri project)

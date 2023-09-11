@@ -7,7 +7,7 @@
    [clojure.string :as string]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.editor :as editor]
-   [com.github.clojure-lsp.intellij.logger :as logger]
+   [com.github.ericdallo.clj4intellij.logger :as logger]
    [com.github.clojure-lsp.intellij.server :as server])
   (:import
    [com.github.clojure_lsp.intellij Icons]
@@ -84,4 +84,4 @@
         (.addAllElements result (mapv completion-item->lookup-element items)))
       (catch ProcessCanceledException _ignore)
       (catch Exception e
-        (logger/error "Completion exception: %s" e)))))
+        (logger/error "Completion exception:" e)))))

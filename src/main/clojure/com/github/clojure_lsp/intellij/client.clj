@@ -3,7 +3,7 @@
    [clojure.core.async :as async]
    [clojure.string :as string]
    [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.clojure-lsp.intellij.logger :as logger]
+   [com.github.ericdallo.clj4intellij.logger :as logger]
    [lsp4clj.coercer :as coercer]
    [lsp4clj.lsp.requests :as lsp.requests]
    [lsp4clj.lsp.responses :as lsp.responses]
@@ -107,7 +107,7 @@
     (when-let [response-body (case method
                                "window/showMessageRequest" (show-message-request params)
                                "workspace/applyEdit" (workspace-apply-edit params)
-                               (logger/warn "Unknown LSP request method %s" method))]
+                               (logger/warn "Unknown LSP request method" method))]
       (let [resp (lsp.responses/response id response-body)]
         (protocols.endpoint/log this :magenta "sending response:" resp)
         resp)))
@@ -118,7 +118,7 @@
       "$/progress" (progress context params)
       "textDocument/publishDiagnostics" (publish-diagnostics params)
 
-      (logger/warn "Unknown LSP notification method %s" method))))
+      (logger/warn "Unknown LSP notification method" method))))
 
 (defn client [server]
   (map->Client
