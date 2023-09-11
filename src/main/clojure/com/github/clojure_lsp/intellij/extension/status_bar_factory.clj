@@ -46,7 +46,7 @@
 (defn ^:private refresh-status-bar [^StatusBarWidgetFactory factory ^Project project]
   (when-let [status-bar (.getStatusBar (WindowManager/getInstance) project)]
     (.updateWidget status-bar widget-id)
-    (.updateWidget (StatusBarWidgetsManager. project) factory)))
+    (.updateWidget ^StatusBarWidgetsManager (.getService project StatusBarWidgetsManager) factory)))
 
 (defn -post-init [this]
   (swap! db/db* update :on-status-changed-fns conj

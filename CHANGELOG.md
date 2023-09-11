@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix exception on startup related to status bar.
+
 ## 0.12.0
 
 - Implement lineIdentProvider to handle enters and move cursor to correct position.
