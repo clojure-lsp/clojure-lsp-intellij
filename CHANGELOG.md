@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.12.1
+
 - Fix exception on startup related to status bar.
 
 ## 0.12.0
