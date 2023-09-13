@@ -6,7 +6,6 @@
    [com.github.clojure-lsp.intellij.action.references :as action.references]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.editor :as editor]
-   [com.github.clojure-lsp.intellij.server :as server]
    [com.rpl.proxy-plus :refer [proxy+]])
   (:import
    [com.github.clojure_lsp.intellij ClojureLanguage]
@@ -83,7 +82,7 @@
 (set! *warn-on-reflection* true)
 
 (defn -getCollectorFor [_ _file ^Editor editor _settings ^InlayHintsSink sink]
-  (when-let [client (server/connected-client)]
+  (when-let [client (lsp-client/connected-client)]
     ;; For some reason `(PresentationFactory. editor)` does not work
     (let [lens-added* (atom false)]
       (proxy+ [editor]

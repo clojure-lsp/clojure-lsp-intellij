@@ -53,12 +53,8 @@
        (logger/info "Initialized LSP server...")))
     true))
 
-(defn connected-client []
-  (when (identical? :connected (:status @db/db*))
-    (:client @db/db*)))
-
 (defn shutdown! []
-  (when-let [client (connected-client)]
+  (when-let [client (lsp-client/connected-client)]
     @(lsp-client/request! client [:shutdown {}])
     (swap! db/db* assoc :status :disconnected
            :client nil

@@ -2,8 +2,7 @@
   (:require
    [camel-snake-kebab.core :as csk]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
-   [com.github.clojure-lsp.intellij.editor :as editor]
-   [com.github.clojure-lsp.intellij.server :as server])
+   [com.github.clojure-lsp.intellij.editor :as editor])
   (:import
    [com.intellij.openapi.actionSystem AnActionEvent]
    [com.intellij.openapi.actionSystem CommonDataKeys]
@@ -12,7 +11,7 @@
 (set! *warn-on-reflection* true)
 
 (defn ^:private action-performed [command _ ^AnActionEvent event]
-  (when-let [client (server/connected-client)]
+  (when-let [client (lsp-client/connected-client)]
     (when-let [editor ^Editor (.getData event CommonDataKeys/EDITOR)]
       (let [[line character] (editor/editor->cursor-position editor)]
         (lsp-client/request! client [:workspace/executeCommand

@@ -143,3 +143,7 @@
 
 (defn notify! [client [method body]]
   (protocols.endpoint/send-notification client (subs (str method) 1) body))
+
+(defn connected-client []
+  (when (identical? :connected (:status @db/db*))
+    (:client @db/db*)))

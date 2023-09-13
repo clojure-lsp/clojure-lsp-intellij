@@ -4,8 +4,7 @@
    [clojure.core.memoize :as memoize]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.clojure-lsp.intellij.editor :as editor]
-   [com.github.clojure-lsp.intellij.server :as server])
+   [com.github.clojure-lsp.intellij.editor :as editor])
   (:import
    [com.intellij.openapi.editor Editor]
    [com.intellij.openapi.project Project]
@@ -16,7 +15,7 @@
 (defonce code-action-name->title* (atom {}))
 
 (defn ^:private req-code-actions [uri [line character]]
-  (when-let [client (server/connected-client)]
+  (when-let [client (lsp-client/connected-client)]
     (let [diagnostics (->> (get-in @db/db* [:diagnostics uri])
                            (filterv (fn [{{:keys [start end]} :range}]
                                       (and (<= (:line start) line (:line end))

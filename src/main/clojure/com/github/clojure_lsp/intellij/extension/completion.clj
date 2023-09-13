@@ -7,8 +7,7 @@
    [clojure.string :as string]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.editor :as editor]
-   [com.github.ericdallo.clj4intellij.logger :as logger]
-   [com.github.clojure-lsp.intellij.server :as server])
+   [com.github.ericdallo.clj4intellij.logger :as logger])
   (:import
    [com.github.clojure_lsp.intellij Icons]
    [com.intellij.codeInsight.completion CompletionParameters CompletionResultSet]
@@ -72,7 +71,7 @@
        (.withAutoCompletionPolicy AutoCompletionPolicy/SETTINGS_DEPENDENT)))))
 
 (defn -fillCompletionVariants [_ ^CompletionParameters params ^CompletionResultSet result]
-  (when-let [client (server/connected-client)]
+  (when-let [client (lsp-client/connected-client)]
     (try
       (let [file (.getOriginalFile params)
             uri (.getUrl (.getVirtualFile file))

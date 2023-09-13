@@ -4,6 +4,7 @@
    :name com.github.clojure_lsp.intellij.extension.StatusBarFactory
    :implements [com.intellij.openapi.wm.StatusBarWidgetFactory])
   (:require
+   [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.project :as project]
    [com.github.clojure-lsp.intellij.server :as server]
@@ -88,6 +89,6 @@
           true)))
     (getTooltipText [_] (status-bar-title))
     (getIcon [_]
-      (if (server/connected-client)
+      (if (lsp-client/connected-client)
         Icons/STATUS_CONNECTED
         Icons/STATUS_DISCONNECTED))))
