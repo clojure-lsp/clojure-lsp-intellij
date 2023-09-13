@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.12.2
+
 - Use nrepl and logger from clj4intellij.
 - Improve line indent to recognize some macros.
 
