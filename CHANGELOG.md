@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.12.3
+
 - Improve troubleshooting section
 
 ## 0.12.2
