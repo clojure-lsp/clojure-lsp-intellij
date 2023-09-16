@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Improve troubleshooting section
+
 ## 0.12.2
 
 - Use nrepl and logger from clj4intellij.

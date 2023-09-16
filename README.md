@@ -21,7 +21,7 @@
   <a href="docs/capabilities.md"><strong>capabilities</strong></a> •
   <a href="docs/developing.md"><strong>developing</strong></a> •
   <!-- <a href="https://clojure-lsp.io/settings"><strong>settings</strong></a> • -->
-  <!-- <a href="https://clojure-lsp.io/troubleshooting"><strong>troubleshooting</strong></a> • -->
+  <a href="docs/troubleshooting.md"><strong>troubleshooting</strong></a> •
   <a href="https://github.com/sponsors/clojure-lsp"><strong>support us</strong></a>
 </p>
 <hr>
@@ -45,4 +45,3 @@ Contributions are very welcome, check the [issues page](https://github.com/cloju
 ## Support the project 💙
 
 You can help us keep going and improving clojure-lsp-intellij by **[supporting the project](https://github.com/sponsors/clojure-lsp)**, the support helps to keep the project going, updated, and maintained.
-
