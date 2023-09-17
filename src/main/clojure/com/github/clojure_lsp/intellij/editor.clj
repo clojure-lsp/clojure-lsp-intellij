@@ -55,19 +55,20 @@
   (.findFile (PsiManager/getInstance project)
              (uri->v-file uri)))
 
-(defn v-file->editor ^Editor [^VirtualFile v-file ^Project project]
+(defn v-file->editor ^Editor [^VirtualFile v-file ^Project project on-open-close-file?]
   (let [file-manager (FileEditorManager/getInstance project)
         file-editor (if (.isFileOpen file-manager v-file)
                       (first (.getAllEditors file-manager v-file))
                       (let [text-editor (first (.openFile file-manager v-file false false))]
                         ;; TODO For some reason openFile always focus on the editor, so we close it to avoid navigating to the file
-                        (.closeFile file-manager v-file)
+                        (when on-open-close-file?
+                          (.closeFile file-manager v-file))
                         text-editor))]
     (.getEditor ^TextEditor file-editor)))
 
-(defn uri->editor ^Editor [^String uri ^Project project]
+(defn uri->editor ^Editor [^String uri ^Project project on-open-close-file?]
   (let [v-file (uri->v-file uri)]
-    (v-file->editor v-file project)))
+    (v-file->editor v-file project on-open-close-file?)))
 
 (defn editor->uri [^Editor editor]
   ;; TODO sanitize URL, encode, etc
@@ -93,7 +94,7 @@
             (fn []
               (doseq [{{:keys [uri]} :text-document
                        :keys [edits]} document-changes
-                      :let [editor (uri->editor uri project)
+                      :let [editor (uri->editor uri project true)
                             document (.getDocument editor)
                             sorted-edits (sort-by (comp #(position->point % document) :start :range) > edits)]]
                 (doseq [{:keys [new-text range]} sorted-edits

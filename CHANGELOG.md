@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix find definition to work for external deps as well.
+
 ## 0.12.3
 
 - Improve troubleshooting section

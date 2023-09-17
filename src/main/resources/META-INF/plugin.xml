@@ -91,16 +91,6 @@
 
     <actions>
         <!-- Features -->
-        <action id="ClojureLSP.FindDefinition"
-                class="com.github.clojure_lsp.intellij.action.DefinitionAction"
-                text="Find definition"
-                description="Find the defintion of the element at cursor."
-                icon="com.github.clojure_lsp.intellij.Icons.CLOJURE"
-                use-shortcut-of="GotoDeclaration">
-            <!-- TODO why Control+B doesnt work/override find declaration? -->
-            <keyboard-shortcut first-keystroke="shift alt F7" keymap="$default"/>
-            <mouse-shortcut keystroke="ctrl shift button1" keymap="$default"/>
-        </action>
         <action id="ClojureLSP.FindReferences"
                 class="com.github.clojure_lsp.intellij.action.ReferencesAction"
                 text="Find references"
@@ -310,7 +300,6 @@
         <group>
             <add-to-group group-id="EditorPopupMenu.GoTo" anchor="first"/>
             <add-to-group group-id="GoToMenu" anchor="before" relative-to-action="GotoDeclaration"/>
-            <reference ref="ClojureLSP.FindDefinition"/>
             <reference ref="ClojureLSP.FindReferences"/>
             <separator/>
         </group>

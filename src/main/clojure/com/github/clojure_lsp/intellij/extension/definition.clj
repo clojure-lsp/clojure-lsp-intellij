@@ -9,7 +9,8 @@
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.clojure-lsp.intellij.file-system :as file-system]
    [com.github.clojure-lsp.intellij.psi :as psi]
-   [com.github.ericdallo.clj4intellij.app-manager :as app-manager])
+   [com.github.ericdallo.clj4intellij.app-manager :as app-manager]
+   [com.github.ericdallo.clj4intellij.logger :as logger])
   (:import
    [com.intellij.openapi.editor Document Editor]
    [com.intellij.openapi.project Project]
@@ -25,13 +26,22 @@
   @(app-manager/invoke-later!
     {:invoke-fn
      (fn []
-       (let [editor ^Editor (editor/v-file->editor v-file project)
-             document ^Document (.getDocument editor)
-             {:keys [range]} definition
-             start ^int (editor/position->point (:start range) document)
-             end ^int (editor/position->point (:end range) document)
-             name (.getText document (TextRange. start end))]
-         (psi/->LSPPsiElement name project (editor/virtual->psi-file v-file project) start end)))}))
+       (try
+         (let [editor ^Editor (editor/v-file->editor v-file project false)
+               document ^Document (.getDocument editor)
+               {:keys [range]} definition
+               start ^int (editor/position->point (:start range) document)
+               end ^int (editor/position->point (:end range) document)
+               name (.getText document (TextRange. start end))]
+           (psi/->LSPPsiElement name project (editor/virtual->psi-file v-file project) start end))
+         (catch Exception e
+           (logger/error "Error finding definition:" e))))}))
+
+(defn dependency-content [client uri project definition path]
+  (let [text @(lsp-client/request! client [:clojure/dependencyContents {:uri uri}])]
+    (when (string? text)
+      (let [v-file (file-system/create-temp-file project path text)]
+        (definition->psi-element v-file project definition)))))
 
 (defn -getGotoDeclarationTarget [_ ^PsiElement element ^Editor editor]
   (when-let [client (and (= :connected (:status @db/db*))
@@ -44,9 +54,8 @@
                                                                       :character character}}])]
         (let [{:keys [uri]} definition]
           (if (string/starts-with? uri "jar:")
-            (let [text @(lsp-client/request! client [:clojure/dependencyContents {:uri uri}])
-                  sub-path (last (re-find #"^(jar|zip):(file:.+)!(/.+)" uri))
-                  ;; TODO FIXME not working when needs to call create-temp-file
-                  v-file (file-system/create-temp-file project sub-path text)]
-              (definition->psi-element v-file project definition))
-            (definition->psi-element (editor/uri->v-file uri) project definition)))))))
+            (dependency-content client uri project definition (last (re-find #"^(jar|zip):(file:.+)!(/.+)" uri)))
+            ;; TODO improve this
+            (if-let [v-file (editor/uri->v-file uri)]
+              (definition->psi-element v-file project definition)
+              (dependency-content client uri project definition (string/replace-first uri (str "file://" (file-system/temp-path project)) "")))))))))
