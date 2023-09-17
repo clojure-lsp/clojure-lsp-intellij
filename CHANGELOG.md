@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.12.4
+
 - Fix find definition to work for external deps as well.
 
 ## 0.12.3
