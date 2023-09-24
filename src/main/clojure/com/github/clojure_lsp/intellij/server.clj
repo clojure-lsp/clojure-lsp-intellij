@@ -5,7 +5,7 @@
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.ericdallo.clj4intellij.logger :as logger]
    [com.github.clojure-lsp.intellij.notification]
-   [com.github.clojure-lsp.intellij.project-lsp-lsp :as project]
+   [com.github.clojure-lsp.intellij.project-lsp :as project]
    [com.github.clojure-lsp.intellij.tasks :as tasks]
    [com.github.clojure-lsp.intellij.workspace-edit]
    [lsp4clj.server :as lsp4clj.server])

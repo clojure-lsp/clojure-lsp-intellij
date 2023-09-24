@@ -6,7 +6,7 @@
   (:require
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.clojure-lsp.intellij.project-lsp-lsp :as project]
+   [com.github.clojure-lsp.intellij.project-lsp :as project]
    [com.github.clojure-lsp.intellij.server :as server]
    [com.rpl.proxy-plus :refer [proxy+]])
   (:import
