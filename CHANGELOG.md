@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.12.5
+
 - Allow specifying a server log-path to better troubleshooting.
 
 ## 0.12.4
