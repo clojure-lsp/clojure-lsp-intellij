@@ -9,6 +9,7 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 @State(storages = [Storage("ClojureLSPSettings.xml")], name = "ClojureLSPSettingsState")
 class SettingsState : PersistentStateComponent<SettingsState?> {
     var traceLevel: String? = null
+    var serverLogPath: String? = null
 
     override fun getState(): SettingsState? {
         return this

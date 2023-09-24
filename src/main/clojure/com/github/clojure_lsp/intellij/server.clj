@@ -5,7 +5,7 @@
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.ericdallo.clj4intellij.logger :as logger]
    [com.github.clojure-lsp.intellij.notification]
-   [com.github.clojure-lsp.intellij.project :as project]
+   [com.github.clojure-lsp.intellij.project-lsp-lsp :as project]
    [com.github.clojure-lsp.intellij.tasks :as tasks]
    [com.github.clojure-lsp.intellij.workspace-edit]
    [lsp4clj.server :as lsp4clj.server])
@@ -44,8 +44,9 @@
        @(lsp-client/request! client [:initialize
                                      {:root-uri (project/project->root-uri project)
                                       :work-done-token "lsp-startup"
-                                      :initialization-options {:dependency-scheme "jar"
-                                                               :hover {:arity-on-same-line? true}}
+                                      :initialization-options (merge {:dependency-scheme "jar"
+                                                                      :hover {:arity-on-same-line? true}}
+                                                                     (:settings @db/db*))
                                       :capabilities client-capabilities}])
        (lsp-client/notify! client [:initialized {}])
        (swap! db/db* assoc :status :connected)

@@ -4,6 +4,7 @@
    :implements [com.intellij.openapi.options.Configurable])
   (:require
    [clojure.pprint :as pprint]
+   [clojure.string :as str]
    [clojure.walk :as walk]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
@@ -17,7 +18,7 @@
    [com.intellij.ui IdeBorderFactory]
    [java.awt Toolkit]
    [java.awt.datatransfer StringSelection]
-   [javax.swing JComboBox]))
+   [javax.swing JComboBox JTextField]))
 
 (set! *warn-on-reflection* true)
 
@@ -31,25 +32,24 @@
      :items (->> [(when-not server-running?
                     [(s/label :text "Warning: Clojure LSP is not running or not started yet"
                               :foreground (s.color/color 243 156 18)) "wrap"])
+                  [(s/label "Note: clojure-lsp is built-in this plugin, external installation is not needed.") "wrap"]
                   [(s.mig/mig-panel :border (IdeBorderFactory/createTitledBorder "Troubleshooting")
-                                    :items [[(s/label "Server log path") ""]
+                                    :items [[(s/label "Server log path *") ""]
                                             [(s/text :id :server-log
                                                      :columns 30
-                                                     :editable? false
-                                                     :enabled? server-running?
-                                                     :text (or log-path server-not-started-message)) "wrap"]
+                                                     :editable? true
+                                                     :enabled? true
+                                                     :text log-path) "wrap"]
                                             [(s/label "Server version") ""]
                                             [(s/text :id :server-log
                                                      :columns 30
                                                      :editable? false
                                                      :enabled? server-running?
                                                      :text (or server-version server-not-started-message)) "wrap"]
-                                            [(s/label "Server trace level") ""]
-                                            [(s/combobox :id :trace-level :model ["off" "messages" "verbose"]) "split 2"]
-                                            [(s/label :text "requires LSP restart"
-                                                      :font (s.font/font  :size 14)
-                                                      :foreground (s.color/color 110 110 110)) "wrap"]
-                                            [(s/button :text "Copy server info to clipboard"
+                                            [(s/label "Server trace level *") ""]
+                                            [(s/combobox :id :trace-level :model ["off" "messages" "verbose"]) "wrap"]
+                                            [(s/button :id :copy-server-info
+                                                       :text "Copy server info to clipboard"
                                                        :listen [:action (fn [e]
                                                                           (.setContents (.getSystemClipboard (Toolkit/getDefaultToolkit))
                                                                                         (StringSelection. (with-out-str (pprint/pprint server-info)))
@@ -59,36 +59,52 @@
                                                        :listen [:action (fn [_]
                                                                           (server/shutdown!)
                                                                           (server/spawn-server! (:project @db/db*)))]) "wrap"]]) "span"]
-                  [(s/label "Tip: clojure-lsp is built-in this plugin, external installation is not needed.") "shrink"]]
+                  [(s/label :text "*  requires LSP restart"
+                            :font (s.font/font  :size 14)
+                            :foreground (s.color/color 110 110 110)) "wrap"]]
                  (remove nil?)))))
 
+(defn ^:private server-info! []
+  (some-> (lsp-client/connected-client)
+          (lsp-client/request! [":clojure/serverInfo/raw" {}])
+          deref
+          walk/keywordize-keys))
+
 (defn -createComponent [_]
-  (let [server-info (some-> (lsp-client/connected-client)
-                            (lsp-client/request! [":clojure/serverInfo/raw" {}])
-                            deref
-                            walk/keywordize-keys)
+  (let [server-info (server-info!)
         component (build-component server-info)]
     (reset! component* component)
     component))
 
 (defn -getPreferredFocusedComponent [_]
-  (s/select @component* [:#trace-level]))
+  (s/select @component* [:#copy-server-info]))
 
 (defn -isModified [_]
   (let [settings-state (SettingsState/get)
-        trace-level-combo-box ^JComboBox (s/select @component* [:#trace-level])]
-    (not= (.getSelectedItem trace-level-combo-box) (.getTraceLevel settings-state))))
+        trace-level-combo-box ^JComboBox (s/select @component* [:#trace-level])
+        server-log-path ^JTextField (s/select @component* [:#server-log])]
+    (boolean
+     (or (not= (.getSelectedItem trace-level-combo-box) (.getTraceLevel settings-state))
+         (not= (.getText server-log-path) (or (.getServerLogPath settings-state)
+                                              ""))
+         (and (str/blank? (.getText server-log-path))
+              (-> @db/db* :settings :log-path))))))
 
 (defn -reset [_]
-  (let [trace-level-combo-box ^JComboBox (s/select @component* [:#trace-level])]
-    (.setSelectedItem trace-level-combo-box (-> @db/db* :settings :trace-level))))
+  (let [trace-level-combo-box ^JComboBox (s/select @component* [:#trace-level])
+        server-log-path ^JTextField (s/select @component* [:#server-log])
+        server-info (server-info!)]
+    (.setSelectedItem trace-level-combo-box (-> @db/db* :settings :trace-level))
+    (.setText server-log-path (or (-> @db/db* :settings :log-path) (:log-path server-info)))))
 
 (defn -disposeUIResources [_]
   (reset! component* nil))
 
 (defn -apply [_]
   (let [settings-state (SettingsState/get)
-        trace-level-combo-box ^JComboBox (s/select @component* [:#trace-level])]
-    (db/set-trace-level-setting! settings-state (.getSelectedItem trace-level-combo-box))))
+        trace-level (.getSelectedItem ^JComboBox (s/select @component* [:#trace-level]))
+        server-log-path (.getText ^JTextField (s/select @component* [:#server-log]))]
+    (db/set-server-log-path-setting! settings-state server-log-path)
+    (db/set-trace-level-setting! settings-state trace-level)))
 
 (defn -cancel [_])

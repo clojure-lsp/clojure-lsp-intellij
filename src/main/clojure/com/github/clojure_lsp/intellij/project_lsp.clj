@@ -1,4 +1,4 @@
-(ns com.github.clojure-lsp.intellij.project
+(ns com.github.clojure-lsp.intellij.project-lsp
   (:require
    [clojure.java.io :as io])
   (:import

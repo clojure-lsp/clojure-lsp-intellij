@@ -26,8 +26,14 @@
 (defn load-settings-from-state! [^SettingsState settings-state]
   (swap! db* update :settings (fn [settings]
                                 (-> settings
-                                    (update :trace-level #(or (.getTraceLevel settings-state) %))))))
+                                    (update :trace-level #(or (.getTraceLevel settings-state) %))
+                                    (update :log-path #(or (.getServerLogPath settings-state) %))))))
 
 (defn set-trace-level-setting! [^SettingsState settings-state trace-level]
   (.setTraceLevel settings-state trace-level)
   (swap! db* assoc-in [:settings :trace-level] trace-level))
+
+(defn set-server-log-path-setting! [^SettingsState settings-state log-path]
+  (let [log-path (not-empty log-path)]
+    (.setServerLogPath settings-state log-path)
+    (swap! db* assoc-in [:settings :log-path] log-path)))

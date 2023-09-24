@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Allow specifying a server log-path to better troubleshooting.
+
 ## 0.12.4
 
 - Fix find definition to work for external deps as well.
