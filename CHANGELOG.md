@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add support for paredit actions: slurp, barf, raise and kill.
+
 ## 0.12.5
 
 - Allow specifying a server log-path to better troubleshooting.

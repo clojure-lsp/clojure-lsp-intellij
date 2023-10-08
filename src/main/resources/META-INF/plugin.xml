@@ -295,6 +295,45 @@
                 text="Unwind thread once"
                 description="Unwind thread once"
                 icon="com.github.clojure_lsp.intellij.Icons.CLOJURE"/>
+        <action id="ClojureLSP.ForwardSlurp"
+                class="com.github.clojure_lsp.intellij.action.ForwardSlurpAction"
+                text="Slurp forward"
+                description="Slurp forward"
+                icon="com.github.clojure_lsp.intellij.Icons.CLOJURE">
+          <keyboard-shortcut keymap="$default" first-keystroke="alt CLOSE_BRACKET" replace-all="true"/>
+        </action>
+        <action id="ClojureLSP.ForwardBarf"
+                class="com.github.clojure_lsp.intellij.action.ForwardBarfAction"
+                text="Barf forward"
+                description="Barf forward"
+                icon="com.github.clojure_lsp.intellij.Icons.CLOJURE">
+          <keyboard-shortcut keymap="$default" first-keystroke="alt OPEN_BRACKET" replace-all="true"/>
+        </action>
+        <action id="ClojureLSP.BackwardSlurp"
+                class="com.github.clojure_lsp.intellij.action.BackwardSlurpAction"
+                text="Slurp backward"
+                description="Slurp backward"
+                icon="com.github.clojure_lsp.intellij.Icons.CLOJURE"/>
+        <action id="ClojureLSP.BackwardBarf"
+                class="com.github.clojure_lsp.intellij.action.BackwardBarfAction"
+                text="Barf backward"
+                description="Barf backward"
+                icon="com.github.clojure_lsp.intellij.Icons.CLOJURE"/>
+        <action id="ClojureLSP.RaiseSexp"
+                class="com.github.clojure_lsp.intellij.action.RaiseSexpAction"
+                text="Raise sexpr"
+                description="Raise current sexpr"
+                icon="com.github.clojure_lsp.intellij.Icons.CLOJURE">
+          <keyboard-shortcut keymap="$default" first-keystroke="alt R" replace-all="true"/>
+        </action>
+        <action id="ClojureLSP.KillSexp"
+                class="com.github.clojure_lsp.intellij.action.KillSexpAction"
+                text="Kill sexpr"
+                description="Kill current sexpr"
+                icon="com.github.clojure_lsp.intellij.Icons.CLOJURE">
+          <keyboard-shortcut keymap="$default" first-keystroke="alt K" replace-all="true"/>
+        </action>
+
 
         <!-- groups -->
         <group>
@@ -345,6 +384,12 @@
             <reference ref="ClojureLSP.ThreadLast"/>
             <reference ref="ClojureLSP.UnwindAll"/>
             <reference ref="ClojureLSP.UnwindThread"/>
+            <reference ref="ClojureLSP.ForwardSlurp"/>
+            <reference ref="ClojureLSP.ForwardBarf"/>
+            <reference ref="ClojureLSP.BackwardSlurp"/>
+            <reference ref="ClojureLSP.BackwardBarf"/>
+            <reference ref="ClojureLSP.RaiseSexp"/>
+            <reference ref="ClojureLSP.KillSexp"/>
             <separator/>
         </group>
     </actions>
