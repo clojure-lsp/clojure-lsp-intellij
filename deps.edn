@@ -2,7 +2,7 @@
  :mvn/repos {"intellij-1" {:url "https://cache-redirector.jetbrains.com/intellij-dependencies"}
              "intellij-2" {:url "https://www.jetbrains.com/intellij-repository/releases"}}
  :deps {org.clojure/clojure {:mvn/version "1.11.1"}
-        com.github.ericdallo/clj4intellij {:mvn/version "0.3.1"}
+        com.github.ericdallo/clj4intellij {:mvn/version "0.3.3"}
         seesaw/seesaw {:mvn/version "1.5.0"}
         camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.3"}
         com.github.clojure-lsp/clojure-lsp-standalone {:mvn/version "2023.08.06-00.28.06"}
