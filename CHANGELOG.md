@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Add support for paredit actions: slurp, barf, raise and kill.
+- Bump clojure-lsp to `2023.10.30-16.25.41`.
 
 ## 0.12.5
 
