@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix classpath lookup injecting user env on default classpath lookup commands.
+
 ## 0.13.0
 
 - Add support for paredit actions: slurp, barf, raise and kill.

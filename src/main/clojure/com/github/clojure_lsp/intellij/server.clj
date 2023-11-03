@@ -1,17 +1,20 @@
 (ns com.github.clojure-lsp.intellij.server
   (:require
+   [clojure-lsp.classpath :as lsp.classpath]
+   [clojure-lsp.source-paths :as lsp.source-paths]
    [clojure.core.async :as async]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.ericdallo.clj4intellij.logger :as logger]
    [com.github.clojure-lsp.intellij.notification]
    [com.github.clojure-lsp.intellij.project-lsp :as project]
    [com.github.clojure-lsp.intellij.tasks :as tasks]
    [com.github.clojure-lsp.intellij.workspace-edit]
+   [com.github.ericdallo.clj4intellij.logger :as logger]
    [lsp4clj.server :as lsp4clj.server])
   (:import
    [com.github.ericdallo.clj4intellij ClojureClassLoader]
-   [com.intellij.openapi.project Project]))
+   [com.intellij.openapi.project Project]
+   [com.intellij.util EnvironmentUtil]))
 
 (def ^:private client-capabilities
   {:text-document {:hover {:content-format ["markdown"]}}
@@ -45,7 +48,13 @@
                                      {:root-uri (project/project->root-uri project)
                                       :work-done-token "lsp-startup"
                                       :initialization-options (merge {:dependency-scheme "jar"
-                                                                      :hover {:arity-on-same-line? true}}
+                                                                      :hover {:arity-on-same-line? true}
+                                                                      ;; For some users like brew users, System/getEnv doesn't match
+                                                                      ;; User env, so we inject the env that intellij magically calculates
+                                                                      ;; from EnvironemntUtil class and pass to clojure-lsp as default.
+                                                                      :project-specs (mapv (fn [project-spec]
+                                                                                             (assoc project-spec :env (EnvironmentUtil/getEnvironmentMap)))
+                                                                                           (lsp.classpath/default-project-specs lsp.source-paths/default-source-aliases))}
                                                                      (:settings @db/db*))
                                       :capabilities client-capabilities}])
        (lsp-client/notify! client [:initialized {}])
