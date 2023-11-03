@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.13.1
+
 - Fix classpath lookup injecting user env on default classpath lookup commands.
 
 ## 0.13.0
