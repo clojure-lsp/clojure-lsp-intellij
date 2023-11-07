@@ -72,6 +72,7 @@
    []
    StatusBarWidget
     (ID [_] widget-id)
+    (install [_ _])
     (getPresentation [this] this)
     StatusBarWidget$IconPresentation
     (getClickConsumer [_]
