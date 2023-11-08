@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.13.2
+
 - Fix support for older intellij.
 
 ## 0.13.1
