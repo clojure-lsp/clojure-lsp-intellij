@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 0.13.3
+
 - Fix exception during hover element.
 - Fix exception during find definition specific cases.
 
