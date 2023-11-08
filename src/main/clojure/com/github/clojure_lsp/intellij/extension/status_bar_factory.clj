@@ -11,7 +11,8 @@
    [com.rpl.proxy-plus :refer [proxy+]])
   (:import
    [com.github.clojure_lsp.intellij Icons]
-   [com.intellij.openapi.actionSystem AnAction DataContext DefaultActionGroup]
+   [com.intellij.ide DataManager]
+   [com.intellij.openapi.actionSystem AnAction DefaultActionGroup]
    [com.intellij.openapi.project Project]
    [com.intellij.openapi.ui.popup JBPopupFactory JBPopupFactory$ActionSelectionAid]
    [com.intellij.openapi.wm
@@ -78,15 +79,16 @@
     (getClickConsumer [_]
       (reify Consumer
         (consume [_ e]
-          (let [popup (.createActionGroupPopup
+          (let [component (.getComponent ^MouseEvent e)
+                popup (.createActionGroupPopup
                        (JBPopupFactory/getInstance)
                        (status-bar-title)
                        (doto (DefaultActionGroup.)
                          (.add (restart-lsp-action project)))
-                       DataContext/EMPTY_CONTEXT
+                       (.getDataContext (DataManager/getInstance) component)
                        JBPopupFactory$ActionSelectionAid/SPEEDSEARCH
                        true)]
-            (.show popup (RelativePoint. (.getComponent ^MouseEvent e) (Point. 0 (-> popup .getContent .getPreferredSize .getHeight -)))))
+            (.show popup (RelativePoint. component (Point. 0 (-> popup .getContent .getPreferredSize .getHeight -)))))
           true)))
     (getTooltipText [_] (status-bar-title))
     (getIcon [_]
