@@ -45,3 +45,5 @@
 (defn -generateRenderedDoc [_ _])
 (defn -collectDocComments [_ _ _])
 (defn -getLocalImageForElement [_ _ _])
+(defn -getDocumentationElementForLookupItem [_ _ _ _])
+(defn -getDocumentationElementForLink [_ _ _ _])

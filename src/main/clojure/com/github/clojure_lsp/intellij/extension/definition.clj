@@ -52,7 +52,7 @@
                                                           {:text-document {:uri (editor/editor->uri editor)}
                                                            :position {:line line
                                                                       :character character}}])]
-        (let [{:keys [uri]} definition]
+        (when-let [uri (:uri definition)]
           (if (string/starts-with? uri "jar:")
             (dependency-content client uri project definition (last (re-find #"^(jar|zip):(file:.+)!(/.+)" uri)))
             ;; TODO improve this

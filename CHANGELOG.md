@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- Fix exception during hover element.
+- Fix exception during find definition specific cases.
+
 ## 0.13.2
 
 - Fix support for older intellij.
