@@ -30,7 +30,7 @@ dependencies {
     implementation ("org.clojure:core.async:1.5.648") {
         because("issue https://clojure.atlassian.net/browse/ASYNC-248")
     }
-    implementation ("com.github.clojure-lsp:clojure-lsp-standalone:2023.10.30-16.25.41") {
+    implementation ("com.github.clojure-lsp:clojure-lsp-standalone:2023.10.30-16.25.41-hotfix2") {
         exclude("org.clojure", "core.async")
     }
     implementation ("com.rpl:proxy-plus:0.0.9")
