@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 1.13.4
+
 - Bump clojure-lsp to 2023.10.30-16.25.41-hotfix2 to fix settings merge during startup.
 
 ## 0.13.3
