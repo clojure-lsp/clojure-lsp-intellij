@@ -17,8 +17,8 @@
   #{})
 
 (defn -canFormat [_ ^PsiFile psi-file]
-  (and (lsp-client/connected-client)
-       (instance? ClojureFileType (.getFileType psi-file))))
+  (and (instance? ClojureFileType (.getFileType psi-file))
+       (boolean (lsp-client/connected-client))))
 
 (defn -getName [_]
   "LSP format")
