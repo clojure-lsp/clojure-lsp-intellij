@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 1.13.5
+
 - Fix format for non clojure files. #28
 
 ## 1.13.4
