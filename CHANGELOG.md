@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add wizzard to create multiple Clojure types of projects directly via Intellij.
+
 ## 1.13.5
 
 - Fix format for non clojure files. #28

@@ -76,6 +76,7 @@
         <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.UnwindAll</className></intentionAction>
 
         <!-- misc -->
+        <moduleBuilder builderClass="com.github.clojure_lsp.intellij.extension.ClojureModuleBuilder"/>
         <spellchecker.bundledDictionaryProvider implementation="com.github.clojure_lsp.intellij.extension.BundledDictionaryProvider"/>
         <lang.commenter language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.Commenter"/>
         <lang.quoteHandler language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.QuoteHandler"/>
