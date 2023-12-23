@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 1.14.0
+
 - Add wizzard to create multiple Clojure types of projects directly via Intellij.
 
 ## 1.13.5
