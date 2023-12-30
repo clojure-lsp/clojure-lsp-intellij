@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 1.14.1
+
 - Bump clojure-lsp to `2023.12.29-12.09.27`.
 
 ## 1.14.0
