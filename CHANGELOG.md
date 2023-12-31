@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 1.14.2
+
 - Improve project creation wizard icons.
 
 ## 1.14.1
