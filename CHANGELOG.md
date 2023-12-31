@@ -2,13 +2,15 @@
 
 ## [Unreleased]
 
+- Improve project creation wizard icons.
+
 ## 1.14.1
 
 - Bump clojure-lsp to `2023.12.29-12.09.27`.
 
 ## 1.14.0
 
-- Add wizzard to create multiple Clojure types of projects directly via Intellij.
+- Add wizard to create multiple Clojure types of projects directly via Intellij.
 
 ## 1.13.5
 

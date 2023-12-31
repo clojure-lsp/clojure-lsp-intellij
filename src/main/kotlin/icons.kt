@@ -5,6 +5,10 @@ import javax.swing.Icon
 
 object Icons {
   @JvmField val CLOJURE = IconLoader.getIcon("/icons/clojure.svg", Icons::class.java)
+  @JvmField val LEININGEN = IconLoader.getIcon("/icons/leiningen.svg", Icons::class.java)
+  @JvmField val CLOJURE_SCRIPT = IconLoader.getIcon("/icons/clojure-script.svg", Icons::class.java)
+  @JvmField val BABASHKA = IconLoader.getIcon("/icons/babashka.svg", Icons::class.java)
+  @JvmField val CLOJURE_DART = IconLoader.getIcon("/icons/clojure-dart.svg", Icons::class.java)
   @JvmField val STATUS_CONNECTED = IconLoader.getIcon("/icons/clojure.svg", Icons::class.java)
   @JvmField val STATUS_DISCONNECTED = IconLoader.getIcon("/icons/clojure-mono.svg", Icons::class.java)
   @JvmField val SYMBOL_CLASS = IconLoader.getIcon("/icons/symbol-class.svg", Icons::class.java)

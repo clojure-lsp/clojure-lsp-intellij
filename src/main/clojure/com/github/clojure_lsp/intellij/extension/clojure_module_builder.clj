@@ -33,36 +33,12 @@
 
 (defn -getModuleType [_] clojure-module)
 
-(defn ^:private project-type-option [id label group]
-  (s.mig/mig-panel :items [[(s/label :icon (s/icon Icons/CLOJURE)) ""]
-                           [(s/radio :text label
-                                     :selected? true
-                                     :id id
-                                     :group group) ""]]))
-
-(defonce ^:private wizzard* (atom {:component nil
-                                   :project-type nil
-                                   :button-group nil}))
-
-(defn -getCustomOptionsStep [_ _context ^Disposable _parent-disposable]
-  (proxy+ ClojureModuleWizard [] ModuleWizardStep
-          (getComponent [_]
-            (let [project-group (s/button-group)
-                  component (s.mig/mig-panel :items [[(s/label "Choose the Clojure project type") "wrap"]
-                                                     [(project-type-option :clojure "Clojure (deps.edn)" project-group) "wrap"]
-                                                     [(project-type-option :leiningen "Leiningen (project.clj)" project-group) "wrap"]
-                                                     [(project-type-option :shadow-cljs "ClojureScript (shadow.cljs)" project-group) "wrap"]
-                                                     [(project-type-option :babashka "Babashka (bb.edn)" project-group) "wrap"]
-                                                     [(project-type-option :clojure-dart "ClojureDart (deps.edn)" project-group) "wrap"]])]
-              (swap! wizzard* #(-> %
-                                   (assoc :component component)
-                                   (assoc :button-group project-group)))
-              component))
-          (updateDataModel [_]
-            (swap! wizzard* assoc :project-type (s/id-of (s/selection (:button-group @wizzard*)))))))
-
-(defn -setupRootModel [^ModuleBuilder this ^ModifiableRootModel model]
-  (.doAddContentEntry this model))
+(def ^:private project-type->icon
+  {:clojure Icons/CLOJURE
+   :leiningen Icons/LEININGEN
+   :shadow-cljs Icons/CLOJURE_SCRIPT
+   :babashka Icons/BABASHKA
+   :clojure-dart Icons/CLOJURE_DART})
 
 (defn ^:private project-template [project-type]
   (get
@@ -72,6 +48,37 @@
     :babashka "project-templates/bb"
     :clojure-dart "project-templates/cljd"}
    project-type))
+
+(defn ^:private project-type-option [id label group]
+  (s.mig/mig-panel :items [[(s/label :icon (s/icon (project-type->icon id))) ""]
+                           [(s/radio :text label
+                                     :selected? true
+                                     :id id
+                                     :group group) ""]]))
+
+(defonce ^:private wizard* (atom {:component nil
+                                  :project-type nil
+                                  :button-group nil}))
+
+(defn -getCustomOptionsStep [_ _context ^Disposable _parent-disposable]
+  (proxy+ ClojureModuleWizard [] ModuleWizardStep
+          (getComponent [_]
+            (let [project-group (s/button-group)
+                  component (s.mig/mig-panel :items [[(s/label "Choose the Clojure project type") "wrap"]
+                                                     [(project-type-option :clojure "Clojure (deps.edn)" project-group) "wrap"]
+                                                     [(project-type-option :leiningen "Leiningen (project.clj)" project-group) "wrap"]
+                                                     [(project-type-option :shadow-cljs "ClojureScript (shadow-cljs.edn)" project-group) "wrap"]
+                                                     [(project-type-option :babashka "Babashka (bb.edn)" project-group) "wrap"]
+                                                     [(project-type-option :clojure-dart "ClojureDart (deps.edn)" project-group) "wrap"]])]
+              (swap! wizard* #(-> %
+                                  (assoc :component component)
+                                  (assoc :button-group project-group)))
+              component))
+          (updateDataModel [_]
+            (swap! wizard* assoc :project-type (s/id-of (s/selection (:button-group @wizard*)))))))
+
+(defn -setupRootModel [^ModuleBuilder this ^ModifiableRootModel model]
+  (.doAddContentEntry this model))
 
 (defn ^:private normalize-entry-name [entry-name project-template project-name]
   (-> entry-name
@@ -106,6 +113,6 @@
 (defn -commitModule [this ^Project project ^ModifiableModuleModel model]
   (let [project-path (.getBasePath project)
         project-name (.getName project)
-        template (project-template (:project-type @wizzard*))]
+        template (project-template (:project-type @wizard*))]
     (copy-template template project-path project-name)
     (.superCommitModule this project model)))

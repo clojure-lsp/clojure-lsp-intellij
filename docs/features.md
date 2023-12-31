@@ -36,6 +36,6 @@ This plugin relies on clojure-lsp features, so most work is done there, for more
 
 ### Format a whole file or range
 
-### Wizzard to create new Clojure projects
+### Wizard to create new Clojure projects
 
-![](../images/wizzard.png)
+![](../images/wizard.png)
