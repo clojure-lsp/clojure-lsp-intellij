@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## 0.14.3
+## 1.14.3
 
 - Start NREPL server only for development.
 
