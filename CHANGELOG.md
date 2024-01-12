@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 1.14.5
+
 - Fix ctrl/cmd + click going to definition automatically. #27
 
 ## 1.14.4
