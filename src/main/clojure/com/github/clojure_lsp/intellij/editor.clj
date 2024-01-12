@@ -6,7 +6,11 @@
    [com.github.ericdallo.clj4intellij.app-manager :as app-manager])
   (:import
    [com.intellij.openapi.editor Document Editor]
-   [com.intellij.openapi.fileEditor FileDocumentManager FileEditorManager TextEditor]
+   [com.intellij.openapi.fileEditor
+    FileDocumentManager
+    FileEditorManager
+    OpenFileDescriptor
+    TextEditor]
    [com.intellij.openapi.project Project]
    [com.intellij.openapi.util TextRange]
    [com.intellij.openapi.util.text StringUtil]
@@ -21,6 +25,9 @@
   (let [text (.getCharsSequence (.getDocument editor))
         line-col (StringUtil/offsetToLineColumn text offset)]
     [(.line line-col) (.column line-col)]))
+
+(defn position->offset [text line character]
+  (StringUtil/lineColToOffset text line character))
 
 (defn editor->cursor-position [^Editor editor]
   (let [offset (.. editor getCaretModel getCurrentCaret getOffset)]
@@ -57,14 +64,10 @@
 
 (defn v-file->editor ^Editor [^VirtualFile v-file ^Project project on-open-close-file?]
   (let [file-manager (FileEditorManager/getInstance project)
-        file-editor (if (.isFileOpen file-manager v-file)
-                      (first (.getAllEditors file-manager v-file))
-                      (let [text-editor (first (.openFile file-manager v-file false false))]
-                        ;; TODO For some reason openFile always focus on the editor, so we close it to avoid navigating to the file
-                        (when on-open-close-file?
-                          (.closeFile file-manager v-file))
-                        text-editor))]
-    (.getEditor ^TextEditor file-editor)))
+        editor (if (.isFileOpen file-manager v-file)
+                 (.getEditor ^TextEditor (first (.getAllEditors file-manager v-file)))
+                 (.openTextEditor file-manager (OpenFileDescriptor. project v-file) false))]
+    editor))
 
 (defn uri->editor ^Editor [^String uri ^Project project on-open-close-file?]
   (let [v-file (uri->v-file uri)]
