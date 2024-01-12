@@ -4,6 +4,8 @@
 
 ## 1.14.4
 
+## 1.14.4
+
 - Fix possible exception when calculating code lens.
 
 ## 1.14.3
