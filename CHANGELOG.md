@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## 1.14.4
+
+- Fix possible exception when calculating code lens.
+
 ## 1.14.3
 
 - Start NREPL server only for development.

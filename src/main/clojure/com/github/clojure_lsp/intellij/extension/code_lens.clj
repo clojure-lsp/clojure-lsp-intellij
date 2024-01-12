@@ -95,14 +95,15 @@
                   factory (.getFactory ^FactoryInlayHintsCollector this)]
               (doseq [code-len code-lens]
                 (let [{:keys [range] {:keys [title command arguments]} :command} @(lsp-client/request! client [:codeLens/resolve code-len])]
-                  (.addInlineElement sink
-                                     (editor/position->point (:start range) document)
-                                     true
-                                     (code-lens-presentation
-                                      factory
-                                      title
-                                      (fn onClick []
-                                        (handle-command editor command arguments)))
-                                     true)))
+                  (when range
+                    (.addInlineElement sink
+                                       (editor/position->point (:start range) document)
+                                       true
+                                       (code-lens-presentation
+                                         factory
+                                         title
+                                         (fn onClick []
+                                           (handle-command editor command arguments)))
+                                       true))))
               (reset! lens-added* true)))
           false)))))
