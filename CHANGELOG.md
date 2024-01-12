@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Start NREPL server only for development.
+
 ## 1.14.2
 
 - Improve project creation wizard icons.

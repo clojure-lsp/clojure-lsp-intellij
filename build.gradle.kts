@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     implementation ("org.clojure:clojure:1.11.1")
-    implementation ("com.github.ericdallo:clj4intellij:0.3.3")
+    implementation ("com.github.ericdallo:clj4intellij:0.3.7")
     implementation ("seesaw:seesaw:1.5.0")
     implementation ("camel-snake-kebab:camel-snake-kebab:0.4.3")
     implementation ("org.clojure:core.async:1.5.648") {
@@ -40,7 +40,10 @@ dependencies {
 sourceSets {
     main {
         java.srcDirs("src/main", "src/gen")
-        resources.srcDirs("resources")
+        if (project.gradle.startParameter.taskNames.contains("buildPlugin") ||
+            project.gradle.startParameter.taskNames.contains("runIde")) {
+            resources.srcDirs("src/main/dev-resources")
+        }
     }
     test {
         java.srcDirs("tests")
