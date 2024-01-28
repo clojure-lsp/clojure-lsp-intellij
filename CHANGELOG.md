@@ -4,6 +4,7 @@
 
 - Add shortcuts to backward slurp and barf.
 - Add shortcut documentation to all features, check the features doc page.
+- Fix Rename feature not being available for some cases.
 
 ## 1.14.5
 

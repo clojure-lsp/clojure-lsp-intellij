@@ -12,17 +12,20 @@
    [com.intellij.openapi.project Project]
    [com.intellij.openapi.ui Messages NonEmptyInputValidator]
    [com.intellij.openapi.util TextRange]
-   [com.intellij.psi PsiFile]
+   [com.intellij.psi PsiDocumentManager PsiFile]
    [com.intellij.refactoring.rename PsiElementRenameHandler]))
 
 (set! *warn-on-reflection* true)
 
 (defn -isAvailableOnDataContext [_ ^DataContext data-context]
   (boolean
-   (and (.getData data-context CommonDataKeys/EDITOR)
-        (.getData data-context CommonDataKeys/PSI_FILE)
-        (let [element (PsiElementRenameHandler/getElement data-context)]
-          (instance? PsiFile element)))))
+   (when-let [element (or (and (.getData data-context CommonDataKeys/PSI_FILE)
+                               (PsiElementRenameHandler/getElement data-context))
+                          (and (.getData data-context CommonDataKeys/PROJECT)
+                               (.getData data-context CommonDataKeys/EDITOR)
+                               (.getPsiFile (PsiDocumentManager/getInstance (.getData data-context CommonDataKeys/PROJECT))
+                                            (.getDocument ^Editor (.getData data-context CommonDataKeys/EDITOR)))))]
+     (instance? PsiFile element))))
 
 (defn -isRenaming [this data-context]
   (-isAvailableOnDataContext this data-context))
