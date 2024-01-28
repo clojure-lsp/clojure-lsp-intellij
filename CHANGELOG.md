@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- Add shortcuts to backward slurp and barf.
+- Add shortcut documentation to all features, check the features doc page.
+
 ## 1.14.5
 
 - Fix ctrl/cmd + click going to definition automatically. #27
