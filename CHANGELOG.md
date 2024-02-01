@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Bump clojure-lsp to `2024.02.01-11.01.59`.
+
 ## 1.14.6
 
 - Add shortcuts to backward slurp and barf.
