@@ -131,7 +131,7 @@
     :request-id (atom 0)}))
 
 (defn start-server-and-client! [server client context]
-  ((requiring-resolve 'clojure-lsp.server/start-server!) server)
+  ((requiring-resolve 'clojure-lsp.server/start-server!) server nil)
   (protocols.endpoint/start client context)
   (async/go-loop []
     (when-let [log-args (async/<! (:log-ch client))]

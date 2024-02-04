@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix exception when starting server related to previous version.
+
 ## 1.14.7
 
 - Bump clojure-lsp to `2024.02.01-11.01.59`.
