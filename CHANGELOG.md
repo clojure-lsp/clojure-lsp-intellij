@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 1.14.8
+
 - Fix exception when starting server related to previous version.
 
 ## 1.14.7
