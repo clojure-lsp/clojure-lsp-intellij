@@ -66,14 +66,15 @@
 (defn -bulkUpdateStarting [_ _])
 (defn -bulkUpdateFinished [_ _])
 (defn -documentChanged [_ ^DocumentEvent event]
-  (when-let [vfile (.getFile (FileDocumentManager/getInstance) (.getDocument event))]
-    (let [url (.getUrl vfile)
-          {:keys [client documents]} @db/db*]
-      (when-let [{:keys [version]} (get documents url)]
-        (lsp-client/notify!
-         client
-         [:textDocument/didChange
-          {:text-document {:uri url
-                           :version (inc version)}
-           :content-changes [{:text (.getText (.getDocument event))}]}])
-        (swap! db/db* update-in [:documents url :version] inc)))))
+  (when-let [client (lsp-client/connected-client)]
+    (when-let [vfile (.getFile (FileDocumentManager/getInstance) (.getDocument event))]
+      (let [url (.getUrl vfile)
+            {:keys [documents]} @db/db*]
+        (when-let [{:keys [version]} (get documents url)]
+          (lsp-client/notify!
+           client
+           [:textDocument/didChange
+            {:text-document {:uri url
+                             :version (inc version)}
+             :content-changes [{:text (.getText (.getDocument event))}]}])
+          (swap! db/db* update-in [:documents url :version] inc))))))
