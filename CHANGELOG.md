@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 1.14.9
+
 - Fix some exceptions that can rarely occurr after startup.
 
 ## 1.14.8
