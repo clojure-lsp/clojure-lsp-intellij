@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 1.14.10
+
 - Bump clojure-lsp to `2024.03.01-11.37.51`.
 
 ## 1.14.9
