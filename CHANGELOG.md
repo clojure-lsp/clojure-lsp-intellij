@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Bump clojure-lsp to `2024.03.01-11.37.51`.
+
 ## 1.14.9
 
 - Fix some exceptions that can rarely occurr after startup.
