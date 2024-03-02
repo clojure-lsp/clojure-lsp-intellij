@@ -5,7 +5,7 @@
         com.github.ericdallo/clj4intellij {:mvn/version "0.3.7"}
         seesaw/seesaw {:mvn/version "1.5.0"}
         camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.3"}
-        com.github.clojure-lsp/clojure-lsp-standalone {:mvn/version "2024.03.01-11.37.51"}
+        com.github.clojure-lsp/clojure-lsp {:mvn/version "2024.03.01-11.37.51"}
         markdown-clj/markdown-clj {:mvn/version "1.11.4"}
         com.rpl/proxy-plus {:mvn/version "0.0.9"}}
  :aliases {:dev {:deps {nrepl/nrepl {:mvn/version "1.0.0"}

@@ -5,6 +5,7 @@
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.ericdallo.clj4intellij.logger :as logger]
    [lsp4clj.coercer :as coercer]
+   [lsp4clj.io-chan :as io-chan]
    [lsp4clj.lsp.requests :as lsp.requests]
    [lsp4clj.lsp.responses :as lsp.responses]
    [lsp4clj.protocols.endpoint :as protocols.endpoint]))
@@ -26,7 +27,7 @@
       (let [response
             (case message-type
               (:parse-error :invalid-request)
-              (protocols.endpoint/log client :red "Error reading message" message-type)
+              (protocols.endpoint/log client :red "Error reading message" message)
               :request
               (protocols.endpoint/receive-request client context message)
               (:response.result :response.error)
@@ -40,9 +41,9 @@
         (protocols.endpoint/log client :red "Error receiving:" e)
         (throw e)))))
 
-;; TODO move to lsp4clj
 (defrecord Client [client-id
-                   input output
+                   input-ch
+                   output-ch
                    log-ch
                    join
                    request-id
@@ -52,11 +53,11 @@
     (protocols.endpoint/log this :white "lifecycle:" "starting")
     (let [pipeline (async/pipeline-blocking
                     1 ;; no parallelism preserves server message order
-                    output
+                    output-ch
                      ;; TODO: return error until initialize request is received? https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#initialize
                      ;; `keep` means we do not reply to responses and notifications
                     (keep #(receive-message this context %))
-                    input)]
+                    input-ch)]
       (async/go
         ;; wait for pipeline to close, indicating input closed
         (async/<! pipeline)
@@ -68,7 +69,7 @@
     (protocols.endpoint/log this :white "lifecycle:" "shutting down")
     ;; closing input will drain pipeline, then close output, then close
     ;; pipeline
-    (async/close! input)
+    (async/close! input-ch)
     (if (= :done (deref join 10e3 :timeout))
       (protocols.endpoint/log this :white "lifecycle:" "shutdown")
       (protocols.endpoint/log this :red "lifecycle:" "shutdown timed out"))
@@ -87,12 +88,12 @@
       ;; available during receive-response.
       (swap! sent-requests assoc (:id req) {:request p
                                             :start-ns start-ns})
-      (async/>!! output req)
+      (async/>!! output-ch req)
       p))
   (send-notification [this method body]
     (let [notif (lsp.requests/notification method body)]
       (protocols.endpoint/log this :blue "sending notification:" notif)
-      (async/>!! output notif)))
+      (async/>!! output-ch notif)))
   (receive-response [this {:keys [id] :as resp}]
     (if-let [{:keys [request start-ns]} (get @sent-requests id)]
       (let [ms (float (/ (- (System/nanoTime) start-ns) 1000000))]
@@ -120,18 +121,17 @@
 
       (logger/warn "Unknown LSP notification method" method))))
 
-(defn client [server]
+(defn client [in out]
   (map->Client
    {:client-id 1
-    :input (:output-ch server)
-    :output (:input-ch server)
+    :input-ch (io-chan/input-stream->input-chan out {:keyword-function keyword})
+    :output-ch (io-chan/output-stream->output-chan in)
     :log-ch (async/chan (async/sliding-buffer 20))
     :join (promise)
     :sent-requests (atom {})
     :request-id (atom 0)}))
 
-(defn start-server-and-client! [server client context]
-  ((requiring-resolve 'clojure-lsp.server/start-server!) server nil)
+(defn start-client! [client context]
   (protocols.endpoint/start client context)
   (async/go-loop []
     (when-let [log-args (async/<! (:log-ch client))]

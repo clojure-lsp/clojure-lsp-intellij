@@ -46,4 +46,4 @@
             ;; TODO improve this
             (if-let [v-file (editor/uri->v-file uri)]
               (definition->psi-element v-file project definition nil)
-              (dependency-content client uri project definition (string/replace-first uri (str "file://" (file-system/temp-path project)) "")))))))))
+              (dependency-content client uri project definition (string/replace-first uri (str "file://" (file-system/project-cache-path project)) "")))))))))

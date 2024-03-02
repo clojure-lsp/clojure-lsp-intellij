@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Use clojure-lsp externally instead of built-in since causes PATH issues sometimes. Related to #25 and #26
+
 ## 1.14.10
 
 - Bump clojure-lsp to `2024.03.01-11.37.51`.

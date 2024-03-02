@@ -28,7 +28,7 @@
                (project/clojure-project? project @db/db*))
            (do
              (swap! db/db* assoc :project project)
-             (server/spawn-server! project)))))
+             (server/start-server! project)))))
 
 (defn -fileOpened [_this ^FileEditorManager source ^VirtualFile file]
   (when (ensure-server-up! file (.getProject source))

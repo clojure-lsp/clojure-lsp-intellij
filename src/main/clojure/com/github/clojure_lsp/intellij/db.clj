@@ -8,12 +8,14 @@
 
 (def ^:private initial-db
   {:status :disconnected
+   :downloaded-server-path nil
    :on-status-changed-fns []
    :client nil
-   :server nil
+   :server-process nil
    :project nil
    :diagnostics {}
-   :settings {:trace-level "off"}})
+   :settings {:trace-level "off"
+              :server-path nil}})
 
 (defonce db* (atom initial-db))
 
@@ -37,3 +39,8 @@
   (let [log-path (not-empty log-path)]
     (.setServerLogPath settings-state log-path)
     (swap! db* assoc-in [:settings :log-path] log-path)))
+
+(defn set-server-path-setting! [^SettingsState settings-state server-path]
+  (let [server-path (not-empty server-path)]
+    (.setServerPath settings-state server-path)
+    (swap! db* assoc-in [:settings :server-path] server-path)))

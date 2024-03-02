@@ -7,7 +7,7 @@
 
 <!-- Plugin description -->
 
-[Free OpenSource Intellij plugin](https://github.com/clojure-lsp/clojure-lsp-intellij) with support for Clojure & ClojureScript development via the built-in Language Server (LSP) [clojure-lsp](https://clojure-lsp.io/) providing features via static analysis
+[Free OpenSource Intellij plugin](https://github.com/clojure-lsp/clojure-lsp-intellij) with support for Clojure & ClojureScript development using the Language Server (LSP) [clojure-lsp](https://clojure-lsp.io/) providing features via static analysis
 
 <!-- Plugin description end -->
 

@@ -63,7 +63,7 @@
 
     (actionPerformed [_ _event]
       (server/shutdown!)
-      (server/spawn-server! project))))
+      (server/start-server! project))))
 
 (defn ^:private status-bar-title []
   (str "Clojure LSP: " (name (:status @db/db*))))
