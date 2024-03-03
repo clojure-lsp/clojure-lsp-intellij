@@ -14,6 +14,7 @@
    lsp4clj.server)
   (:import
    [com.intellij.openapi.project Project]
+   [com.intellij.util EnvironmentUtil]
    [java.util.zip ZipInputStream]))
 
 (def ^:private client-capabilities
@@ -61,7 +62,8 @@
   (logger/info "Spawning LSP server process...")
   (tasks/set-progress indicator "LSP: Starting server")
   (let [process (p/process [server-path "listen"]
-                           {:dir (.getBasePath project)})
+                           {:dir (.getBasePath project)
+                            :env (EnvironmentUtil/getEnvironmentMap)})
         client (lsp-client/client (:in process) (:out process))]
     (swap! db/db* assoc
            :server-process process
@@ -72,13 +74,7 @@
                                   {:root-uri (project/project->root-uri project)
                                    :work-done-token "lsp-startup"
                                    :initialization-options (merge {:dependency-scheme "jar"
-                                                                   :hover {:arity-on-same-line? true}
-                                                                   ;; For some users like brew users, System/getEnv doesn't match
-                                                                   ;; User env, so we inject the env that intellij magically calculates
-                                                                   ;; from EnvironemntUtil class and pass to clojure-lsp as default.
-                                                                   #_#_:project-specs (mapv (fn [project-spec]
-                                                                                              (assoc project-spec :env (EnvironmentUtil/getEnvironmentMap)))
-                                                                                            (lsp.classpath/default-project-specs lsp.source-paths/default-source-aliases))}
+                                                                   :hover {:arity-on-same-line? true}}
                                                                   (:settings @db/db*))
                                    :capabilities client-capabilities}])
     (lsp-client/notify! client [:initialized {}])
