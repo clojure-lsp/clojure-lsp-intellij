@@ -35,14 +35,20 @@
       (string/starts-with? os-name "macos") :macos
       :else :linux)))
 
+(def ^:private latest-version-uri
+  "https://raw.githubusercontent.com/clojure-lsp/clojure-lsp/master/lib/resources/CLOJURE_LSP_RELEASED_VERSION")
+
+(def ^:private download-artifact-uri
+  "https://github.com/clojure-lsp/clojure-lsp/releases/download/%s/%s")
+
 (defn ^:private download-server! [indicator]
   (logger/info "Downloading clojure-lsp...")
   (tasks/set-progress indicator "LSP: Downloading clojure-lsp")
-  (let [version (string/trim (slurp "https://raw.githubusercontent.com/clojure-lsp/clojure-lsp/master/lib/resources/CLOJURE_LSP_RELEASED_VERSION"))
+  (let [version (string/trim (slurp latest-version-uri))
         platform (os-name)
         arch (keyword (System/getProperty "os.arch"))
         artifact-name (get-in artifacts [platform arch])
-        uri (format "https://github.com/clojure-lsp/clojure-lsp/releases/download/%s/%s" version artifact-name)
+        uri (format download-artifact-uri version artifact-name)
         dest-file (io/file (file-system/plugin-path) "clojure-lsp")
         dest-path (.getCanonicalPath dest-file)]
     (with-open [in (io/input-stream uri)
