@@ -67,8 +67,8 @@
     dest-path))
 
 (defn ^:private spawn-server! [^Project project indicator server-path]
-  (logger/info "Spawning LSP server process...")
-  (tasks/set-progress indicator "LSP: Starting server")
+  (logger/info "Spawning LSP server process using path" server-path)
+  (tasks/set-progress indicator "LSP: Starting server...")
   (let [process (p/process [server-path "listen"]
                            {:dir (.getBasePath project)
                             :env (EnvironmentUtil/getEnvironmentMap)})
@@ -77,7 +77,7 @@
            :server-process process
            :client client)
     (lsp-client/start-client! client {:progress-indicator indicator})
-    (tasks/set-progress indicator "LSP: Initializing")
+    (tasks/set-progress indicator "LSP: Initializing...")
     @(lsp-client/request! client [:initialize
                                   {:root-uri (project/project->root-uri project)
                                    :work-done-token "lsp-startup"
@@ -85,10 +85,7 @@
                                                                    :hover {:arity-on-same-line? true}}
                                                                   (:settings @db/db*))
                                    :capabilities client-capabilities}])
-    (lsp-client/notify! client [:initialized {}])
-    (swap! db/db* assoc :status :connected)
-    (run! #(% :connected) (:on-status-changed-fns @db/db*))
-    (logger/info "Initialized LSP server")))
+    (lsp-client/notify! client [:initialized {}])))
 
 (defn start-server! [^Project project]
   (swap! db/db* assoc :status :connecting)
@@ -108,7 +105,16 @@
 
          :else
          (->> (download-server! indicator download-path)
-              (spawn-server! project indicator))))))
+              (spawn-server! project indicator)))
+
+       (swap! db/db* assoc :status :connected)
+       (run! #(% :connected) (:on-status-changed-fns @db/db*))
+       ;; For race conditions when server starts too fast
+       ;; and other places that listen didn't setup yet
+       (future
+         (Thread/sleep 1000)
+         (run! #(% :connected) (:on-status-changed-fns @db/db*)))
+       (logger/info "Initialized LSP server"))))
   true)
 
 (defn shutdown! []
