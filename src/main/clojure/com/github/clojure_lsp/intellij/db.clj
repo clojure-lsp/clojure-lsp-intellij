@@ -28,6 +28,7 @@
 (defn load-settings-from-state! [^SettingsState settings-state]
   (swap! db* update :settings (fn [settings]
                                 (-> settings
+                                    (update :server-path #(or (.getServerPath settings-state) %))
                                     (update :trace-level #(or (.getTraceLevel settings-state) %))
                                     (update :log-path #(or (.getServerLogPath settings-state) %))))))
 

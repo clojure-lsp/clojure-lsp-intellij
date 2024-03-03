@@ -4,18 +4,20 @@
    [clojure.java.io :as io]
    [clojure.string :as string]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
+   [com.github.clojure-lsp.intellij.config :as config]
    [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.clojure-lsp.intellij.file-system :as file-system]
    [com.github.clojure-lsp.intellij.notification]
    [com.github.clojure-lsp.intellij.project-lsp :as project]
    [com.github.clojure-lsp.intellij.tasks :as tasks]
    [com.github.clojure-lsp.intellij.workspace-edit]
-   [com.github.ericdallo.clj4intellij.logger :as logger]
-   lsp4clj.server)
+   [com.github.ericdallo.clj4intellij.logger :as logger])
   (:import
    [com.intellij.openapi.project Project]
    [com.intellij.util EnvironmentUtil]
+   [java.io File]
    [java.util.zip ZipInputStream]))
+
+(set! *warn-on-reflection* true)
 
 (def ^:private client-capabilities
   {:text-document {:hover {:content-format ["markdown"]}}
@@ -41,7 +43,7 @@
 (def ^:private download-artifact-uri
   "https://github.com/clojure-lsp/clojure-lsp/releases/download/%s/%s")
 
-(defn ^:private download-server! [indicator]
+(defn ^:private download-server! [indicator ^File download-path]
   (logger/info "Downloading clojure-lsp...")
   (tasks/set-progress indicator "LSP: Downloading clojure-lsp")
   (let [version (string/trim (slurp latest-version-uri))
@@ -49,7 +51,7 @@
         arch (keyword (System/getProperty "os.arch"))
         artifact-name (get-in artifacts [platform arch])
         uri (format download-artifact-uri version artifact-name)
-        dest-file (io/file (file-system/plugin-path) "clojure-lsp")
+        dest-file download-path
         dest-path (.getCanonicalPath dest-file)]
     (with-open [in (io/input-stream uri)
                 out (io/output-stream dest-file)]
@@ -96,7 +98,7 @@
    "Clojure LSP startup"
    (fn [indicator]
      (let [db @db/db*
-           download-path (io/file (file-system/plugin-path) "clojure-lsp")]
+           download-path (config/download-server-path)]
        (cond
          (-> db :settings :server-path)
          (spawn-server! project indicator (-> db :settings :server-path))
@@ -105,7 +107,7 @@
          (spawn-server! project indicator download-path)
 
          :else
-         (->> (download-server! indicator)
+         (->> (download-server! indicator download-path)
               (spawn-server! project indicator))))))
   true)
 
