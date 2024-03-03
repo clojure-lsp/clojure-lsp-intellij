@@ -32,11 +32,15 @@ IntelliJ is the only mainstream editor without a plugin with good, free, and ded
 
 Keep in mind that this plugin provides only LSP features relying on clojure-lsp (and clj-kondo under the hood) static analysis, so no runtime features exist, like REPL integration or support, for that a separated plugin is needed as it's not possible to use only the REPL part of other plugins like Cursive together with this plugin.
 
-Also, this plugin does not use IntelliJ's LSP support yet for 2 reasons:
-  - The LSP feature is only available for Ultimate Edition (paid edition), making this plugin only available for those editions.
-  - The LSP feature is pretty alpha, missing some features yet, some that were already implemented in this plugin.
+Also, this plugin does not use official IntelliJ's LSP support yet for 2 reasons:
+  - It's only available for Ultimate Edition (paid edition), making this plugin only available for those editions.
+  - It's pretty alpha, missing some features yet, some that were already implemented in this plugin.
 
 ---
+
+## Getting Started
+
+When opening a Clojure project or file, the plugin will try to download latest clojure-lsp server or use it from a custom path if specified in IntelliJ settings, then it will spawn the process for each project and communicate with it to provide [all features](https://clojure-lsp.io/features/).
 
 ## Contributing
 
