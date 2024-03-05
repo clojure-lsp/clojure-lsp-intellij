@@ -9,6 +9,7 @@
    [com.github.clojure-lsp.intellij.project-lsp :as project]
    [com.github.clojure-lsp.intellij.server :as server])
   (:import
+   [com.github.clojure_lsp.intellij.extension SettingsState]
    [com.intellij.openapi.editor.event DocumentEvent]
    [com.intellij.openapi.fileEditor FileDocumentManager FileEditorManager]
    [com.intellij.openapi.project Project]
@@ -28,6 +29,7 @@
                (project/clojure-project? project @db/db*))
            (do
              (swap! db/db* assoc :project project)
+             (db/load-settings-from-state! (SettingsState/get))
              (server/start-server! project)))))
 
 (defn -fileOpened [_this ^FileEditorManager source ^VirtualFile file]

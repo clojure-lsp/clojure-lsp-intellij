@@ -2,9 +2,9 @@
   (:require
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.ericdallo.clj4intellij.logger :as logger]
    [com.github.clojure-lsp.intellij.tasks :as tasks]
    [com.github.ericdallo.clj4intellij.app-manager :as app-manager]
+   [com.github.ericdallo.clj4intellij.logger :as logger]
    [seesaw.core :as see])
   (:import
    [com.github.clojure_lsp.intellij Icons]
@@ -13,17 +13,27 @@
 
 (set! *warn-on-reflection* true)
 
-(def ^:private message-type->notification-type
-  {1 NotificationType/ERROR
-   2 NotificationType/WARNING
-   3 NotificationType/INFORMATION
-   4 NotificationType/INFORMATION})
+(def ^:private type->notification-type
+  {:error NotificationType/ERROR
+   :warning NotificationType/WARNING
+   :info NotificationType/INFORMATION})
 
-(defmethod lsp-client/show-message :default [{:keys [type message]}]
+(def ^:private message-type->notification-type
+  {1 :error
+   2 :warning
+   3 :info
+   4 :info})
+
+(defn show-notification! [{:keys [type title message]}]
   (-> (NotificationGroupManager/getInstance)
       (.getNotificationGroup "Clojure LSP notifications")
-      (.createNotification "Clojure LSP" ^String message ^NotificationType (message-type->notification-type type))
+      (.createNotification ^String title ^String message ^NotificationType (type->notification-type type))
       (.notify ^Project (:project @db/db*))))
+
+(defmethod lsp-client/show-message :default [{:keys [type message]}]
+  (show-notification! {:type (message-type->notification-type type)
+                       :title "Clojure LSP"
+                       :message message}))
 
 (defmethod lsp-client/show-message-request :default [{:keys [_type message actions]}]
   @(app-manager/invoke-later!
