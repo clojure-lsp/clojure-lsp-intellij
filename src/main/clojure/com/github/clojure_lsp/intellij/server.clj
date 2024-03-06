@@ -42,10 +42,10 @@
   (run! #(% :disconnected) (:on-status-changed-fns @db/db*)))
 
 (defn ^:private os-name []
-  (let [os-name (string/lower-case (System/getProperty "os.name"))]
+  (let [os-name (string/lower-case (System/getProperty "os.name" "generic"))]
     (cond
       (string/starts-with? os-name "windows") :windows
-      (string/starts-with? os-name "mac os") :macos
+      (string/starts-with? os-name "mac") :macos
       :else :linux)))
 
 (def ^:private latest-version-uri
