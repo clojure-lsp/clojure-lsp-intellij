@@ -33,7 +33,8 @@
    :windows {:amd64 "clojure-lsp-native-windows-amd64.zip"}})
 
 (defn ^:private clean-up-server []
-  (p/destroy-tree (:server-process @db/db*))
+  (when (p/alive? (:server-process @db/db*))
+    (p/destroy-tree (:server-process @db/db*)))
   (swap! db/db* assoc :status :disconnected
          :client nil
          :server-process nil
@@ -44,7 +45,7 @@
   (let [os-name (string/lower-case (System/getProperty "os.name"))]
     (cond
       (string/starts-with? os-name "windows") :windows
-      (string/starts-with? os-name "macos") :macos
+      (string/starts-with? os-name "mac os") :macos
       :else :linux)))
 
 (def ^:private latest-version-uri
@@ -53,8 +54,17 @@
 (def ^:private download-artifact-uri
   "https://github.com/clojure-lsp/clojure-lsp/releases/download/%s/%s")
 
+(defn ^:private unzip-file [input ^File dest-file]
+  (with-open [stream (-> input io/input-stream ZipInputStream.)]
+    (loop [entry (.getNextEntry stream)]
+      (when entry
+        (if (.isDirectory entry)
+          (when-not (.exists dest-file)
+            (.mkdirs dest-file))
+          (clojure.java.io/copy stream dest-file))
+        (recur (.getNextEntry stream))))))
+
 (defn ^:private download-server! [indicator ^File download-path]
-  (logger/info "Downloading clojure-lsp...")
   (tasks/set-progress indicator "LSP: Downloading clojure-lsp")
   (let [version (string/trim (slurp latest-version-uri))
         platform (os-name)
@@ -63,18 +73,14 @@
         uri (format download-artifact-uri version artifact-name)
         dest-file download-path
         dest-path (.getCanonicalPath dest-file)]
-    (with-open [in (io/input-stream uri)
-                out (io/output-stream dest-file)]
-      (let [stream (ZipInputStream. in)]
-        (.getNextEntry stream)
-        (io/copy stream out)))
+    (logger/info "Downloading clojure-lsp from" uri)
+    (unzip-file (io/input-stream uri) dest-file)
     (doto (io/file dest-file)
       (.setWritable true)
       (.setReadable true)
       (.setExecutable true))
     (swap! db/db* assoc :downloaded-server-path dest-path)
-    (logger/info "Downloaded clojure-lsp to" dest-path)
-    dest-path))
+    (logger/info "Downloaded clojure-lsp to" dest-path)))
 
 (defn ^:private spawn-server! [^Project project indicator server-path]
   (logger/info "Spawning LSP server process using path" server-path)
@@ -127,22 +133,23 @@
    "Clojure LSP startup"
    (fn [indicator]
      (let [db @db/db*
-           download-path (config/download-server-path)]
+           download-path (config/download-server-path)
+           custom-server-path (-> db :settings :server-path)]
        (cond
-         (-> db :settings :server-path)
-         (spawn-server! project indicator (-> db :settings :server-path))
+         custom-server-path
+         (spawn-server! project indicator custom-server-path)
 
          (.exists download-path)
          (spawn-server! project indicator download-path)
 
          :else
-         (->> (download-server! indicator download-path)
-              (spawn-server! project indicator)))
+         (do (download-server! indicator download-path)
+             (spawn-server! project indicator download-path)))
 
        (swap! db/db* assoc :status :connected)
        (run! #(% :connected) (:on-status-changed-fns @db/db*))
-       ;; For race conditions when server starts too fast
-       ;; and other places that listen didn't setup yet
+        ;; For race conditions when server starts too fast
+        ;; and other places that listen didn't setup yet
        (future
          (Thread/sleep 1000)
          (run! #(% :connected) (:on-status-changed-fns @db/db*)))

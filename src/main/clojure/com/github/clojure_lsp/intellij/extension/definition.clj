@@ -43,7 +43,8 @@
                                                                       :character character}}])]
         (when-let [uri (:uri definition)]
           (if (string/starts-with? uri "jar:")
-            (dependency-content client uri project definition (last (re-find #"^(jar|zip):(file:.+)!(/.+)" uri)))
+            (let [jar-pattern (re-pattern (str "^(jar|zip):(file:.+)!" (System/getProperty "file.separator") "(.+)"))]
+              (dependency-content client uri project definition (last (re-find jar-pattern uri))))
             ;; TODO improve this
             (if-let [v-file (editor/uri->v-file uri)]
               (definition->psi-element v-file project definition nil)
