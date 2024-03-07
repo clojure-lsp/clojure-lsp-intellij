@@ -135,8 +135,10 @@
 (defn -apply [_]
   (let [settings-state (SettingsState/get)
         trace-level (s/config (s/select @component* [:#trace-level]) :selected-item)
-        server-log-path (s/config (s/select @component* [:#server-log]) :text)
-        server-path (s/config (s/select @component* [:#server-path]) :text)]
+        server-log-path (when (s/config (s/select @component* [:#custom-server-log?]) :selected?)
+                          (s/config (s/select @component* [:#server-log]) :text))
+        server-path (when (s/config (s/select @component* [:#custom-server-path?]) :selected?)
+                      (s/config (s/select @component* [:#server-path]) :text))]
     (db/set-server-path-setting! settings-state server-path)
     (db/set-server-log-path-setting! settings-state server-log-path)
     (db/set-trace-level-setting! settings-state trace-level)))

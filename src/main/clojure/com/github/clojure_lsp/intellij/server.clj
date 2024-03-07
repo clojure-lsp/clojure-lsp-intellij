@@ -34,7 +34,7 @@
 
 (defn ^:private clean-up-server []
   (when (and (:server-process @db/db*) (p/alive? (:server-process @db/db*)))
-    (p/destroy-tree (:server-process @db/db*)))
+    (p/destroy (:server-process @db/db*)))
   (swap! db/db* assoc :status :disconnected
          :client nil
          :server-process nil
