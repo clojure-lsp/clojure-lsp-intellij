@@ -5,6 +5,7 @@
   (:require
    [clojure.string :as string]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
+   [com.github.clojure-lsp.intellij.config :as config]
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.clojure-lsp.intellij.file-system :as file-system]
@@ -42,8 +43,9 @@
                                                                       :character character}}])]
         (when-let [uri (:uri definition)]
           (if (string/starts-with? uri "jar:")
-            (dependency-content client uri project definition (last (re-find #"^(jar|zip):(file:.+)!(/.+)" uri)))
+            (let [jar-pattern (re-pattern (str "^(jar|zip):(file:.+)!" (System/getProperty "file.separator") "(.+)"))]
+              (dependency-content client uri project definition (last (re-find jar-pattern uri))))
             ;; TODO improve this
             (if-let [v-file (editor/uri->v-file uri)]
               (definition->psi-element v-file project definition nil)
-              (dependency-content client uri project definition (string/replace-first uri (str "file://" (file-system/temp-path project)) "")))))))))
+              (dependency-content client uri project definition (string/replace-first uri (str "file://" (config/project-cache-path project)) "")))))))))

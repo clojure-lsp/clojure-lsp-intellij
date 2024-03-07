@@ -36,7 +36,7 @@
   "Clojure LSP code lens")
 
 (defn -getPreviewText [_]
-  "fooo")
+  "LSP Code lens")
 
 (defn -getKey [_] (SettingsKey. "LSP code lens"))
 
@@ -81,29 +81,32 @@
                                 (reify Function1 (invoke [_ _] true)))))
 (set! *warn-on-reflection* true)
 
+(def lens-added-by-uri* (atom {}))
+
 (defn -getCollectorFor [_ _file ^Editor editor _settings ^InlayHintsSink sink]
-  (when-let [client (lsp-client/connected-client)]
-    ;; For some reason `(PresentationFactory. editor)` does not work
-    (let [lens-added* (atom false)]
-      (proxy+ [editor]
-              FactoryInlayHintsCollector
+  (let [uri (editor/editor->uri editor)]
+    (when-let [client (lsp-client/connected-client)]
+      ;; For some reason `(PresentationFactory. editor)` does not work
+      (proxy+ [editor] FactoryInlayHintsCollector
         (collect [^FactoryInlayHintsCollector this _ _ _]
-          (when-not @lens-added*
-            (let [document (.getDocument editor)
-                  code-lens @(lsp-client/request! client [:textDocument/codeLens
-                                                          {:text-document {:uri (editor/editor->uri editor)}}])
-                  factory (.getFactory ^FactoryInlayHintsCollector this)]
+
+          (let [document (.getDocument editor)
+                code-lens @(lsp-client/request! client [:textDocument/codeLens {:text-document {:uri uri}}])
+                factory (.getFactory ^FactoryInlayHintsCollector this)]
+            (when-not (get @lens-added-by-uri* uri)
+              (swap! lens-added-by-uri* assoc uri true)
               (doseq [code-len code-lens]
                 (let [{:keys [range] {:keys [title command arguments]} :command} @(lsp-client/request! client [:codeLens/resolve code-len])]
                   (when range
                     (.addInlineElement sink
                                        (editor/position->point (:start range) document)
-                                       true
+                                       false
                                        (code-lens-presentation
-                                         factory
-                                         title
-                                         (fn onClick []
-                                           (handle-command editor command arguments)))
+                                        factory
+                                        title
+                                        (fn onClick []
+                                          (handle-command editor command arguments)))
                                        true))))
-              (reset! lens-added* true)))
+
+              (swap! lens-added-by-uri* assoc uri false)))
           false)))))

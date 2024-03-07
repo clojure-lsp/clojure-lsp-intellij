@@ -7,6 +7,7 @@
    [clojure.string :as str]
    [clojure.walk :as walk]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
+   [com.github.clojure-lsp.intellij.config :as config]
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.server :as server]
    [seesaw.color :as s.color]
@@ -17,8 +18,7 @@
    [com.github.clojure_lsp.intellij.extension SettingsState]
    [com.intellij.ui IdeBorderFactory]
    [java.awt Toolkit]
-   [java.awt.datatransfer StringSelection]
-   [javax.swing JComboBox JTextField]))
+   [java.awt.datatransfer StringSelection]))
 
 (set! *warn-on-reflection* true)
 
@@ -26,23 +26,52 @@
 
 (def ^:private server-not-started-message "Server not started")
 
-(defn ^:private build-component [{:keys [server-version log-path] :as server-info}]
-  (let [server-running? (boolean server-info)]
+(defn ^:private build-component [{:keys [server-version log-path] :as server-info} settings]
+  (let [server-running? (boolean server-info)
+        custom-server-path (:server-path settings)
+        server-path (or custom-server-path (.getCanonicalPath (config/download-server-path)))
+        custom-server-log-path (:log-path settings)
+        server-log-path (or custom-server-log-path log-path)]
     (s.mig/mig-panel
      :items (->> [(when-not server-running?
                     [(s/label :text "Warning: Clojure LSP is not running or not started yet"
                               :foreground (s.color/color 243 156 18)) "wrap"])
-                  [(s/label "Note: clojure-lsp is built-in this plugin, external installation is not needed.") "wrap"]
+                  [(s.mig/mig-panel :border (IdeBorderFactory/createTitledBorder "Settings")
+                                    :items [[(s/label "Server path *") ""]
+                                            [(s/text :id :server-path
+                                                     :columns 30
+                                                     :editable? true
+                                                     :enabled? custom-server-path
+                                                     :text server-path) ""]
+                                            [(s/checkbox :id :custom-server-path?
+                                                         :selected? custom-server-path
+                                                         :text "Custom path?"
+                                                         :listen [:action (fn [_]
+                                                                            (let [enabled? (s/config (s/select @component* [:#custom-server-path?]) :selected?)
+                                                                                  server-path-component (s/select @component* [:#server-path])]
+                                                                              (s/config! server-path-component :text "")
+                                                                              (s/config! server-path-component :enabled? enabled?)))]) "wrap"]]) "span"]
+                  [(s/label :text "When not speciying a custom server path, the plugin will download the latest clojure-lsp automatically."
+                            :font (s.font/font  :size 14)
+                            :foreground (s.color/color 110 110 110)) "wrap"]
                   [(s.mig/mig-panel :border (IdeBorderFactory/createTitledBorder "Troubleshooting")
                                     :items [[(s/label "Server log path *") ""]
                                             [(s/text :id :server-log
                                                      :columns 30
                                                      :editable? true
-                                                     :enabled? true
-                                                     :text log-path) "wrap"]
+                                                     :enabled? custom-server-log-path
+                                                     :text server-log-path) ""]
+                                            [(s/checkbox :id :custom-server-log?
+                                                         :selected? custom-server-log-path
+                                                         :text "Custom path?"
+                                                         :listen [:action (fn [_]
+                                                                            (let [enabled? (s/config (s/select @component* [:#custom-server-log?]) :selected?)
+                                                                                  server-log-component (s/select @component* [:#server-log])]
+                                                                              (s/config! server-log-component :text "")
+                                                                              (s/config! server-log-component :enabled? enabled?)))]) "wrap"]
                                             [(s/label "Server version") ""]
-                                            [(s/text :id :server-log
-                                                     :columns 30
+                                            [(s/text :id :server-version
+                                                     :columns 20
                                                      :editable? false
                                                      :enabled? server-running?
                                                      :text (or server-version server-not-started-message)) "wrap"]
@@ -58,7 +87,7 @@
                                             [(s/button :text "Restart LSP server"
                                                        :listen [:action (fn [_]
                                                                           (server/shutdown!)
-                                                                          (server/spawn-server! (:project @db/db*)))]) "wrap"]]) "span"]
+                                                                          (server/start-server! (:project @db/db*)))]) "wrap"]]) "span"]
                   [(s/label :text "*  requires LSP restart"
                             :font (s.font/font  :size 14)
                             :foreground (s.color/color 110 110 110)) "wrap"]]
@@ -72,7 +101,7 @@
 
 (defn -createComponent [_]
   (let [server-info (server-info!)
-        component (build-component server-info)]
+        component (build-component server-info (:settings @db/db*))]
     (reset! component* component)
     component))
 
@@ -81,29 +110,36 @@
 
 (defn -isModified [_]
   (let [settings-state (SettingsState/get)
-        trace-level-combo-box ^JComboBox (s/select @component* [:#trace-level])
-        server-log-path ^JTextField (s/select @component* [:#server-log])]
+        server-path (s/config (s/select @component* [:#server-path]) :text)
+        trace-level-combo-box (s/config (s/select @component* [:#trace-level]) :selected-item)
+        server-log-path (s/config (s/select @component* [:#server-log]) :text)]
     (boolean
-     (or (not= (.getSelectedItem trace-level-combo-box) (.getTraceLevel settings-state))
-         (not= (.getText server-log-path) (or (.getServerLogPath settings-state)
-                                              ""))
-         (and (str/blank? (.getText server-log-path))
+     (or (not= server-path (or (.getServerPath settings-state) ""))
+         (not= trace-level-combo-box (.getTraceLevel settings-state))
+         (not= server-log-path (or (.getServerLogPath settings-state) ""))
+         (and (str/blank? server-log-path)
               (-> @db/db* :settings :log-path))))))
 
 (defn -reset [_]
-  (let [trace-level-combo-box ^JComboBox (s/select @component* [:#trace-level])
-        server-log-path ^JTextField (s/select @component* [:#server-log])
-        server-info (server-info!)]
-    (.setSelectedItem trace-level-combo-box (-> @db/db* :settings :trace-level))
-    (.setText server-log-path (or (-> @db/db* :settings :log-path) (:log-path server-info)))))
+  (let [server-info (server-info!)
+        trace-level-combo-box (-> @db/db* :settings :trace-level)
+        server-log-path (or (-> @db/db* :settings :log-path) (:log-path server-info))
+        server-path (or (-> @db/db* :settings :server-path) (.getCanonicalPath (config/download-server-path)))]
+    (s/config! (s/select @component* [:#trace-level]) :selected-item trace-level-combo-box)
+    (s/config! (s/select @component* [:#server-log]) :text server-log-path)
+    (s/config! (s/select @component* [:#server-path]) :text server-path)))
 
 (defn -disposeUIResources [_]
   (reset! component* nil))
 
 (defn -apply [_]
   (let [settings-state (SettingsState/get)
-        trace-level (.getSelectedItem ^JComboBox (s/select @component* [:#trace-level]))
-        server-log-path (.getText ^JTextField (s/select @component* [:#server-log]))]
+        trace-level (s/config (s/select @component* [:#trace-level]) :selected-item)
+        server-log-path (when (s/config (s/select @component* [:#custom-server-log?]) :selected?)
+                          (s/config (s/select @component* [:#server-log]) :text))
+        server-path (when (s/config (s/select @component* [:#custom-server-path?]) :selected?)
+                      (s/config (s/select @component* [:#server-path]) :text))]
+    (db/set-server-path-setting! settings-state server-path)
     (db/set-server-log-path-setting! settings-state server-log-path)
     (db/set-trace-level-setting! settings-state trace-level)))
 

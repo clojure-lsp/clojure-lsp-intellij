@@ -1,6 +1,7 @@
 (ns com.github.clojure-lsp.intellij.file-system
   (:require
    [clojure.java.io :as io]
+   [com.github.clojure-lsp.intellij.config :as config]
    [com.rpl.proxy-plus :refer [proxy+]])
   (:import
    [com.intellij.openapi.project Project]
@@ -8,19 +9,15 @@
 
 (set! *warn-on-reflection* true)
 
-(defn temp-path [^Project project]
-  (str (com.intellij.openapi.application.PathManager/getPluginsPath) "/clojure-lsp/cache/" (.getName project)))
-
 (defn create-temp-file ^VirtualFile
   [^Project project ^String path ^String text]
-  (let [temp-file-path (str (temp-path project) path)
-        temp-file (io/file temp-file-path)]
-    (io/make-parents temp-file-path)
+  (let [temp-file (io/file (config/project-cache-path project) path)]
+    (io/make-parents temp-file)
     (spit temp-file text)
     (proxy+ [] VirtualFile
       (getName [_] (.getName temp-file))
       (getFileSystem [_] (LocalFileSystem/getInstance))
-      (getPath [_] temp-file-path)
+      (getPath [_] (.getCanonicalPath temp-file))
       (isWritable [_] false)
       (isDirectory [_] false)
       (isValid [_] true)

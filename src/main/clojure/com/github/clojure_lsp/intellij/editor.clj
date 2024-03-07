@@ -33,7 +33,7 @@
   (let [offset (.. editor getCaretModel getCurrentCaret getOffset)]
     (offset->cursor-position editor offset)))
 
-(defn position->point [{:keys [line character]} ^Document document]
+(defn position->point ^Integer [{:keys [line character]} ^Document document]
   (if (and (<= 0 line)
            (< line (.getLineCount document)))
     (let [start-line (.getLineStartOffset document line)
@@ -62,16 +62,16 @@
   (.findFile (PsiManager/getInstance project)
              (uri->v-file uri)))
 
-(defn v-file->editor ^Editor [^VirtualFile v-file ^Project project on-open-close-file?]
+(defn v-file->editor ^Editor [^VirtualFile v-file ^Project project]
   (let [file-manager (FileEditorManager/getInstance project)
         editor (if (.isFileOpen file-manager v-file)
                  (.getEditor ^TextEditor (first (.getAllEditors file-manager v-file)))
                  (.openTextEditor file-manager (OpenFileDescriptor. project v-file) false))]
     editor))
 
-(defn uri->editor ^Editor [^String uri ^Project project on-open-close-file?]
+(defn uri->editor ^Editor [^String uri ^Project project]
   (let [v-file (uri->v-file uri)]
-    (v-file->editor v-file project on-open-close-file?)))
+    (v-file->editor v-file project)))
 
 (defn editor->uri [^Editor editor]
   ;; TODO sanitize URL, encode, etc
@@ -97,7 +97,7 @@
             (fn []
               (doseq [{{:keys [uri]} :text-document
                        :keys [edits]} document-changes
-                      :let [editor (uri->editor uri project true)
+                      :let [editor (uri->editor uri project)
                             document (.getDocument editor)
                             sorted-edits (sort-by (comp #(position->point % document) :start :range) > edits)]]
                 (doseq [{:keys [new-text range]} sorted-edits

@@ -12,8 +12,8 @@
         (proxy+
          [project title]
          Task$Backgroundable
-         (run [_ ^ProgressIndicator indicator]
-              (run-fn indicator)))))
+          (run [_ ^ProgressIndicator indicator]
+            (run-fn indicator)))))
 
 (defn set-progress
   ([^ProgressIndicator indicator text]

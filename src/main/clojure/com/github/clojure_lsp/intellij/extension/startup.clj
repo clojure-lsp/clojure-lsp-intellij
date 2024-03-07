@@ -13,6 +13,6 @@
 (set! *warn-on-reflection* true)
 
 (defn -runActivity [_this ^Project project]
-  (logger/info "Starting clojure-lsp plugin...")
   (swap! db/db* assoc :project project)
-  (db/load-settings-from-state! (SettingsState/get)))
+  (db/load-settings-from-state! (SettingsState/get))
+  (logger/info "Loaded settings to memory:" (:settings @db/db*)))
