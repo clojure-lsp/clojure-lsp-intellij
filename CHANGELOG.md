@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.0.0
+
 - Use clojure-lsp externally instead of built-in since causes PATH issues sometimes. Fixes #25 and #26
 - Fix multiple code lens for the same line. #29
 
