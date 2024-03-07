@@ -33,7 +33,7 @@
    :windows {:amd64 "clojure-lsp-native-windows-amd64.zip"}})
 
 (defn ^:private clean-up-server []
-  (when (p/alive? (:server-process @db/db*))
+  (when (and (:server-process @db/db*) (p/alive? (:server-process @db/db*)))
     (p/destroy-tree (:server-process @db/db*)))
   (swap! db/db* assoc :status :disconnected
          :client nil
