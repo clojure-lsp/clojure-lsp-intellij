@@ -2,7 +2,8 @@
 
 ## [Unreleased]
 
-- Use clojure-lsp externally instead of built-in since causes PATH issues sometimes. Related to #25 and #26
+- Use clojure-lsp externally instead of built-in since causes PATH issues sometimes. Fixes #25 and #26
+- Fix multiple code lens for the same line. #29
 
 ## 1.14.10
 
