@@ -44,9 +44,14 @@
 (defn ^:private os-name []
   (let [os-name (string/lower-case (System/getProperty "os.name" "generic"))]
     (cond
-      (string/starts-with? os-name "windows") :windows
-      (string/starts-with? os-name "mac") :macos
+      (string/includes? os-name "win") :windows
+      (string/includes? os-name "mac") :macos
       :else :linux)))
+
+(defn ^:private os-arch []
+  (if (= "aarch64" (System/getProperty "os.arch"))
+    :aarch64
+    :amd64))
 
 (def ^:private latest-version-uri
   "https://raw.githubusercontent.com/clojure-lsp/clojure-lsp/master/lib/resources/CLOJURE_LSP_RELEASED_VERSION")
@@ -68,7 +73,7 @@
   (tasks/set-progress indicator "LSP: Downloading clojure-lsp")
   (let [version (string/trim (slurp latest-version-uri))
         platform (os-name)
-        arch (keyword (System/getProperty "os.arch"))
+        arch (os-arch)
         artifact-name (get-in artifacts [platform arch])
         uri (format download-artifact-uri version artifact-name)
         dest-file download-path
