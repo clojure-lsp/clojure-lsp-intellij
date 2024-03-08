@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix os type for macos non aarch64 when downloading clojure-lsp server.
+
 ## 2.0.0
 
 - Use clojure-lsp externally instead of built-in since causes PATH issues sometimes. Fixes #25 and #26
