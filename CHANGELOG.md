@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.0.1
+
 - Fix os type for macos non aarch64 when downloading clojure-lsp server.
 
 ## 2.0.0
