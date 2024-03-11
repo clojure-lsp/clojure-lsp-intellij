@@ -99,7 +99,7 @@
                 (let [{:keys [range] {:keys [title command arguments]} :command} @(lsp-client/request! client [:codeLens/resolve code-len])]
                   (when range
                     (.addInlineElement sink
-                                       (editor/position->point (:start range) document)
+                                       (editor/document+position->offset (:start range) document)
                                        false
                                        (code-lens-presentation
                                         factory

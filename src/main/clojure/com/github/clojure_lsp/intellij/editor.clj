@@ -33,22 +33,12 @@
   (let [offset (.. editor getCaretModel getCurrentCaret getOffset)]
     (offset->cursor-position editor offset)))
 
-(defn position->point ^Integer [{:keys [line character]} ^Document document]
-  (if (and (<= 0 line)
-           (< line (.getLineCount document)))
-    (let [start-line (.getLineStartOffset document line)
-          end-line (.getLineEndOffset document line)]
-      (loop [column 0
-             offset start-line]
-        (if (and (< offset end-line)
-                 (< column character))
-          (recur (inc column) (inc offset))
-          offset)))
-    (.getTextLength document)))
+(defn document+position->offset ^Integer [{:keys [line character]} ^Document document]
+  (position->offset (.getText document) line character))
 
 (defn range->text-range ^TextRange [range ^Document document]
-  (TextRange/create (position->point (:start range) document)
-                    (position->point (:end range) document)))
+  (TextRange/create (document+position->offset (:start range) document)
+                    (document+position->offset (:end range) document)))
 
 (defn text-range->range [^TextRange range ^Editor editor]
   {:start (offset->cursor-position editor (.getStartOffset range))
@@ -99,10 +89,10 @@
                        :keys [edits]} document-changes
                       :let [editor (uri->editor uri project)
                             document (.getDocument editor)
-                            sorted-edits (sort-by (comp #(position->point % document) :start :range) > edits)]]
+                            sorted-edits (sort-by (comp #(document+position->offset % document) :start :range) > edits)]]
                 (doseq [{:keys [new-text range]} sorted-edits
-                        :let [start (position->point (:start range) document)
-                              end (position->point (:end range) document)]]
+                        :let [start (document+position->offset (:start range) document)
+                              end (document+position->offset (:end range) document)]]
                   (cond
                     (>= end 0)
                     (if (<= (- end start) 0)

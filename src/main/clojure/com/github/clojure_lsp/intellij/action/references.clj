@@ -3,9 +3,9 @@
    :name com.github.clojure_lsp.intellij.action.ReferencesAction
    :extends com.intellij.openapi.project.DumbAwareAction)
   (:require
+   [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.editor :as editor]
-   [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.psi :as psi])
   (:import
    [com.intellij.codeInsight.hint HintManager]
@@ -34,11 +34,11 @@
                                                                :character character}}])]
       (if (seq references)
         (let [project ^Project (.getProject editor)
-              document ^Document (.getDocument editor)
               elements (->> references
                             (mapv (fn [{:keys [uri range]}]
-                                    (let [start ^int (editor/position->point (:start range) document)
-                                          end ^int (editor/position->point (:end range) document)
+                                    (let [document ^Document (.getDocument (editor/uri->editor uri project))
+                                          start ^int (editor/document+position->offset (:start range) document)
+                                          end ^int (editor/document+position->offset (:end range) document)
                                           name (.getText document (TextRange. start end))
                                           file (editor/uri->psi-file uri project)]
                                       (psi/->LSPPsiElement name project file start end)))))

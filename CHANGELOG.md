@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix references for different URIs when finding references.
+
 ## 2.0.1
 
 - Fix os type for macos non aarch64 when downloading clojure-lsp server.

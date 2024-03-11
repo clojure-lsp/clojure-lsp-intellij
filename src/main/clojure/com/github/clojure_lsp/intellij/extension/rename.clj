@@ -38,8 +38,8 @@
                                                            :character character}}])]
     (if-let [{:keys [message]} (:error response)]
       (lsp-client/show-message {:type 1 :message message})
-      (let [start ^int (editor/position->point (:start response) document)
-            end ^int (editor/position->point (:end response) document)]
+      (let [start ^int (editor/document+position->offset (:start response) document)
+            end ^int (editor/document+position->offset (:end response) document)]
         (.getText document (TextRange. start end))))))
 
 (defn -invoke
