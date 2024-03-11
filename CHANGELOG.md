@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.0.2
+
 - Fix references for different URIs when finding references.
 
 ## 2.0.1
