@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix only noisy codelens exception. #33
+
 ## 2.0.2
 
 - Fix references for different URIs when finding references.

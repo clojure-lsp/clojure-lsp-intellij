@@ -20,7 +20,10 @@
     SettingsKey]
    [com.intellij.codeInsight.hints.presentation ChangeOnHoverPresentation PresentationFactory]
    [com.intellij.lang Language]
-   [com.intellij.openapi.editor Editor]
+   [com.intellij.openapi.editor Document Editor]
+   [com.intellij.openapi.fileTypes FileType]
+   [com.intellij.openapi.project Project]
+   [com.intellij.psi PsiFileFactory]
    [javax.swing JPanel]
    [kotlin.jvm.functions Function0 Function1]))
 
@@ -50,6 +53,13 @@
   (reify
     ImmediateConfigurable
     (createComponent [_ _] (JPanel.))))
+
+(defn -createFile [_ ^Project project ^FileType file-type ^Document document]
+  (.createFileFromText
+   (PsiFileFactory/getInstance project)
+   "dummy"
+   file-type
+   (.getText document)))
 
 (defn ^:private handle-command [^Editor editor command arguments]
   (case command
