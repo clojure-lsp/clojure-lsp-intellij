@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.0.3
+
 - Fix only noisy codelens exception. #33
 
 ## 2.0.2
