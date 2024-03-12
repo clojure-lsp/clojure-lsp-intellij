@@ -41,7 +41,7 @@
                                           end ^int (editor/document+position->offset (:end range) document)
                                           name (.getText document (TextRange. start end))
                                           file (editor/uri->psi-file uri project)]
-                                      (psi/->LSPPsiElement name project file start end)))))
+                                      (psi/->LSPPsiElement name project file start end (-> range :start :line))))))
               usages (mapv (fn [^PsiElement element]
                              (UsageInfo2UsageAdapter.
                               (UsageInfo. element false))) elements)

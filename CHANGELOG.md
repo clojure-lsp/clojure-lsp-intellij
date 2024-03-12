@@ -4,6 +4,7 @@
 
 - Support "Find implementations" of defmultis/defprotocols. #31
 - Fix commands, code actions not being applied after 2.0.0.
+- Improve "find declaration or usages" to show popup for references.
 
 ## 2.0.3
 

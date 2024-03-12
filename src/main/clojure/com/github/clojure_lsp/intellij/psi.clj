@@ -16,11 +16,14 @@
 
 (set! *warn-on-reflection* true)
 
-(defn ->LSPPsiElement [^String name ^Project project ^PsiFile file ^Integer start ^Integer end]
+(defn ->LSPPsiElement
+  [^String name ^Project project ^PsiFile file
+   ^Integer start-offset ^Integer end-offset
+   ^Integer start-line]
   (let [manager (PsiManager/getInstance project)]
     (reify
       PsiNameIdentifierOwner
-      (getName [_] name)
+      (getName [_] (str (.getPresentableName (.getVirtualFile file)) ":" start-line))
       (setName [_ _])
       (getNameIdentifier [this] this)
       (getIdentifyingElement [this] this)
@@ -33,10 +36,10 @@
       (getLastChild [_])
       (getNextSibling [_])
       (getPrevSibling [_])
-      (getTextRange [_] (TextRange. start end))
-      (getTextOffset [_] start)
-      (getStartOffsetInParent [_] start)
-      (getTextLength [_] (- end start))
+      (getTextRange [_] (TextRange. start-offset end-offset))
+      (getTextOffset [_] start-offset)
+      (getStartOffsetInParent [_] start-offset)
+      (getTextLength [_] (- end-offset start-offset))
       (findElementAt [_ _])
       (findReferenceAt [_ _])
       (textToCharArray [_] (char-array name))
@@ -75,7 +78,7 @@
       (getUseScope [this] (.getResolveScope (.getContainingFile this)))
       (getNode [_])
       (isEquivalentTo [this other] (= this other))
-      (toString [_] (str name ":" start ":" end))
+      (toString [_] (str name ":" start-offset ":" end-offset))
       (getContainingFile [_] file)
 
       (getUserData [_ _]
