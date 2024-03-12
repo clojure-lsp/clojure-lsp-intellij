@@ -124,7 +124,7 @@
 (defn client [in out]
   (map->Client
    {:client-id 1
-    :input-ch (io-chan/input-stream->input-chan out {:keyword-function keyword})
+    :input-ch (io-chan/input-stream->input-chan out)
     :output-ch (io-chan/output-stream->output-chan in)
     :log-ch (async/chan (async/sliding-buffer 20))
     :join (promise)
