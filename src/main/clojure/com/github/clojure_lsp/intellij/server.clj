@@ -22,7 +22,8 @@
 (set! *warn-on-reflection* true)
 
 (def ^:private client-capabilities
-  {:text-document {:hover {:content-format ["markdown"]}}
+  {:text-document {:hover {:content-format ["markdown"]}
+                   :implementation {}}
    :workspace {:workspace-edit {:document-changes true}}})
 
 (def ^:private artifacts

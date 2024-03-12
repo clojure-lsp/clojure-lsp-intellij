@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Support "Find implementations" of defmultis/defprotocols. #31
+
 ## 2.0.3
 
 - Fix only noisy codelens exception. #33

@@ -14,6 +14,12 @@ This plugin relies on clojure-lsp features, so most work is done there, for more
 
 ![](../images/find-references.png)
 
+### Find all implementations of a defmulti or defprotocol
+
+> <kbd>Ctrl/Cmd</kbd> + <kbd>Alt</kbd> + <kbd>B</kbd>
+
+![](../images/find-implementations.png)
+
 ### Rename
 
 > <kbd>Shift</kbd> + <kbd>F6</kbd>

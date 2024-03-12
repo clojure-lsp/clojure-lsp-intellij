@@ -47,7 +47,7 @@ Below are all the currently supported LSP capabilities and their implementation 
 | textDocument/declaration               |      |       |
 | textDocument/definition                | √    |       |
 | textDocument/typeDefinition            |      |       |
-| textDocument/implementation            |      |       |
+| textDocument/implementation            | √    |       |
 | textDocument/references                | √    |       |
 | textDocument/documentHighlight         |      |       |
 | textDocument/documentSymbol            |      |       |

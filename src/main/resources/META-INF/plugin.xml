@@ -100,6 +100,13 @@
                 icon="com.github.clojure_lsp.intellij.Icons.CLOJURE"
                 use-shortcut-of="FindUsages">
         </action>
+        <action id="ClojureLSP.FindImplementations"
+                class="com.github.clojure_lsp.intellij.action.ImplementationsAction"
+                text="Find implementations"
+                description="Find all implementations of the element at cursor if any."
+                icon="com.github.clojure_lsp.intellij.Icons.CLOJURE"
+                use-shortcut-of="GotoImplementation">
+        </action>
         <!-- Refactors -->
         <action id="ClojureLSP.DragParamBackward"
                 class="com.github.clojure_lsp.intellij.action.DragParamBackwardAction"
@@ -346,6 +353,7 @@
             <add-to-group group-id="EditorPopupMenu.GoTo" anchor="first"/>
             <add-to-group group-id="GoToMenu" anchor="before" relative-to-action="GotoDeclaration"/>
             <reference ref="ClojureLSP.FindReferences"/>
+            <reference ref="ClojureLSP.FindImplementations"/>
             <separator/>
         </group>
 
