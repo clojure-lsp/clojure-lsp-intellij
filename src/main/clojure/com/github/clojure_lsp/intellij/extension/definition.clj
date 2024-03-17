@@ -20,10 +20,10 @@
 
 (set! *warn-on-reflection* true)
 
-(defn ^:private definition->psi-element
-  [^VirtualFile v-file ^Project project definition text]
-  (let [{{:keys [start]} :range} definition
-        text (or text (slurp (:uri definition)))
+(defn ^:private element->psi-element
+  [^VirtualFile v-file ^Project project element text]
+  (let [{{:keys [start]} :range} element
+        text (or text (slurp (:uri element)))
         offset (editor/position->offset text (:line start) (:character start))]
     [(psi/->LSPPsiElement "" project (editor/virtual->psi-file v-file project) offset offset (:line start))]))
 
@@ -31,7 +31,7 @@
   (let [text @(lsp-client/request! client [:clojure/dependencyContents {:uri uri}])]
     (when (string? text)
       (let [v-file (file-system/create-temp-file project path text)]
-        (definition->psi-element v-file project definition text)))))
+        (element->psi-element v-file project definition text)))))
 
 (defn ^:private show-definition [definition client project]
   (when-let [uri (:uri definition)]
@@ -40,7 +40,7 @@
         (dependency-content client uri project definition (last (re-find jar-pattern uri))))
       ;; TODO improve this
       (if-let [v-file (editor/uri->v-file uri)]
-        (definition->psi-element v-file project definition nil)
+        (element->psi-element v-file project definition nil)
         (dependency-content client uri project definition (string/replace-first uri (str "file://" (config/project-cache-path project)) ""))))))
 
 (defn -getGotoDeclarationTargets [_ ^PsiElement element _ ^Editor editor]
@@ -54,6 +54,6 @@
                                                                       :character character}}])]
         (when-let [elements (if (and (= line (-> definition :range :start :line))
                                      (= character (-> definition :range :start :character)))
-                              (action.references/get-references editor line character)
+                              (action.references/get-psi-references editor line character)
                               (show-definition definition client project))]
           (into-array PsiElement elements))))))

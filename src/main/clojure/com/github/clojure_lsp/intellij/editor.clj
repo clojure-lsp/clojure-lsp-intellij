@@ -2,6 +2,7 @@
   (:require
    [clojure-lsp.shared :as lsp.shared]
    [clojure.java.io :as io]
+   [clojure.string :as string]
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.ericdallo.clj4intellij.app-manager :as app-manager])
   (:import
@@ -28,6 +29,9 @@
 
 (defn position->offset [text line character]
   (StringUtil/lineColToOffset text line character))
+
+(defn code-at-line [code line]
+  (nth (string/split-lines code) line))
 
 (defn editor->cursor-position [^Editor editor]
   (let [offset (.. editor getCaretModel getCurrentCaret getOffset)]
@@ -69,6 +73,11 @@
 
 (defn virtual->psi-file ^PsiFile [^VirtualFile v-file ^Project project]
   (.findFile (PsiManager/getInstance project) v-file))
+
+(defn uri->project-relative-filename [uri ^Project project]
+  (lsp.shared/relativize-filepath
+   (lsp.shared/uri->filename uri)
+   (.getBasePath project)))
 
 (defn apply-workspace-edit ^Boolean
   [^Project project label move-caret? {:keys [document-changes]}]

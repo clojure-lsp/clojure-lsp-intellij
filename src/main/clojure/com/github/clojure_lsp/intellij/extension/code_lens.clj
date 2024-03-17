@@ -19,6 +19,7 @@
     NoSettings
     SettingsKey]
    [com.intellij.codeInsight.hints.presentation ChangeOnHoverPresentation PresentationFactory]
+   [com.intellij.ide DataManager]
    [com.intellij.lang Language]
    [com.intellij.openapi.editor Document Editor]
    [com.intellij.openapi.fileTypes FileType]
@@ -79,7 +80,8 @@
                         base
                         base
                         (reify InlayPresentationFactory$ClickListener
-                          (onClick [_ _ _] (on-click-fn)))
+                          (onClick [_ e _] (on-click-fn (.getDataContext (DataManager/getInstance)
+                                                                         (.getComponent e)))))
                         (reify InlayPresentationFactory$HoverListener
                           (onHover [_ _ _])
                           (onHoverFinished [_]))
@@ -114,7 +116,7 @@
                                        (code-lens-presentation
                                         factory
                                         title
-                                        (fn onClick []
+                                        (fn on-click [_]
                                           (handle-command editor command arguments)))
                                        true))))
 

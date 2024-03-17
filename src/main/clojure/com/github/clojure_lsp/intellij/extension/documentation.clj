@@ -3,8 +3,8 @@
    :name com.github.clojure_lsp.intellij.extension.Documentation
    :implements [com.intellij.lang.documentation.DocumentationProvider])
   (:require
-   [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
+   [com.github.clojure-lsp.intellij.db :as db]
    [markdown.core :as markdown])
   (:import
    [com.intellij.openapi.util.text StringUtil]
