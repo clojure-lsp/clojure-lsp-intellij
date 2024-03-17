@@ -21,6 +21,7 @@
 
 (defmacro await-init [field & body]
   `(async/go-loop [~'value (get @db* ~field)]
+     (Thread/sleep 50)
      (if ~'value
        ~@body
        (recur (get @db* ~field)))))

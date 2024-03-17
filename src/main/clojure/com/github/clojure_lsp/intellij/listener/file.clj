@@ -19,8 +19,6 @@
 
 (def ^:private valid-extensions #{"clj" "cljs" "cljc" "cljd" "edn" "bb" "clj_kondo"})
 
-(:project @db/db*)
-
 (defn ^:private ensure-server-up!
   "If server was not started before, check if it's a Clojure file and starts it."
   [^VirtualFile file ^Project project]
