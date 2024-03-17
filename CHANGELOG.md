@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Wait to check for client initialized to minor cpu usage improvmenet.
+
 ## 2.2.0
 
 - Improve Find references/implementations to go directly to the usage if only one is found. #39
