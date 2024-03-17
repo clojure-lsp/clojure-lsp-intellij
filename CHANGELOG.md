@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.2.1
+
 - Wait to check for client initialized to minor cpu usage improvmenet.
 
 ## 2.2.0
