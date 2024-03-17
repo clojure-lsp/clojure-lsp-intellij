@@ -4,7 +4,7 @@
 
 ## 2.2.0
 
-- Improve Find references/implementations to go directly to the usage if only one is found.
+- Improve Find references/implementations to go directly to the usage if only one is found. #39
 
 ## 2.1.0
 
