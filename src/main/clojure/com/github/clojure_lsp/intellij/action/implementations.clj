@@ -9,12 +9,12 @@
    [com.github.clojure-lsp.intellij.psi :as psi])
   (:import
    [com.intellij.codeInsight.hint HintManager]
+   [com.intellij.codeInsight.navigation NavigationUtil]
    [com.intellij.find.findUsages FindUsagesOptions]
    [com.intellij.openapi.actionSystem CommonDataKeys]
    [com.intellij.openapi.actionSystem AnActionEvent]
-   [com.intellij.openapi.editor Document Editor]
+   [com.intellij.openapi.editor Editor]
    [com.intellij.openapi.project Project]
-   [com.intellij.openapi.util TextRange]
    [com.intellij.psi PsiElement]
    [com.intellij.usages
     Usage
@@ -31,31 +31,27 @@
     (let [implementations @(lsp-client/request! client [:textDocument/implementation
                                                         {:text-document {:uri (editor/editor->uri editor)}
                                                          :position {:line line
-                                                                    :character character}}])]
+                                                                    :character character}}])
+          project ^Project (.getProject editor)]
       (if (seq implementations)
-        (let [project ^Project (.getProject editor)
-              elements (->> implementations
-                            (mapv (fn [{:keys [uri range]}]
-                                    (let [document ^Document (.getDocument (editor/uri->editor uri project))
-                                          start ^int (editor/document+position->offset (:start range) document)
-                                          end ^int (editor/document+position->offset (:end range) document)
-                                          name (.getText document (TextRange. start end))
-                                          file (editor/uri->psi-file uri project)]
-                                      (psi/->LSPPsiElement name project file start end (-> range :start :line))))))
-              usages (mapv (fn [^PsiElement element]
-                             (UsageInfo2UsageAdapter.
-                              (UsageInfo. element false))) elements)
-              options (FindUsagesOptions. project)]
-          (.showUsages (UsageViewManager/getInstance project)
-                       (into-array UsageTarget [])
-                       (into-array Usage usages)
-                       (doto (UsageViewPresentation.)
-                         (.setScopeText (.getDisplayName (.searchScope options)))
-                         (.setSearchString (.generateUsagesString options))
-                         (.setTabText (str (count implementations) " implementations"))
-                         (.setTabName "implementations")
-                         (.setShowCancelButton true)
-                         (.setOpenInNewTab false))))
+        (if (= 1 (count implementations))
+          (NavigationUtil/activateFileWithPsiElement (psi/element->psi-element (first implementations) project) true)
+          (let [elements (->> implementations
+                              (mapv #(psi/element->psi-element % project)))
+                usages (mapv (fn [^PsiElement element]
+                               (UsageInfo2UsageAdapter.
+                                (UsageInfo. element false))) elements)
+                options (FindUsagesOptions. project)]
+            (.showUsages (UsageViewManager/getInstance project)
+                         (into-array UsageTarget [])
+                         (into-array Usage usages)
+                         (doto (UsageViewPresentation.)
+                           (.setScopeText (.getDisplayName (.searchScope options)))
+                           (.setSearchString (.generateUsagesString options))
+                           (.setTabText (str (count implementations) " implementations"))
+                           (.setTabName "implementations")
+                           (.setShowCancelButton true)
+                           (.setOpenInNewTab false)))))
         (.showErrorHint (HintManager/getInstance)
                         editor
                         "No implementations found")))))

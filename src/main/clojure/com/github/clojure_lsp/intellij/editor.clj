@@ -52,20 +52,25 @@
   (.findFile (PsiManager/getInstance project)
              (uri->v-file uri)))
 
-(defn v-file->editor ^Editor [^VirtualFile v-file ^Project project]
+(defn v-file->editor ^Editor [^VirtualFile v-file ^Project project ^Boolean focus]
   (let [file-manager (FileEditorManager/getInstance project)
         editor (if (.isFileOpen file-manager v-file)
                  (.getEditor ^TextEditor (first (.getAllEditors file-manager v-file)))
-                 (.openTextEditor file-manager (OpenFileDescriptor. project v-file) false))]
+                 (.openTextEditor file-manager (OpenFileDescriptor. project v-file) focus))]
     editor))
 
 (defn uri->editor ^Editor [^String uri ^Project project]
   (let [v-file (uri->v-file uri)]
-    (v-file->editor v-file project)))
+    (v-file->editor v-file project false)))
 
 (defn editor->uri [^Editor editor]
   ;; TODO sanitize URL, encode, etc
   (.getUrl (.getFile (FileDocumentManager/getInstance) (.getDocument editor))))
+
+(defn filename->project-relative-filename [filename ^Project project]
+  (lsp.shared/relativize-filepath
+   filename
+   (.getBasePath project)))
 
 (defn virtual->psi-file ^PsiFile [^VirtualFile v-file ^Project project]
   (.findFile (PsiManager/getInstance project) v-file))

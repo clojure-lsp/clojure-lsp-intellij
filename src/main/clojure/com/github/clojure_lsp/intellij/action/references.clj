@@ -9,6 +9,7 @@
    [com.github.clojure-lsp.intellij.psi :as psi])
   (:import
    [com.intellij.codeInsight.hint HintManager]
+   [com.intellij.codeInsight.navigation NavigationUtil]
    [com.intellij.find.findUsages FindUsagesOptions]
    [com.intellij.openapi.actionSystem CommonDataKeys]
    [com.intellij.openapi.actionSystem AnActionEvent]
@@ -33,32 +34,28 @@
                                          :position {:line line
                                                     :character character}}])
            deref
-           (mapv (fn [{:keys [uri] {:keys [start end]} :range}]
-                   (let [text (slurp uri)
-                         start-offset (editor/position->offset text (:line start) (:character start))
-                         end-offset (editor/position->offset text (:line end) (:character end))
-                         file (editor/uri->psi-file uri project)
-                         name (subs text start-offset end-offset)]
-                     (psi/->LSPPsiElement name project file start-offset end-offset (:line start)))))))))
+           (mapv #(psi/element->psi-element % project))))))
 
 (defn show-references [^Editor editor line character]
   (when-let [references (get-references editor line character)]
     (if (seq references)
-      (let [project ^Project (.getProject editor)
-            usages (mapv (fn [^PsiElement element]
-                           (UsageInfo2UsageAdapter.
-                            (UsageInfo. element false))) references)
-            options (FindUsagesOptions. project)]
-        (.showUsages (UsageViewManager/getInstance project)
-                     (into-array UsageTarget [])
-                     (into-array Usage usages)
-                     (doto (UsageViewPresentation.)
-                       (.setScopeText (.getDisplayName (.searchScope options)))
-                       (.setSearchString (.generateUsagesString options))
-                       (.setTabText (str (count references) " references"))
-                       (.setTabName "references")
-                       (.setShowCancelButton true)
-                       (.setOpenInNewTab false))))
+      (if (= 1 (count references))
+        (NavigationUtil/activateFileWithPsiElement (first references) true)
+        (let [project ^Project (.getProject editor)
+              usages (mapv (fn [^PsiElement element]
+                             (UsageInfo2UsageAdapter.
+                              (UsageInfo. element false))) references)
+              options (FindUsagesOptions. project)]
+          (.showUsages (UsageViewManager/getInstance project)
+                       (into-array UsageTarget [])
+                       (into-array Usage usages)
+                       (doto (UsageViewPresentation.)
+                         (.setScopeText (.getDisplayName (.searchScope options)))
+                         (.setSearchString (.generateUsagesString options))
+                         (.setTabText (str (count references) " references"))
+                         (.setTabName "references")
+                         (.setShowCancelButton true)
+                         (.setOpenInNewTab false)))))
       (.showErrorHint (HintManager/getInstance)
                       editor
                       "No references found"))))

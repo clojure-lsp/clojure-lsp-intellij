@@ -1,11 +1,15 @@
 (ns com.github.clojure-lsp.intellij.psi
   (:require
-   [clojure.string :as string])
+   [clojure.string :as string]
+   [com.github.clojure-lsp.intellij.editor :as editor])
   (:import
    [com.github.clojure_lsp.intellij ClojureLanguage]
    [com.github.clojure_lsp.intellij Icons]
+   [com.intellij.navigation ItemPresentation NavigationItem PsiElementNavigationItem]
+   [com.intellij.openapi.fileEditor FileEditorManager]
    [com.intellij.openapi.project Project]
    [com.intellij.openapi.util TextRange]
+   [com.intellij.openapi.vfs VirtualFile]
    [com.intellij.psi
     PsiElement
     PsiElementVisitor
@@ -16,20 +20,27 @@
 
 (set! *warn-on-reflection* true)
 
+VirtualFile
+
 (defn ->LSPPsiElement
   [^String name ^Project project ^PsiFile file
    ^Integer start-offset ^Integer end-offset
    ^Integer start-line]
-  (let [manager (PsiManager/getInstance project)]
+  (let [psi-manager (PsiManager/getInstance project)
+        file-editor-manager (FileEditorManager/getInstance project)]
     (reify
       PsiNameIdentifierOwner
-      (getName [_] (str (.getPresentableName (.getVirtualFile file)) ":" start-line))
+      (getName [_] (str  (editor/filename->project-relative-filename
+                          (.getCanonicalPath (.getVirtualFile file))
+                          project)
+                         "  "
+                         start-line))
       (setName [_ _])
       (getNameIdentifier [this] this)
       (getIdentifyingElement [this] this)
       (getProject [_] project)
       (getLanguage [_] ClojureLanguage/INSTANCE)
-      (getManager [_] manager)
+      (getManager [_] psi-manager)
       (getChildren [_] (into-array PsiElement []))
       (getParent [this] (.getContainingFile this))
       (getFirstChild [_])
@@ -81,6 +92,21 @@
       (toString [_] (str name ":" start-offset ":" end-offset))
       (getContainingFile [_] file)
 
+      PsiElementNavigationItem
+      (getTargetElement [this] this)
+
+      NavigationItem
+      (getPresentation [this]
+        (reify ItemPresentation
+          (getPresentableText [_] (.getName this))
+          (getIcon [_ _] Icons/CLOJURE)))
+      (canNavigate [_] true)
+      (canNavigateToSource [_] true)
+      (navigate [_ _]
+        (let [editor (editor/v-file->editor (.getVirtualFile file) project true)]
+          (.openFile file-editor-manager (.getVirtualFile file) true)
+          (.moveToOffset (.getCaretModel editor) start-offset)))
+
       (getUserData [_ _]
         nil)
       (putUserData [_ _ _])
@@ -88,3 +114,11 @@
       (putCopyableUserData [_ _ _])
 
       (getIcon [_ _] Icons/CLOJURE))))
+
+(defn element->psi-element [{:keys [uri] {:keys [start end]} :range} project]
+  (let [text (slurp uri)
+        start-offset (editor/position->offset text (:line start) (:character start))
+        end-offset (editor/position->offset text (:line end) (:character end))
+        file (editor/uri->psi-file uri project)
+        name (subs text start-offset end-offset)]
+    (->LSPPsiElement name project file start-offset end-offset (:line start))))

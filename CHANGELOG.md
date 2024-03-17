@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Improve Find references/implementations to go directly to the usage if only one is found.
+
 ## 2.1.0
 
 - Support "Find implementations" of defmultis/defprotocols. #31
