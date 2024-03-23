@@ -43,9 +43,9 @@
         (.getText document (TextRange. start end))))))
 
 (defn -invoke
-  ([_ ^Project project ^"[Lcom.intellij.psi.PsiElement;" _elements ^DataContext data-context]
+  ([this ^Project project ^"[Lcom.intellij.psi.PsiElement;" _elements ^DataContext data-context]
    ;; TODO handle if only single element and do inPlaceRename instead.
-   (-invoke project (.getData data-context CommonDataKeys/EDITOR) (.getData data-context CommonDataKeys/PSI_FILE) data-context))
+   (-invoke this project (.getData data-context CommonDataKeys/EDITOR) (.getData data-context CommonDataKeys/PSI_FILE) data-context))
   ([_ ^Project project ^Editor editor ^PsiFile _psi-file ^DataContext _data-context]
    (when-let [client (lsp-client/connected-client project)]
      (let [[line character] (editor/editor->cursor-position editor)]
