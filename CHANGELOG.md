@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.3.1
+
 - Add common shortcuts to DragForward and DragBackward.
 
 ## 2.3.0
