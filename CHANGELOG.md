@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.3.0
+
 - Support multiple projects opened with the plugin. #37
 - Fix Stackoverflow exception when renaming. #32
 
