@@ -1,7 +1,6 @@
 (ns com.github.clojure-lsp.intellij.notification
   (:require
    [com.github.clojure-lsp.intellij.client :as lsp-client]
-   [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.tasks :as tasks]
    [com.github.ericdallo.clj4intellij.app-manager :as app-manager]
    [com.github.ericdallo.clj4intellij.logger :as logger]
@@ -24,14 +23,15 @@
    3 :info
    4 :info})
 
-(defn show-notification! [{:keys [type title message]}]
+(defn show-notification! [{:keys [project type title message]}]
   (-> (NotificationGroupManager/getInstance)
       (.getNotificationGroup "Clojure LSP notifications")
       (.createNotification ^String title ^String message ^NotificationType (type->notification-type type))
-      (.notify ^Project (:project @db/db*))))
+      (.notify ^Project project)))
 
-(defmethod lsp-client/show-message :default [{:keys [type message]}]
-  (show-notification! {:type (message-type->notification-type type)
+(defmethod lsp-client/show-message :default [{:keys [project]} {:keys [type message]}]
+  (show-notification! {:project project
+                       :type (message-type->notification-type type)
                        :title "Clojure LSP"
                        :message message}))
 

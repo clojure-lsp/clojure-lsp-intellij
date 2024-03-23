@@ -33,14 +33,16 @@
            :aarch64 "clojure-lsp-native-macos-aarch64.zip"}
    :windows {:amd64 "clojure-lsp-native-windows-amd64.zip"}})
 
-(defn ^:private clean-up-server []
-  (when (and (:server-process @db/db*) (p/alive? (:server-process @db/db*)))
-    (p/destroy (:server-process @db/db*)))
-  (swap! db/db* assoc :status :disconnected
-         :client nil
-         :server-process nil
-         :diagnostics {})
-  (run! #(% :disconnected) (:on-status-changed-fns @db/db*)))
+(defn ^:private clean-up-server [^Project project]
+  (let [server-process (db/get-in project [:server-process])]
+    (when (some-> server-process p/alive?)
+      (p/destroy server-process)))
+  (db/update-in project [] (fn [db]
+                             (assoc db :status :disconnected
+                                    :client nil
+                                    :server-process nil
+                                    :diagnostics {})))
+  (run! #(% project :disconnected) (:on-status-changed-fns @db/db*)))
 
 (defn ^:private os-name []
   (let [os-name (string/lower-case (System/getProperty "os.name" "generic"))]
@@ -70,7 +72,7 @@
           (clojure.java.io/copy stream dest-file))
         (recur (.getNextEntry stream))))))
 
-(defn ^:private download-server! [indicator ^File download-path]
+(defn ^:private download-server! [project indicator ^File download-path]
   (tasks/set-progress indicator "LSP: Downloading clojure-lsp")
   (let [version (string/trim (slurp latest-version-uri))
         platform (os-name)
@@ -85,7 +87,7 @@
       (.setWritable true)
       (.setReadable true)
       (.setExecutable true))
-    (swap! db/db* assoc :downloaded-server-path dest-path)
+    (db/assoc-in project [:downloaded-server-path] dest-path)
     (logger/info "Downloaded clojure-lsp to" dest-path)))
 
 (defn ^:private spawn-server! [^Project project indicator server-path]
@@ -101,46 +103,46 @@
         (p/check process)
         (catch Exception e
           (logger/warn "Error on clojure-lsp process:\n" (pr-str e))
-          (clean-up-server)
+          (clean-up-server project)
           (.cancel ^ProgressIndicator indicator))))
-    (swap! db/db* assoc
-           :server-process process
-           :client client)
-    (lsp-client/start-client! client {:progress-indicator indicator})
+    (db/assoc-in project [:server-process] process)
+    (lsp-client/start-client! client {:progress-indicator indicator
+                                      :project project})
     (tasks/set-progress indicator "LSP: Initializing...")
     (let [request-initiatilize (lsp-client/request! client [:initialize
                                                             {:root-uri (project/project->root-uri project)
                                                              :work-done-token "lsp-startup"
                                                              :initialization-options (merge {:dependency-scheme "jar"
                                                                                              :hover {:arity-on-same-line? true}}
-                                                                                            (:settings @db/db*))
+                                                                                            (db/get-in project [:settings]))
                                                              :capabilities client-capabilities}])]
       (loop []
         (Thread/sleep 500)
         (cond
           (and (not (realized? request-initiatilize))
                (not (p/alive? process)))
-          (notification/show-notification! {:type :error
+          (notification/show-notification! {:project project
+                                            :type :error
                                             :title "Clojure LSP process error"
                                             :message @(:err process)})
 
           (and (realized? request-initiatilize)
                (p/alive? process))
-          (lsp-client/notify! client [:initialized {}])
+          (do (lsp-client/notify! client [:initialized {}])
+              (db/assoc-in project [:client] client))
 
           :else
           (recur))))))
 
 (defn start-server! [^Project project]
-  (swap! db/db* assoc :status :connecting)
-  (run! #(% :connecting) (:on-status-changed-fns @db/db*))
+  (db/assoc-in project [:status] :connecting)
+  (run! #(% project :connecting) (:on-status-changed-fns @db/db*))
   (tasks/run-background-task!
    project
    "Clojure LSP startup"
    (fn [indicator]
-     (let [db @db/db*
-           download-path (config/download-server-path)
-           custom-server-path (-> db :settings :server-path)]
+     (let [download-path (config/download-server-path)
+           custom-server-path (db/get-in project [:settings :server-path])]
        (cond
          custom-server-path
          (spawn-server! project indicator custom-server-path)
@@ -149,20 +151,20 @@
          (spawn-server! project indicator download-path)
 
          :else
-         (do (download-server! indicator download-path)
+         (do (download-server! project indicator download-path)
              (spawn-server! project indicator download-path)))
 
-       (swap! db/db* assoc :status :connected)
-       (run! #(% :connected) (:on-status-changed-fns @db/db*))
+       (db/assoc-in project [:status] :connected)
+       (run! #(% project :connected) (:on-status-changed-fns @db/db*))
         ;; For race conditions when server starts too fast
         ;; and other places that listen didn't setup yet
        (future
          (Thread/sleep 1000)
-         (run! #(% :connected) (:on-status-changed-fns @db/db*)))
+         (run! #(% project :connected) (:on-status-changed-fns @db/db*)))
        (logger/info "Initialized LSP server"))))
   true)
 
-(defn shutdown! []
-  (when-let [client (lsp-client/connected-client)]
+(defn shutdown! [^Project project]
+  (when-let [client (lsp-client/connected-client project)]
     @(lsp-client/request! client [:shutdown {}])
-    (clean-up-server)))
+    (clean-up-server project)))

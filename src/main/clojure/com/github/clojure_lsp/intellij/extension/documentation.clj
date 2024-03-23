@@ -3,8 +3,8 @@
    :name com.github.clojure_lsp.intellij.extension.Documentation
    :implements [com.intellij.lang.documentation.DocumentationProvider])
   (:require
-   [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
+   [com.github.clojure-lsp.intellij.db :as db]
    [markdown.core :as markdown])
   (:import
    [com.intellij.openapi.util.text StringUtil]
@@ -14,7 +14,7 @@
 (set! *warn-on-reflection* true)
 
 (defn ^:private build-doc [^PsiElement element]
-  (when-let [client (:client @db/db*)]
+  (when-let [client (db/get-in (.getProject element) [:client])]
     (when-let [psi-file ^PsiFile (.getContainingFile element)]
       (let [project (.getProject element)
             document (.getDocument (PsiDocumentManager/getInstance project) psi-file)

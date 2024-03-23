@@ -16,6 +16,7 @@
    [seesaw.mig :as s.mig])
   (:import
    [com.github.clojure_lsp.intellij.extension SettingsState]
+   [com.intellij.openapi.project Project]
    [com.intellij.ui IdeBorderFactory]
    [java.awt Toolkit]
    [java.awt.datatransfer StringSelection]))
@@ -86,22 +87,24 @@
                                                                           (s/alert e "Server info copied to clipboard"))]) "wrap"]
                                             [(s/button :text "Restart LSP server"
                                                        :listen [:action (fn [_]
-                                                                          (server/shutdown!)
-                                                                          (server/start-server! (:project @db/db*)))]) "wrap"]]) "span"]
+                                                                          (doseq [project (db/all-projects)]
+                                                                            (server/shutdown! project)
+                                                                            (server/start-server! project)))]) "wrap"]]) "span"]
                   [(s/label :text "*  requires LSP restart"
                             :font (s.font/font  :size 14)
                             :foreground (s.color/color 110 110 110)) "wrap"]]
                  (remove nil?)))))
 
-(defn ^:private server-info! []
-  (some-> (lsp-client/connected-client)
+(defn ^:private server-info! [^Project project]
+  (some-> (lsp-client/connected-client project)
           (lsp-client/request! [":clojure/serverInfo/raw" {}])
           deref
           walk/keywordize-keys))
 
 (defn -createComponent [_]
-  (let [server-info (server-info!)
-        component (build-component server-info (:settings @db/db*))]
+  (let [project (first (db/all-projects))
+        server-info (server-info! project)
+        component (build-component server-info (db/get-in project [:settings]))]
     (reset! component* component)
     component))
 
@@ -109,7 +112,8 @@
   (s/select @component* [:#copy-server-info]))
 
 (defn -isModified [_]
-  (let [settings-state (SettingsState/get)
+  (let [project (first (db/all-projects))
+        settings-state (SettingsState/get)
         server-path (s/config (s/select @component* [:#server-path]) :text)
         trace-level-combo-box (s/config (s/select @component* [:#trace-level]) :selected-item)
         server-log-path (s/config (s/select @component* [:#server-log]) :text)]
@@ -118,13 +122,14 @@
          (not= trace-level-combo-box (.getTraceLevel settings-state))
          (not= server-log-path (or (.getServerLogPath settings-state) ""))
          (and (str/blank? server-log-path)
-              (-> @db/db* :settings :log-path))))))
+              (db/get-in project [:settings :log-path]))))))
 
 (defn -reset [_]
-  (let [server-info (server-info!)
-        trace-level-combo-box (-> @db/db* :settings :trace-level)
-        server-log-path (or (-> @db/db* :settings :log-path) (:log-path server-info))
-        server-path (or (-> @db/db* :settings :server-path) (.getCanonicalPath (config/download-server-path)))]
+  (let [project (first (db/all-projects))
+        server-info (server-info! project)
+        trace-level-combo-box (db/get-in project [:settings :trace-level])
+        server-log-path (or (db/get-in project [:settings :log-path]) (:log-path server-info))
+        server-path (or (db/get-in project [:settings :server-path]) (.getCanonicalPath (config/download-server-path)))]
     (s/config! (s/select @component* [:#trace-level]) :selected-item trace-level-combo-box)
     (s/config! (s/select @component* [:#server-log]) :text server-log-path)
     (s/config! (s/select @component* [:#server-path]) :text server-path)))

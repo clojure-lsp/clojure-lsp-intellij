@@ -35,7 +35,7 @@
 (defn -getDisplayName [_] "Clojure LSP")
 
 (defn -isAvailable [_ project]
-  (project/clojure-project? project @db/db*))
+  (project/clojure-project? project))
 
 (defn -canBeEnabledOn [_ _] true)
 
@@ -51,9 +51,8 @@
     (.updateWidget ^StatusBarWidgetsManager (.getService project StatusBarWidgetsManager) factory)))
 
 (defn -post-init [this]
-  (swap! db/db* update :on-status-changed-fns conj
-         (fn [_status]
-           (refresh-status-bar this (:project @db/db*)))))
+  (swap! db/db* update :on-status-changed-fns conj (fn [project _status]
+                                                     (refresh-status-bar this project))))
 
 (defn ^:private restart-lsp-action [^Project project]
   (proxy+
@@ -62,11 +61,11 @@
     (update [_ _event])
 
     (actionPerformed [_ _event]
-      (server/shutdown!)
+      (server/shutdown! project)
       (server/start-server! project))))
 
-(defn ^:private status-bar-title []
-  (str "Clojure LSP: " (name (:status @db/db*))))
+(defn ^:private status-bar-title [project]
+  (str "Clojure LSP: " (name (db/get-in project [:status]))))
 
 (defn -createWidget ^StatusBarWidget [_this ^Project project]
   (proxy+
@@ -83,7 +82,7 @@
           (let [component (.getComponent ^MouseEvent e)
                 popup (.createActionGroupPopup
                        (JBPopupFactory/getInstance)
-                       (status-bar-title)
+                       (status-bar-title project)
                        (doto (DefaultActionGroup.)
                          (.add (restart-lsp-action project)))
                        (.getDataContext (DataManager/getInstance) component)
@@ -91,8 +90,8 @@
                        true)]
             (.show popup (RelativePoint. component (Point. 0 (-> popup .getContent .getPreferredSize .getHeight -)))))
           true)))
-    (getTooltipText [_] (status-bar-title))
+    (getTooltipText [_] (status-bar-title project))
     (getIcon [_]
-      (if (lsp-client/connected-client)
+      (if (lsp-client/connected-client project)
         Icons/STATUS_CONNECTED
         Icons/STATUS_DISCONNECTED))))

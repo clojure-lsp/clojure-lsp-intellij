@@ -2,7 +2,8 @@
   (:require
    [camel-snake-kebab.core :as csk]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
-   [com.github.clojure-lsp.intellij.editor :as editor])
+   [com.github.clojure-lsp.intellij.editor :as editor]
+   [com.github.clojure-lsp.intellij.tasks :as tasks])
   (:import
    [com.intellij.openapi.actionSystem AnActionEvent]
    [com.intellij.openapi.actionSystem CommonDataKeys]
@@ -11,12 +12,16 @@
 (set! *warn-on-reflection* true)
 
 (defn ^:private action-performed [command _ ^AnActionEvent event]
-  (when-let [client (lsp-client/connected-client)]
-    (when-let [editor ^Editor (.getData event CommonDataKeys/EDITOR)]
+  (when-let [editor ^Editor (.getData event CommonDataKeys/EDITOR)]
+    (when-let [client (lsp-client/connected-client (.getProject editor))]
       (let [[line character] (editor/editor->cursor-position editor)]
-        (lsp-client/request! client [:workspace/executeCommand
-                                     {:command command
-                                      :arguments [(editor/editor->uri editor) line character]}])))))
+        (tasks/run-background-task!
+         (.getProject editor)
+         "LSP: refactoring"
+         (fn [_]
+           (lsp-client/request! client [:workspace/executeCommand
+                                        {:command command
+                                         :arguments [(editor/editor->uri editor) line character]}])))))))
 
 (defmacro ^:private gen-refactor [& {:keys [command]}]
   `(do

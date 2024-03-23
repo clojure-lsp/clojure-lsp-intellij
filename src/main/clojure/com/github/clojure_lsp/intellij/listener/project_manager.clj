@@ -3,7 +3,6 @@
    :name com.github.clojure_lsp.intellij.listener.ProjectManagerListener
    :implements [com.intellij.openapi.project.ProjectManagerListener])
   (:require
-   [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.project-lsp :as project]
    [com.github.clojure-lsp.intellij.server :as server])
   (:import
@@ -15,5 +14,5 @@
 (defn -projectClosed [_ _])
 
 (defn -projectClosing [_ ^Project project]
-  (when (project/clojure-project? project @db/db*)
-    (server/shutdown!)))
+  (when (project/clojure-project? project)
+    (server/shutdown! project)))

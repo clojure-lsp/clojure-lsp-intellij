@@ -4,7 +4,6 @@
    :extends com.intellij.openapi.project.DumbAwareAction)
   (:require
    [com.github.clojure-lsp.intellij.client :as lsp-client]
-   [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.clojure-lsp.intellij.psi :as psi])
   (:import
@@ -27,7 +26,7 @@
 (set! *warn-on-reflection* true)
 
 (defn show-implementations [^Editor editor line character]
-  (when-let [client (:client @db/db*)]
+  (when-let [client (lsp-client/connected-client (.getProject editor))]
     (let [implementations @(lsp-client/request! client [:textDocument/implementation
                                                         {:text-document {:uri (editor/editor->uri editor)}
                                                          :position {:line line

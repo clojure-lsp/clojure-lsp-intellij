@@ -4,7 +4,7 @@
    :implements [com.intellij.openapi.fileEditor.FileDocumentManagerListener])
   (:require
    [com.github.clojure-lsp.intellij.client :as lsp-client]
-   [com.github.clojure-lsp.intellij.db :as db])
+   [com.github.clojure-lsp.intellij.editor :as editor])
   (:import
    [com.intellij.openapi.editor Document]
    [com.intellij.openapi.fileEditor FileDocumentManager]))
@@ -20,7 +20,7 @@
 (defn -afterDocumentUnbound [_ _ _])
 
 (defn -beforeDocumentSaving [_ ^Document document]
-  (when-let [client (and (= :connected (:status @db/db*))
-                         (:client @db/db*))]
-    (lsp-client/notify! client [:textDocument/didSave
-                                {:textDocument {:uri (.getUrl (.getFile (FileDocumentManager/getInstance) document))}}])))
+  (let [vfile (.getFile (FileDocumentManager/getInstance) document)]
+    (when-let [client (some-> vfile editor/v-file->project lsp-client/connected-client)]
+      (lsp-client/notify! client [:textDocument/didSave
+                                  {:textDocument {:uri (.getUrl vfile)}}]))))

@@ -8,17 +8,19 @@
    [lsp4clj.io-chan :as io-chan]
    [lsp4clj.lsp.requests :as lsp.requests]
    [lsp4clj.lsp.responses :as lsp.responses]
-   [lsp4clj.protocols.endpoint :as protocols.endpoint]))
+   [lsp4clj.protocols.endpoint :as protocols.endpoint])
+  (:import
+   [com.intellij.openapi.project Project]))
 
 (set! *warn-on-reflection* true)
 
-(defmulti show-message identity)
+(defmulti show-message (fn [_context args] args))
 (defmulti show-message-request identity)
 (defmulti progress (fn [_context {:keys [token]}] token))
-(defmulti workspace-apply-edit (fn [{:keys [label]}] label))
+(defmulti workspace-apply-edit (fn [_context {:keys [label]}] label))
 
-(defn ^:private publish-diagnostics [{:keys [uri diagnostics]}]
-  (swap! db/db* assoc-in [:diagnostics uri] diagnostics))
+(defn ^:private publish-diagnostics [{:keys [project]} {:keys [uri diagnostics]}]
+  (db/assoc-in project [:diagnostics uri] diagnostics))
 
 (defn ^:private receive-message
   [client context message]
@@ -103,11 +105,11 @@
                            resp
                            (:result resp))))
       (protocols.endpoint/log this :red "received response for unmatched request:" resp)))
-  (receive-request [this _ {:keys [id method params] :as req}]
+  (receive-request [this context {:keys [id method params] :as req}]
     (protocols.endpoint/log this :magenta "received request:" req)
     (when-let [response-body (case method
                                "window/showMessageRequest" (show-message-request params)
-                               "workspace/applyEdit" (workspace-apply-edit params)
+                               "workspace/applyEdit" (workspace-apply-edit context params)
                                (logger/warn "Unknown LSP request method" method))]
       (let [resp (lsp.responses/response id response-body)]
         (protocols.endpoint/log this :magenta "sending response:" resp)
@@ -115,9 +117,9 @@
   (receive-notification [this context {:keys [method params] :as notif}]
     (protocols.endpoint/log this :blue "received notification:" notif)
     (case method
-      "window/showMessage" (show-message params)
+      "window/showMessage" (show-message context params)
       "$/progress" (progress context params)
-      "textDocument/publishDiagnostics" (publish-diagnostics params)
+      "textDocument/publishDiagnostics" (publish-diagnostics context params)
 
       (logger/warn "Unknown LSP notification method" method))))
 
@@ -144,6 +146,6 @@
 (defn notify! [client [method body]]
   (protocols.endpoint/send-notification client (subs (str method) 1) body))
 
-(defn connected-client []
-  (when (identical? :connected (:status @db/db*))
-    (:client @db/db*)))
+(defn connected-client [^Project project]
+  (when (identical? :connected (db/get-in project [:status]))
+    (db/get-in project [:client])))

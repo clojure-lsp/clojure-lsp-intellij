@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Support multiple projects opened with the plugin. #37
+
 ## 2.2.1
 
 - Wait to check for client initialized to minor cpu usage improvmenet.

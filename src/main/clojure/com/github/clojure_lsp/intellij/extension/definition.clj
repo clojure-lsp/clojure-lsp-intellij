@@ -7,7 +7,6 @@
    [com.github.clojure-lsp.intellij.action.references :as action.references]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.config :as config]
-   [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.clojure-lsp.intellij.file-system :as file-system]
    [com.github.clojure-lsp.intellij.psi :as psi])
@@ -44,10 +43,9 @@
         (dependency-content client uri project definition (string/replace-first uri (str "file://" (config/project-cache-path project)) ""))))))
 
 (defn -getGotoDeclarationTargets [_ ^PsiElement element _ ^Editor editor]
-  (when-let [client (and (= :connected (:status @db/db*))
-                         (:client @db/db*))]
-    (let [[line character] (:start (editor/text-range->range (.getTextRange element) editor))
-          project ^Project (.getProject editor)]
+  (let [[line character] (:start (editor/text-range->range (.getTextRange element) editor))
+        project ^Project (.getProject editor)]
+    (when-let [client (lsp-client/connected-client project)]
       (when-let [definition @(lsp-client/request! client [:textDocument/definition
                                                           {:text-document {:uri (editor/editor->uri editor)}
                                                            :position {:line line

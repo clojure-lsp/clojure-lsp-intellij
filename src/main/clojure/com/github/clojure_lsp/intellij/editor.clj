@@ -11,7 +11,7 @@
     FileEditorManager
     OpenFileDescriptor
     TextEditor]
-   [com.intellij.openapi.project Project]
+   [com.intellij.openapi.project Project ProjectLocator]
    [com.intellij.openapi.util TextRange]
    [com.intellij.openapi.util.text StringUtil]
    [com.intellij.openapi.vfs LocalFileSystem]
@@ -75,44 +75,48 @@
 (defn virtual->psi-file ^PsiFile [^VirtualFile v-file ^Project project]
   (.findFile (PsiManager/getInstance project) v-file))
 
+(defn v-file->project ^Project [^VirtualFile v-file]
+  (.guessProjectForFile (ProjectLocator/getInstance)
+                        v-file))
+
 (defn apply-workspace-edit ^Boolean
   [^Project project label move-caret? {:keys [document-changes]}]
   ;; TODO Handle resourceOperations like creating, renaming and deleting files
   ;; TODO Improve to check version to known if file changed
   (app-manager/invoke-later!
-   {:invoke-fn
-    (fn []
-      (app-manager/write-action!
-       {:run-fn
-        (fn []
-          (app-manager/execute-command!
-           {:name label
-            :project project
-            :command-fn
-            (fn []
-              (doseq [{{:keys [uri]} :text-document
-                       :keys [edits]} document-changes
-                      :let [editor (uri->editor uri project)
-                            document (.getDocument editor)
-                            sorted-edits (sort-by (comp #(document+position->offset % document) :start :range) > edits)]]
-                (doseq [{:keys [new-text range]} sorted-edits
-                        :let [start (document+position->offset (:start range) document)
-                              end (document+position->offset (:end range) document)]]
-                  (cond
-                    (>= end 0)
-                    (if (<= (- end start) 0)
-                      (.insertString document start new-text)
-                      (.replaceString document start end new-text))
+    {:invoke-fn
+     (fn []
+       (app-manager/write-action!
+         {:run-fn
+          (fn []
+            (app-manager/execute-command!
+              {:name label
+               :project project
+               :command-fn
+               (fn []
+                 (doseq [{{:keys [uri]} :text-document
+                          :keys [edits]} document-changes
+                         :let [editor (uri->editor uri project)
+                               document (.getDocument editor)
+                               sorted-edits (sort-by (comp #(document+position->offset % document) :start :range) > edits)]]
+                   (doseq [{:keys [new-text range]} sorted-edits
+                           :let [start (document+position->offset (:start range) document)
+                                 end (document+position->offset (:end range) document)]]
+                     (cond
+                       (>= end 0)
+                       (if (<= (- end start) 0)
+                         (.insertString document start new-text)
+                         (.replaceString document start end new-text))
 
-                    (= 0 start)
-                    (.setText document new-text)
+                       (= 0 start)
+                       (.setText document new-text)
 
-                    (> start 0)
-                    (.insertString document start new-text)
+                       (> start 0)
+                       (.insertString document start new-text)
 
-                    :else
-                    nil)
-                  (when move-caret?
-                    (.moveToOffset (.getCaretModel editor)
-                                   (+ (count new-text) start))))
-                (.saveDocument (FileDocumentManager/getInstance) document)))}))}))}))
+                       :else
+                       nil)
+                     (when move-caret?
+                       (.moveToOffset (.getCaretModel editor)
+                                      (+ (count new-text) start))))
+                   (.saveDocument (FileDocumentManager/getInstance) document)))}))}))}))

@@ -4,7 +4,6 @@
    :implements [com.intellij.refactoring.rename.RenameHandler])
   (:require
    [com.github.clojure-lsp.intellij.client :as lsp-client]
-   [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.editor :as editor])
   (:import
    [com.intellij.openapi.actionSystem CommonDataKeys DataContext]
@@ -32,12 +31,13 @@
 
 (defn ^:private prepare-rename-current-name [client ^Editor editor line character]
   (let [document (.getDocument editor)
+        project (.getProject editor)
         response @(lsp-client/request! client [:textDocument/prepareRename
                                                {:text-document {:uri (editor/editor->uri editor)}
                                                 :position {:line line
                                                            :character character}}])]
     (if-let [{:keys [message]} (:error response)]
-      (lsp-client/show-message {:type 1 :message message})
+      (lsp-client/show-message {:project project} {:type 1 :message message})
       (let [start ^int (editor/document+position->offset (:start response) document)
             end ^int (editor/document+position->offset (:end response) document)]
         (.getText document (TextRange. start end))))))
@@ -47,7 +47,7 @@
    ;; TODO handle if only single element and do inPlaceRename instead.
    (-invoke project (.getData data-context CommonDataKeys/EDITOR) (.getData data-context CommonDataKeys/PSI_FILE) data-context))
   ([_ ^Project project ^Editor editor ^PsiFile _psi-file ^DataContext _data-context]
-   (when-let [client (:client @db/db*)]
+   (when-let [client (lsp-client/connected-client project)]
      (let [[line character] (editor/editor->cursor-position editor)]
        (when-let [current-name ^String (prepare-rename-current-name client editor line character)]
          (when-let [new-name (Messages/showInputDialog project "Enter new name: " "Rename" (Messages/getQuestionIcon) current-name (NonEmptyInputValidator.))]

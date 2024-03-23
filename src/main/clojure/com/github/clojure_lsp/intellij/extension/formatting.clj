@@ -3,8 +3,7 @@
    :name com.github.clojure_lsp.intellij.extension.Formatting
    :extends com.intellij.formatting.service.AsyncDocumentFormattingService)
   (:require
-   [com.github.clojure-lsp.intellij.client :as lsp-client]
-   [com.github.clojure-lsp.intellij.db :as db])
+   [com.github.clojure-lsp.intellij.client :as lsp-client])
   (:import
    [com.github.clojure_lsp.intellij ClojureFileType]
    [com.intellij.formatting.service AsyncDocumentFormattingService$FormattingTask AsyncFormattingRequest]
@@ -18,7 +17,7 @@
 
 (defn -canFormat [_ ^PsiFile psi-file]
   (and (instance? ClojureFileType (.getFileType psi-file))
-       (boolean (lsp-client/connected-client))))
+       (boolean (lsp-client/connected-client (.getProject psi-file)))))
 
 (defn -getName [_]
   "LSP format")
@@ -28,18 +27,18 @@
 
 (defn -createFormattingTask [_ ^AsyncFormattingRequest request]
   (let [context (.getContext request)
-        client (:client @db/db*)
         file (.getContainingFile context)
         uri (.getUrl (.getVirtualFile file))]
-    (reify AsyncDocumentFormattingService$FormattingTask
-      (run [_]
-        (try
-          (let [[{:keys [new-text]}] @(lsp-client/request! client [:textDocument/formatting
-                                                                   {:text-document {:uri uri}}])]
-            (if new-text
-              (.onTextReady request new-text)
-              (.onTextReady request (.getDocumentText request))))
-          (catch Exception e
-            (.onError request "LSP format error" (.getMessage e)))))
-      (cancel [_] true)
-      (isRunUnderProgress [_] true))))
+    (when-let [client (lsp-client/connected-client (.getProject file))]
+      (reify AsyncDocumentFormattingService$FormattingTask
+        (run [_]
+          (try
+            (let [[{:keys [new-text]}] @(lsp-client/request! client [:textDocument/formatting
+                                                                     {:text-document {:uri uri}}])]
+              (if new-text
+                (.onTextReady request new-text)
+                (.onTextReady request (.getDocumentText request))))
+            (catch Exception e
+              (.onError request "LSP format error" (.getMessage e)))))
+        (cancel [_] true)
+        (isRunUnderProgress [_] true)))))

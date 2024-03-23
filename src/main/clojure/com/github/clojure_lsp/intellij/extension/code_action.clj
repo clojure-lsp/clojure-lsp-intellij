@@ -14,9 +14,9 @@
 
 (defonce code-action-name->title* (atom {}))
 
-(defn ^:private req-code-actions [uri [line character]]
-  (when-let [client (lsp-client/connected-client)]
-    (let [diagnostics (->> (get-in @db/db* [:diagnostics uri])
+(defn ^:private req-code-actions [project uri [line character]]
+  (when-let [client (lsp-client/connected-client project)]
+    (let [diagnostics (->> (db/get-in project [:diagnostics uri])
                            (filterv (fn [{{:keys [start end]} :range}]
                                       (and (<= (:line start) line (:line end))
                                            (<= (:character start) character (:character end))))))
@@ -45,7 +45,7 @@
   (when-let [vfile (.getVirtualFile file)]
     (let [uri (.getUrl vfile)
           pos (editor/editor->cursor-position editor)]
-      (get (memoized-code-actions uri pos) command))))
+      (get (memoized-code-actions (.getProject editor) uri pos) command))))
 
 (defn ^:private is-available [name _ _project editor file]
   (boolean (editor+command->code-action file editor name)))
@@ -53,9 +53,9 @@
 (defn ^:private get-text [name _]
   (get @code-action-name->title* name name))
 
-(defn ^:private invoke [name _ ^Project _project editor file]
+(defn ^:private invoke [name _ ^Project project editor file]
   (when-let [{:keys [command arguments]} (editor+command->code-action file editor name)]
-    (let [client (:client @db/db*)]
+    (let [client (db/get-in project [:client])]
       (lsp-client/request! client [:workspace/executeCommand
                                    {:command command
                                     :arguments arguments}]))))

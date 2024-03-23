@@ -24,7 +24,7 @@
 
 (defn -doAnnotate [_ ^PsiFile psi-file]
   (when-let [virtual-file (.getVirtualFile psi-file)]
-    (get-in @db/db* [:diagnostics (.getUrl virtual-file)])))
+    (db/get-in (.getProject psi-file) [:diagnostics (.getUrl virtual-file)])))
 
 (defn -apply [_ ^PsiFile psi-file result ^AnnotationHolder holder]
   (when-let [document ^Document (some-> (PsiDocumentManager/getInstance (.getProject psi-file))
