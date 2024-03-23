@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add common shortcuts to DragForward and DragBackward.
+
 ## 2.3.0
 
 - Support multiple projects opened with the plugin. #37

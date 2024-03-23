@@ -122,12 +122,14 @@
                 class="com.github.clojure_lsp.intellij.action.DragBackwardAction"
                 text="Drag backward"
                 description="Drag backward"
-                icon="com.github.clojure_lsp.intellij.Icons.CLOJURE"/>
+                icon="com.github.clojure_lsp.intellij.Icons.CLOJURE"
+                use-shortcut-of="MoveStatementUp"/>
         <action id="ClojureLSP.DragForward"
                 class="com.github.clojure_lsp.intellij.action.DragForwardAction"
                 text="Drag forward"
                 description="Drag forward"
-                icon="com.github.clojure_lsp.intellij.Icons.CLOJURE"/>
+                icon="com.github.clojure_lsp.intellij.Icons.CLOJURE"
+                use-shortcut-of="MoveStatementDown"/>
         <action id="ClojureLSP.AddMissingImport"
                 class="com.github.clojure_lsp.intellij.action.AddMissingImportAction"
                 text="Add import to namespace"
