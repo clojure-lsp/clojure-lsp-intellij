@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.3.2
+
 - Fix race condition NPE when intellij starts slowly.
 
 ## 2.3.1
