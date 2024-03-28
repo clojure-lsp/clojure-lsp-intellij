@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix race condition NPE when intellij starts slowly.
+
 ## 2.3.1
 
 - Add common shortcuts to DragForward and DragBackward.

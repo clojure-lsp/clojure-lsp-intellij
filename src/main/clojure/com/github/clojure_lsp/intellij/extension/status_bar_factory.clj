@@ -65,7 +65,7 @@
       (server/start-server! project))))
 
 (defn ^:private status-bar-title [project]
-  (str "Clojure LSP: " (name (db/get-in project [:status]))))
+  (str "Clojure LSP: " (name (db/get-in project [:status] "disconnected"))))
 
 (defn -createWidget ^StatusBarWidget [_this ^Project project]
   (proxy+

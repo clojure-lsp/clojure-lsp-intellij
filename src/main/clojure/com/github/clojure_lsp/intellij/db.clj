@@ -24,8 +24,11 @@
 (defn empty-db? []
   (empty? (:projects @db*)))
 
-(defn get-in [^Project project fields]
-  (clojure.core/get-in @db* (concat [:projects (.getBasePath project)] fields)))
+(defn get-in
+  ([project fields]
+   (get-in project fields nil))
+  ([^Project project fields default]
+   (clojure.core/get-in @db* (concat [:projects (.getBasePath project)] fields) default)))
 
 (defn assoc-in [^Project project fields value]
   (swap! db* clojure.core/assoc-in (concat [:projects (.getBasePath project)] fields) value))
@@ -75,4 +78,5 @@
       (swap! db* clojure.core/assoc-in [:projects project-path :settings :server-path] server-path))))
 
 (defn all-projects []
-  (mapv :project (vals (:projects @db*))))
+  (remove nil?
+          (mapv :project (vals (:projects @db*)))))
