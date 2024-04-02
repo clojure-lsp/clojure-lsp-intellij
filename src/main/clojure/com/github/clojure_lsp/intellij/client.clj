@@ -63,7 +63,7 @@
   (start [this context]
     (protocols.endpoint/log this :white "lifecycle:" "starting")
     (let [pipeline (async/pipeline-blocking
-                    10 ;; no parallelism preserves server message order
+                    1 ;; no parallelism preserves server message order
                     output-ch
                      ;; TODO: return error until initialize request is received? https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#initialize
                      ;; `keep` means we do not reply to responses and notifications
@@ -166,7 +166,7 @@
   Writes in a thread to avoid blocking a go block thread."
   [output]
   (let [output (io/output-stream output)
-        messages (async/chan 10)]
+        messages (async/chan)]
     (async/thread
       (with-open [writer output] ;; close output when channel closes
         (loop []
@@ -241,7 +241,7 @@
   ([input {:keys [close? keyword-function]
            :or {close? true, keyword-function csk/->kebab-case-keyword}}]
    (let [input (io/input-stream input)
-         messages (async/chan 10)]
+         messages (async/chan)]
      (async/thread
        (loop [headers {}]
          (let [line (read-header-line input)]
