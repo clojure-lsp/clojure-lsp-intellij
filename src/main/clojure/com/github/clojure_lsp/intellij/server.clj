@@ -3,6 +3,7 @@
    [babashka.process :as p]
    [clojure.core.async :as async]
    [clojure.java.io :as io]
+   [clojure.pprint :as pp]
    [clojure.string :as string]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.config :as config]
@@ -93,10 +94,10 @@
 (defn ^:private spawn-server! [^Project project indicator server-path]
   (logger/info "Spawning LSP server process using path" server-path)
   (tasks/set-progress indicator "LSP: Starting server...")
-  (let [process (p/process [server-path "listen"]
+  (let [process (p/process [server-path "listen" "--log-path" "/tmp/clojure-lsp.out"]
                            {:dir (.getBasePath project)
-                            :env (EnvironmentUtil/getEnvironmentMap)
-                            :err :string})
+                            :env (EnvironmentUtil/getEnvironmentMap)})
+        _ (Thread/sleep 1000)
         client (lsp-client/client (:in process) (:out process))]
     (async/go
       (try
@@ -106,8 +107,10 @@
           (clean-up-server project)
           (.cancel ^ProgressIndicator indicator))))
     (db/assoc-in project [:server-process] process)
+    (Thread/sleep 1000)
     (lsp-client/start-client! client {:progress-indicator indicator
                                       :project project})
+    (Thread/sleep 2000)
     (tasks/set-progress indicator "LSP: Initializing...")
     (let [request-initiatilize (lsp-client/request! client [:initialize
                                                             {:root-uri (project/project->root-uri project)
@@ -116,7 +119,7 @@
                                                                                              :hover {:arity-on-same-line? true}}
                                                                                             (db/get-in project [:settings]))
                                                              :capabilities client-capabilities}])]
-      (loop []
+      (loop [count 0]
         (Thread/sleep 500)
         (cond
           (and (not (realized? request-initiatilize))
@@ -132,7 +135,9 @@
               (db/assoc-in project [:client] client))
 
           :else
-          (recur))))))
+          (do
+            (logger/info "Checking if server initialized, try number:" count (with-out-str (pp/pprint process)))
+            (recur (inc count))))))))
 
 (defn start-server! [^Project project]
   (db/assoc-in project [:status] :connecting)
