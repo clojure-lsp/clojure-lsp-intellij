@@ -3,7 +3,6 @@
    [babashka.process :as p]
    [clojure.core.async :as async]
    [clojure.java.io :as io]
-   [clojure.pprint :as pp]
    [clojure.string :as string]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.config :as config]
@@ -14,6 +13,7 @@
    [com.github.clojure-lsp.intellij.workspace-edit]
    [com.github.ericdallo.clj4intellij.logger :as logger])
   (:import
+   [com.github.ericdallo.clj4intellij ClojureClassLoader]
    [com.intellij.openapi.progress ProgressIndicator]
    [com.intellij.openapi.project Project]
    [com.intellij.util EnvironmentUtil]
@@ -94,23 +94,21 @@
 (defn ^:private spawn-server! [^Project project indicator server-path]
   (logger/info "Spawning LSP server process using path" server-path)
   (tasks/set-progress indicator "LSP: Starting server...")
-  (let [process (p/process [server-path "listen" "--log-path" "/tmp/clojure-lsp.out"]
+  (let [process (p/process [server-path "listen"]
                            {:dir (.getBasePath project)
                             :env (EnvironmentUtil/getEnvironmentMap)})
-        _ (Thread/sleep 1000)
         client (lsp-client/client (:in process) (:out process))]
-    (async/go
+    (db/assoc-in project [:server-process] process)
+    (lsp-client/start-client! client {:progress-indicator indicator
+                                      :project project})
+    (async/thread
       (try
         (p/check process)
         (catch Exception e
           (logger/warn "Error on clojure-lsp process:\n" (pr-str e))
           (clean-up-server project)
           (.cancel ^ProgressIndicator indicator))))
-    (db/assoc-in project [:server-process] process)
-    (Thread/sleep 1000)
-    (lsp-client/start-client! client {:progress-indicator indicator
-                                      :project project})
-    (Thread/sleep 2000)
+
     (tasks/set-progress indicator "LSP: Initializing...")
     (let [request-initiatilize (lsp-client/request! client [:initialize
                                                             {:root-uri (project/project->root-uri project)
@@ -136,7 +134,7 @@
 
           :else
           (do
-            (logger/info "Checking if server initialized, try number:" count (with-out-str (pp/pprint process)))
+            (logger/info "Checking if server initialized, try number:" count)
             (recur (inc count))))))))
 
 (defn start-server! [^Project project]
@@ -146,6 +144,7 @@
    project
    "Clojure LSP startup"
    (fn [indicator]
+     (ClojureClassLoader/bind)
      (let [download-path (config/download-server-path)
            custom-server-path (db/get-in project [:settings :server-path])]
        (cond

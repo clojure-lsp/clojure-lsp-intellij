@@ -43,12 +43,13 @@
                                   (assoc projects (.getBasePath project) (assoc empty-project :project project))))))
 
 (defn await-field [project field fn]
-  (async/go-loop []
-    (Thread/sleep 100)
-    (let [value (get-in project [field])]
-      (if value
-        (fn value)
-        (recur)))))
+  (async/thread
+    (loop []
+      (Thread/sleep 100)
+      (let [value (get-in project [field])]
+        (if value
+          (fn value)
+          (recur))))))
 
 (defn load-settings-from-state! [^Project project ^SettingsState settings-state]
   (update-in project [:settings] (fn [settings]

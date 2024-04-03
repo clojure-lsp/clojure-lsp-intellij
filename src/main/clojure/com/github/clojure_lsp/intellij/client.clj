@@ -1,24 +1,16 @@
 (ns com.github.clojure-lsp.intellij.client
   (:require
-   [camel-snake-kebab.core :as csk]
-   [camel-snake-kebab.extras :as cske]
-   [cheshire.core :as json]
    [clojure.core.async :as async]
-   [clojure.java.io :as io]
    [clojure.string :as string]
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.ericdallo.clj4intellij.logger :as logger]
    [lsp4clj.coercer :as coercer]
+   [lsp4clj.io-chan :as io-chan]
    [lsp4clj.lsp.requests :as lsp.requests]
    [lsp4clj.lsp.responses :as lsp.responses]
    [lsp4clj.protocols.endpoint :as protocols.endpoint])
   (:import
-   [com.intellij.openapi.project Project]
-   [java.io
-    EOFException
-    IOException
-    InputStream
-    OutputStream]))
+   [com.intellij.openapi.project Project]))
 
 (set! *warn-on-reflection* true)
 
@@ -32,7 +24,6 @@
 
 (defn ^:private receive-message
   [client context message]
-  (logger/info "receiving response ---------->" message)
   (let [message-type (coercer/input-message-type message)]
     (try
       (let [response
@@ -55,7 +46,6 @@
 (defrecord Client [client-id
                    input-ch
                    output-ch
-                   log-ch
                    join
                    request-id
                    sent-requests]
@@ -69,10 +59,9 @@
                      ;; `keep` means we do not reply to responses and notifications
                     (keep #(receive-message this context %))
                     input-ch)]
-      (async/go
+      (async/thread
         ;; wait for pipeline to close, indicating input closed
         (async/<! pipeline)
-        (logger/info "pipeline closed --------->")
         (deliver join :done)))
     ;; invokers can deref the return of `start` to stay alive until server is
     ;; shut down
@@ -84,13 +73,12 @@
     (async/close! input-ch)
     (if (= :done (deref join 10e3 :timeout))
       (protocols.endpoint/log this :white "lifecycle:" "shutdown")
-      (protocols.endpoint/log this :red "lifecycle:" "shutdown timed out"))
-    (async/close! log-ch))
+      (protocols.endpoint/log this :red "lifecycle:" "shutdown timed out")))
   (log [this msg params]
     (protocols.endpoint/log this :white msg params))
   (log [_this _color msg params]
     ;; TODO apply color
-    (async/put! log-ch (string/join " " [msg params])))
+    (logger/info (string/join " " [msg params])))
   (send-request [this method body]
     (let [req (lsp.requests/request (swap! request-id inc) method body)
           p (promise)
@@ -100,9 +88,7 @@
       ;; available during receive-response.
       (swap! sent-requests assoc (:id req) {:request p
                                             :start-ns start-ns})
-      (logger/info "adding to output-ch ---------->" req)
       (async/>!! output-ch req)
-      (logger/info "added to output-ch ---------->" req)
       p))
   (send-notification [this method body]
     (let [notif (lsp.requests/notification method body)]
@@ -135,144 +121,17 @@
 
       (logger/warn "Unknown LSP notification method" method))))
 
-(defn ^:private kw->camelCaseString
-  "Convert keywords to camelCase strings, but preserve capitalization of things
-  that are already strings."
-  [k]
-  (cond-> k (keyword? k) csk/->camelCaseString))
-
-(def ^:private write-lock (Object.))
-
-(defn ^:private write-message [^OutputStream output msg]
-  (let [content (json/generate-string (cske/transform-keys kw->camelCaseString msg))
-        content-bytes (.getBytes content "utf-8")]
-    (locking write-lock
-      (doto output
-        (logger/info "----------->" (-> (str "Content-Length: " (count content-bytes) "\r\n"
-                                             "\r\n")
-                                        (.getBytes "US-ASCII")))
-        (logger/info "----------->" content-bytes)
-        (.write (-> (str "Content-Length: " (count content-bytes) "\r\n"
-                         "\r\n")
-                    (.getBytes "US-ASCII"))) ;; headers are in ASCII, not UTF-8
-        (.write content-bytes)
-        (.flush)))))
-
-(defn output-stream->output-chan
-  "Returns a channel which expects to have messages put on it. nil values are
-  not allowed. Serializes and writes the messages to the output. When the
-  channel is closed, closes the output.
-
-  Writes in a thread to avoid blocking a go block thread."
-  [output]
-  (let [output (io/output-stream output)
-        messages (async/chan)]
-    (async/thread
-      (with-open [writer output] ;; close output when channel closes
-        (loop []
-          (logger/info "checking msg --------->")
-          (if-let [msg (async/<!! messages)]
-            (do
-              (logger/info "got msg --------->" msg)
-              (try
-                (write-message writer msg)
-                (catch Throwable e
-                  (logger/info "error ------------>" e)
-                  (async/close! messages)
-                  (throw e)))
-              (recur))
-            (logger/info "nao caiu no let ------------>")))))
-    messages))
-
-(defn ^:private read-n-bytes [^InputStream input content-length charset-s]
-  (let [buffer (byte-array content-length)]
-    (loop [total-read 0]
-      (when (< total-read content-length)
-        (let [new-read (.read input buffer total-read (- content-length total-read))]
-          (when (< new-read 0)
-            ;; TODO: return nil instead?
-            (throw (EOFException.)))
-          (recur (+ total-read new-read)))))
-    (String. ^bytes buffer ^String charset-s)))
-
-(defn ^:private parse-header [line headers]
-  (let [[h v] (string/split line #":\s*" 2)]
-    (assoc headers h v)))
-
-(defn ^:private parse-charset [content-type]
-  (or (when content-type
-        (when-let [[_ charset] (re-find #"(?i)charset=(.*)$" content-type)]
-          (when (not= "utf8" charset)
-            charset)))
-      "utf-8"))
-
-(defn ^:private read-message [input headers keyword-function]
-  (try
-    (let [content-length (Long/valueOf ^String (get headers "Content-Length"))
-          charset-s (parse-charset (get headers "Content-Type"))
-          content (read-n-bytes input content-length charset-s)]
-      (json/parse-string content keyword-function))
-    (catch Exception _
-      :parse-error)))
-
-(defn ^:private read-header-line
-  "Reads a line of input. Blocks if there are no messages on the input."
-  [^InputStream input]
-  (try
-    (let [s (java.lang.StringBuilder.)]
-      (loop []
-        (let [b (.read input)] ;; blocks, presumably waiting for next message
-          (case b
-            -1 ::eof ;; end of stream
-            #_lf 10 (str s) ;; finished reading line
-            #_cr 13 (recur) ;; ignore carriage returns
-            (do (.append s (char b)) ;; byte == char because header is in US-ASCII
-                (recur))))))
-    (catch IOException _e
-      ::eof)))
-
-(defn input-stream->input-chan
-  "Returns a channel which will yield parsed messages that have been read off
-  the `input`. When the input is closed, closes the channel. By default when the
-  channel closes, will close the input, but can be determined by `close?`.
-
-  Reads in a thread to avoid blocking a go block thread."
-  ([input] (input-stream->input-chan input {}))
-  ([input {:keys [close? keyword-function]
-           :or {close? true, keyword-function csk/->kebab-case-keyword}}]
-   (let [input (io/input-stream input)
-         messages (async/chan)]
-     (async/thread
-       (loop [headers {}]
-         (let [line (read-header-line input)]
-           (cond
-             ;; input closed; also close channel
-             (= line ::eof) (async/close! messages)
-             ;; a blank line after the headers indicates start of message
-             (string/blank? line) (if (async/>!! messages (read-message input headers keyword-function))
-                                    ;; wait for next message
-                                    (recur {})
-                                    ;; messages closed
-                                    (when close? (.close input)))
-             :else (recur (parse-header line headers))))))
-     messages)))
-
 (defn client [in out]
   (map->Client
    {:client-id 1
-    :input-ch (input-stream->input-chan out)
-    :output-ch (output-stream->output-chan in)
-    :log-ch (async/chan (async/sliding-buffer 20))
+    :input-ch (io-chan/input-stream->input-chan out)
+    :output-ch (io-chan/output-stream->output-chan in)
     :join (promise)
     :sent-requests (atom {})
     :request-id (atom 0)}))
 
 (defn start-client! [client context]
-  (protocols.endpoint/start client context)
-  (async/go-loop []
-    (when-let [log-args (async/<! (:log-ch client))]
-      (logger/info log-args)
-      (recur))))
+  (protocols.endpoint/start client context))
 
 (defn request! [client [method body]]
   (protocols.endpoint/send-request client (subs (str method) 1) body))
