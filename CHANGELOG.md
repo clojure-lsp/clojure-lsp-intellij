@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix freeze on initializing on most macos. #41
+
 ## 2.3.2
 
 - Fix race condition NPE when intellij starts slowly.
