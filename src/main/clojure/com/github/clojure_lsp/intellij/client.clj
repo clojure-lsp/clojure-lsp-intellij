@@ -46,7 +46,6 @@
 (defrecord Client [client-id
                    input-ch
                    output-ch
-                   log-ch
                    join
                    request-id
                    sent-requests]
@@ -60,7 +59,7 @@
                      ;; `keep` means we do not reply to responses and notifications
                     (keep #(receive-message this context %))
                     input-ch)]
-      (async/go
+      (async/thread
         ;; wait for pipeline to close, indicating input closed
         (async/<! pipeline)
         (deliver join :done)))
@@ -74,13 +73,12 @@
     (async/close! input-ch)
     (if (= :done (deref join 10e3 :timeout))
       (protocols.endpoint/log this :white "lifecycle:" "shutdown")
-      (protocols.endpoint/log this :red "lifecycle:" "shutdown timed out"))
-    (async/close! log-ch))
+      (protocols.endpoint/log this :red "lifecycle:" "shutdown timed out")))
   (log [this msg params]
     (protocols.endpoint/log this :white msg params))
   (log [_this _color msg params]
     ;; TODO apply color
-    (async/put! log-ch (string/join " " [msg params])))
+    (logger/info (string/join " " [msg params])))
   (send-request [this method body]
     (let [req (lsp.requests/request (swap! request-id inc) method body)
           p (promise)
@@ -128,17 +126,12 @@
    {:client-id 1
     :input-ch (io-chan/input-stream->input-chan out)
     :output-ch (io-chan/output-stream->output-chan in)
-    :log-ch (async/chan (async/sliding-buffer 20))
     :join (promise)
     :sent-requests (atom {})
     :request-id (atom 0)}))
 
 (defn start-client! [client context]
-  (protocols.endpoint/start client context)
-  (async/go-loop []
-    (when-let [log-args (async/<! (:log-ch client))]
-      (logger/info log-args)
-      (recur))))
+  (protocols.endpoint/start client context))
 
 (defn request! [client [method body]]
   (protocols.endpoint/send-request client (subs (str method) 1) body))

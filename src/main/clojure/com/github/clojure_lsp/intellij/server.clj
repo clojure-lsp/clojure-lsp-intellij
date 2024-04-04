@@ -13,6 +13,7 @@
    [com.github.clojure-lsp.intellij.workspace-edit]
    [com.github.ericdallo.clj4intellij.logger :as logger])
   (:import
+   [com.github.ericdallo.clj4intellij ClojureClassLoader]
    [com.intellij.openapi.progress ProgressIndicator]
    [com.intellij.openapi.project Project]
    [com.intellij.util EnvironmentUtil]
@@ -95,19 +96,19 @@
   (tasks/set-progress indicator "LSP: Starting server...")
   (let [process (p/process [server-path "listen"]
                            {:dir (.getBasePath project)
-                            :env (EnvironmentUtil/getEnvironmentMap)
-                            :err :string})
+                            :env (EnvironmentUtil/getEnvironmentMap)})
         client (lsp-client/client (:in process) (:out process))]
-    (async/go
+    (db/assoc-in project [:server-process] process)
+    (lsp-client/start-client! client {:progress-indicator indicator
+                                      :project project})
+    (async/thread
       (try
         (p/check process)
         (catch Exception e
           (logger/warn "Error on clojure-lsp process:\n" (pr-str e))
           (clean-up-server project)
           (.cancel ^ProgressIndicator indicator))))
-    (db/assoc-in project [:server-process] process)
-    (lsp-client/start-client! client {:progress-indicator indicator
-                                      :project project})
+
     (tasks/set-progress indicator "LSP: Initializing...")
     (let [request-initiatilize (lsp-client/request! client [:initialize
                                                             {:root-uri (project/project->root-uri project)
@@ -116,7 +117,7 @@
                                                                                              :hover {:arity-on-same-line? true}}
                                                                                             (db/get-in project [:settings]))
                                                              :capabilities client-capabilities}])]
-      (loop []
+      (loop [count 0]
         (Thread/sleep 500)
         (cond
           (and (not (realized? request-initiatilize))
@@ -132,7 +133,9 @@
               (db/assoc-in project [:client] client))
 
           :else
-          (recur))))))
+          (do
+            (logger/info "Checking if server initialized, try number:" count)
+            (recur (inc count))))))))
 
 (defn start-server! [^Project project]
   (db/assoc-in project [:status] :connecting)
@@ -141,6 +144,7 @@
    project
    "Clojure LSP startup"
    (fn [indicator]
+     (ClojureClassLoader/bind)
      (let [download-path (config/download-server-path)
            custom-server-path (db/get-in project [:settings :server-path])]
        (cond
