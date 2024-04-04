@@ -57,7 +57,10 @@
 (defn ^:private completion-item->lookup-element [{:keys [label kind detail tags]}]
   (let [normalized-label (if-let [i (string/index-of label "/")]
                            (subs label (inc i))
-                           label)]
+                           label)
+        normalized-label (if-let [first-char (second (re-find #"^([^a-zA-Z]).*" label))]
+                           (string/replace-first normalized-label first-char "")
+                           normalized-label)]
     (cond-> (LookupElementBuilder/create normalized-label)
 
       (some #(identical? :deprecated %) (mapv tag-number->tag tags))

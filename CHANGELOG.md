@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix completion of things that start with non letters like `|`.
+
 ## 2.3.3
 
 - Fix freeze on initializing on most macos. #41

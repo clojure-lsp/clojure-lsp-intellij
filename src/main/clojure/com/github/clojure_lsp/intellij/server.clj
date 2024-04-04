@@ -96,7 +96,8 @@
   (tasks/set-progress indicator "LSP: Starting server...")
   (let [process (p/process [server-path "listen"]
                            {:dir (.getBasePath project)
-                            :env (EnvironmentUtil/getEnvironmentMap)})
+                            :env (EnvironmentUtil/getEnvironmentMap)
+                            :err :string})
         client (lsp-client/client (:in process) (:out process))]
     (db/assoc-in project [:server-process] process)
     (lsp-client/start-client! client {:progress-indicator indicator
