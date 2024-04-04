@@ -42,6 +42,8 @@ Also, this plugin does not use official IntelliJ's LSP support yet for 2 reasons
 
 When opening a Clojure project or file, the plugin will try to download latest clojure-lsp server or use it from a custom path if specified in IntelliJ settings, then it will spawn the process for each project and communicate with it to provide [all features](https://clojure-lsp.io/features/).
 
+Make sure to check the [Clojure REPL plugin](https://github.com/afucher/clojure-repl-intellij/) too.
+
 ## Contributing
 
 Contributions are very welcome, check the [issues page](https://github.com/clojure-lsp/clojure-lsp-intellij/issues) for more information about what are good first issues or open an issue describing the desired support.
