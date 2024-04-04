@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.3.3
+
 - Fix freeze on initializing on most macos. #41
 
 ## 2.3.2
