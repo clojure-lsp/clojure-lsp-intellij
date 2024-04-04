@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.3.4
+
 - Fix completion of things that start with non letters like `|`.
 
 ## 2.3.3
