@@ -1,6 +1,6 @@
-(ns com.github.clojure-lsp.intellij.extension.startup
+(ns com.github.clojure-lsp.intellij.extension.init-db-startup
   (:gen-class
-   :name com.github.clojure_lsp.intellij.extension.Startup
+   :name com.github.clojure_lsp.intellij.extension.InitDBStartup
    :implements [com.intellij.openapi.startup.StartupActivity
                 com.intellij.openapi.project.DumbAware])
   (:require

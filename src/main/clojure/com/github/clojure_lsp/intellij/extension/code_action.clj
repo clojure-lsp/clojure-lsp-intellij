@@ -4,7 +4,7 @@
    [clojure.core.memoize :as memoize]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.clojure-lsp.intellij.editor :as editor])
+   [com.github.ericdallo.clj4intellij.util :as util])
   (:import
    [com.intellij.openapi.editor Editor]
    [com.intellij.openapi.project Project]
@@ -44,7 +44,7 @@
 (defn ^:private editor+command->code-action [^PsiFile file ^Editor editor command]
   (when-let [vfile (.getVirtualFile file)]
     (let [uri (.getUrl vfile)
-          pos (editor/editor->cursor-position editor)]
+          pos (util/editor->cursor-position editor)]
       (get (memoized-code-actions (.getProject editor) uri pos) command))))
 
 (defn ^:private is-available [name _ _project editor file]

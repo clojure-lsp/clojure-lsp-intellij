@@ -1,11 +1,9 @@
 (ns com.github.clojure-lsp.intellij.action.implementations
-  (:gen-class
-   :name com.github.clojure_lsp.intellij.action.ImplementationsAction
-   :extends com.intellij.openapi.project.DumbAwareAction)
   (:require
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.editor :as editor]
-   [com.github.clojure-lsp.intellij.psi :as psi])
+   [com.github.clojure-lsp.intellij.psi :as psi]
+   [com.github.ericdallo.clj4intellij.util :as util])
   (:import
    [com.intellij.codeInsight.hint HintManager]
    [com.intellij.codeInsight.navigation NavigationUtil]
@@ -55,7 +53,7 @@
                         editor
                         "No implementations found")))))
 
-(defn -actionPerformed [_ ^AnActionEvent event]
+(defn find-implementations-action [^AnActionEvent event]
   (when-let [editor ^Editor (.getData event CommonDataKeys/EDITOR)]
-    (let [[line character] (editor/editor->cursor-position editor)]
+    (let [[line character] (util/editor->cursor-position editor)]
       (show-implementations editor line character))))

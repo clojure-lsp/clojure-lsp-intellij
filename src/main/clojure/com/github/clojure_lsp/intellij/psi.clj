@@ -1,7 +1,8 @@
 (ns com.github.clojure-lsp.intellij.psi
   (:require
    [clojure.string :as string]
-   [com.github.clojure-lsp.intellij.editor :as editor])
+   [com.github.clojure-lsp.intellij.editor :as editor]
+   [com.github.ericdallo.clj4intellij.util :as util])
   (:import
    [com.github.clojure_lsp.intellij ClojureLanguage]
    [com.github.clojure_lsp.intellij Icons]
@@ -103,7 +104,7 @@ VirtualFile
       (canNavigate [_] true)
       (canNavigateToSource [_] true)
       (navigate [_ _]
-        (let [editor (editor/v-file->editor (.getVirtualFile file) project true)]
+        (let [editor (util/v-file->editor (.getVirtualFile file) project true)]
           (.openFile file-editor-manager (.getVirtualFile file) true)
           (.moveToOffset (.getCaretModel editor) start-offset)))
 

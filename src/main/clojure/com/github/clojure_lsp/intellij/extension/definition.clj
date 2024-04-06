@@ -9,7 +9,8 @@
    [com.github.clojure-lsp.intellij.config :as config]
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.clojure-lsp.intellij.file-system :as file-system]
-   [com.github.clojure-lsp.intellij.psi :as psi])
+   [com.github.clojure-lsp.intellij.psi :as psi]
+   [com.github.ericdallo.clj4intellij.util :as util])
   (:import
    [com.intellij.openapi.editor Editor]
    [com.intellij.openapi.project Project]
@@ -38,7 +39,7 @@
       (let [jar-pattern (re-pattern (str "^(jar|zip):(file:.+)!" (System/getProperty "file.separator") "(.+)"))]
         (dependency-content client uri project definition (last (re-find jar-pattern uri))))
       ;; TODO improve this
-      (if-let [v-file (editor/uri->v-file uri)]
+      (if-let [v-file (util/uri->v-file uri)]
         (definition->psi-element v-file project definition nil)
         (dependency-content client uri project definition (string/replace-first uri (str "file://" (config/project-cache-path project)) ""))))))
 

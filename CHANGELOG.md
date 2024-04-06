@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Support IntelliJ 2024.1. 
+
 ## 2.3.4
 
 - Fix completion of things that start with non letters like `|`.

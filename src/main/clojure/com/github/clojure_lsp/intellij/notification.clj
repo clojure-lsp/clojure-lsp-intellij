@@ -1,9 +1,9 @@
 (ns com.github.clojure-lsp.intellij.notification
   (:require
    [com.github.clojure-lsp.intellij.client :as lsp-client]
-   [com.github.clojure-lsp.intellij.tasks :as tasks]
    [com.github.ericdallo.clj4intellij.app-manager :as app-manager]
    [com.github.ericdallo.clj4intellij.logger :as logger]
+   [com.github.ericdallo.clj4intellij.tasks :as tasks]
    [seesaw.core :as see])
   (:import
    [com.github.clojure_lsp.intellij Icons]

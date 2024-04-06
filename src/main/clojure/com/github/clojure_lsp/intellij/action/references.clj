@@ -1,17 +1,14 @@
 (ns com.github.clojure-lsp.intellij.action.references
-  (:gen-class
-   :name com.github.clojure_lsp.intellij.action.ReferencesAction
-   :extends com.intellij.openapi.project.DumbAwareAction)
   (:require
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.editor :as editor]
-   [com.github.clojure-lsp.intellij.psi :as psi])
+   [com.github.clojure-lsp.intellij.psi :as psi]
+   [com.github.ericdallo.clj4intellij.util :as util])
   (:import
    [com.intellij.codeInsight.hint HintManager]
    [com.intellij.codeInsight.navigation NavigationUtil]
    [com.intellij.find.findUsages FindUsagesOptions]
-   [com.intellij.openapi.actionSystem CommonDataKeys]
-   [com.intellij.openapi.actionSystem AnActionEvent]
+   [com.intellij.openapi.actionSystem AnActionEvent CommonDataKeys]
    [com.intellij.openapi.editor Editor]
    [com.intellij.openapi.project Project]
    [com.intellij.psi PsiElement]
@@ -59,7 +56,7 @@
                       editor
                       "No references found"))))
 
-(defn -actionPerformed [_ ^AnActionEvent event]
+(defn find-references-action [^AnActionEvent event]
   (when-let [editor ^Editor (.getData event CommonDataKeys/EDITOR)]
-    (let [[line character] (editor/editor->cursor-position editor)]
+    (let [[line character] (util/editor->cursor-position editor)]
       (show-references editor line character))))

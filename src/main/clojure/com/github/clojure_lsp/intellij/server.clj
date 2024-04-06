@@ -9,7 +9,7 @@
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.notification :as notification]
    [com.github.clojure-lsp.intellij.project-lsp :as project]
-   [com.github.clojure-lsp.intellij.tasks :as tasks]
+   [com.github.ericdallo.clj4intellij.tasks :as tasks]
    [com.github.clojure-lsp.intellij.workspace-edit]
    [com.github.ericdallo.clj4intellij.logger :as logger])
   (:import

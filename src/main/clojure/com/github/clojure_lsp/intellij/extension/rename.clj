@@ -4,7 +4,8 @@
    :implements [com.intellij.refactoring.rename.RenameHandler])
   (:require
    [com.github.clojure-lsp.intellij.client :as lsp-client]
-   [com.github.clojure-lsp.intellij.editor :as editor])
+   [com.github.clojure-lsp.intellij.editor :as editor]
+   [com.github.ericdallo.clj4intellij.util :as util])
   (:import
    [com.intellij.openapi.actionSystem CommonDataKeys DataContext]
    [com.intellij.openapi.editor Editor]
@@ -48,7 +49,7 @@
    (-invoke this project (.getData data-context CommonDataKeys/EDITOR) (.getData data-context CommonDataKeys/PSI_FILE) data-context))
   ([_ ^Project project ^Editor editor ^PsiFile _psi-file ^DataContext _data-context]
    (when-let [client (lsp-client/connected-client project)]
-     (let [[line character] (editor/editor->cursor-position editor)]
+     (let [[line character] (util/editor->cursor-position editor)]
        (when-let [current-name ^String (prepare-rename-current-name client editor line character)]
          (when-let [new-name (Messages/showInputDialog project "Enter new name: " "Rename" (Messages/getQuestionIcon) current-name (NonEmptyInputValidator.))]
            (->> @(lsp-client/request! client [:textDocument/rename
