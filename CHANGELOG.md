@@ -4,7 +4,7 @@
 
 ## 2.3.5
 
-- Support IntelliJ 2024.1. 
+- Support IntelliJ 2024.1. #43
 
 ## 2.3.4
 
