@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.3.5
+
 - Support IntelliJ 2024.1. 
 
 ## 2.3.4
