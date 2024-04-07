@@ -12,8 +12,8 @@
   (:import
    [com.github.clojure_lsp.intellij Icons]
    [com.intellij.ide DataManager]
-   [com.intellij.openapi.actionSystem AnAction DefaultActionGroup]
-   [com.intellij.openapi.project Project]
+   [com.intellij.openapi.actionSystem DefaultActionGroup]
+   [com.intellij.openapi.project DumbAwareAction Project]
    [com.intellij.openapi.ui.popup JBPopupFactory JBPopupFactory$ActionSelectionAid]
    [com.intellij.openapi.wm
     StatusBarWidget
@@ -57,9 +57,7 @@
 (defn ^:private restart-lsp-action [^Project project]
   (proxy+
    ["Restart server"]
-   AnAction
-    (update [_ _event])
-
+   DumbAwareAction
     (actionPerformed [_ _event]
       (server/shutdown! project)
       (server/start-server! project))))

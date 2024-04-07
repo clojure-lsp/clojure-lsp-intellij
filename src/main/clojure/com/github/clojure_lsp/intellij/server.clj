@@ -1,7 +1,6 @@
 (ns com.github.clojure-lsp.intellij.server
   (:require
    [babashka.process :as p]
-   [clojure.core.async :as async]
    [clojure.java.io :as io]
    [clojure.string :as string]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
@@ -9,12 +8,11 @@
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.notification :as notification]
    [com.github.clojure-lsp.intellij.project-lsp :as project]
-   [com.github.ericdallo.clj4intellij.tasks :as tasks]
    [com.github.clojure-lsp.intellij.workspace-edit]
-   [com.github.ericdallo.clj4intellij.logger :as logger])
+   [com.github.ericdallo.clj4intellij.logger :as logger]
+   [com.github.ericdallo.clj4intellij.tasks :as tasks])
   (:import
    [com.github.ericdallo.clj4intellij ClojureClassLoader]
-   [com.intellij.openapi.progress ProgressIndicator]
    [com.intellij.openapi.project Project]
    [com.intellij.util EnvironmentUtil]
    [java.io File]
@@ -102,13 +100,6 @@
     (db/assoc-in project [:server-process] process)
     (lsp-client/start-client! client {:progress-indicator indicator
                                       :project project})
-    (async/thread
-      (try
-        (p/check process)
-        (catch Exception e
-          (logger/warn "Error on clojure-lsp process:\n" (pr-str e))
-          (clean-up-server project)
-          (.cancel ^ProgressIndicator indicator))))
 
     (tasks/set-progress indicator "LSP: Initializing...")
     (let [request-initiatilize (lsp-client/request! client [:initialize
@@ -171,5 +162,6 @@
 
 (defn shutdown! [^Project project]
   (when-let [client (lsp-client/connected-client project)]
+    (db/assoc-in project [:status] :shutting-down)
     @(lsp-client/request! client [:shutdown {}])
     (clean-up-server project)))

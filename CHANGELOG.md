@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix minor exceptions happening with recent intellij versions.
+
 ## 2.3.6
 
 - Check for LSP connected when executing actions.

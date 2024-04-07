@@ -61,7 +61,7 @@
                     input-ch)]
       (async/thread
         ;; wait for pipeline to close, indicating input closed
-        (async/<! pipeline)
+        (async/<!! pipeline)
         (deliver join :done)))
     ;; invokers can deref the return of `start` to stay alive until server is
     ;; shut down
