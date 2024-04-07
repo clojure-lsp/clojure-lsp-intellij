@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.3.6
+
 - Check for LSP connected when executing actions.
 
 ## 2.3.5
