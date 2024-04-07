@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Check for LSP connected when executing actions.
+
 ## 2.3.5
 
 - Support IntelliJ 2024.1. #43
