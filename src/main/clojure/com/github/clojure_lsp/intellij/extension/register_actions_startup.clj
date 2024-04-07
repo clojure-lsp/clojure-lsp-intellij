@@ -56,12 +56,12 @@
    {:name "thread-last" :text "Thread last expression" :description "Thread last expression"}
    {:name "unwind-all" :text "Unwind whole thread" :description "Unwind whole thread"}
    {:name "unwind-thread" :text "Unwind thread once" :description "Unwind thread once"}
-   {:name "forward-slurp" :text "Slurp forward" :description "Slurp forward" :keyboard-shortcut "alt CLOSE_BRACKET"}
-   {:name "forward-barf" :text "Barf forward" :description "Barf forward" :keyboard-shortcut "alt OPEN_BRACKET"}
-   {:name "backward-slurp" :text "Slurp backward" :description "Slurp backward" :keyboard-shortcut "alt shift CLOSE_BRACKET"}
-   {:name "backward-barf" :text "Barf backward" :description "Barf backward" :keyboard-shortcut "alt shift OPEN_BRACKET"}
-   {:name "raise-sexp" :text "Raise sexpr" :description "Raise current sexpr" :keyboard-shortcut "alt R"}
-   {:name "kill-sexp" :text "Kill sexpr" :description "Kill current sexpr" :keyboard-shortcut "alt K"}])
+   {:name "forward-slurp" :text "Slurp forward" :description "Slurp forward" :keyboard-shortcut {:first "alt CLOSE_BRACKET" :replace-all true}}
+   {:name "forward-barf" :text "Barf forward" :description "Barf forward" :keyboard-shortcut {:first "alt OPEN_BRACKET" :replace-all true}}
+   {:name "backward-slurp" :text "Slurp backward" :description "Slurp backward" :keyboard-shortcut {:first "alt shift CLOSE_BRACKET" :replace-all true}}
+   {:name "backward-barf" :text "Barf backward" :description "Barf backward" :keyboard-shortcut {:first "alt shift OPEN_BRACKET" :replace-all true}}
+   {:name "raise-sexp" :text "Raise sexpr" :description "Raise current sexpr" :keyboard-shortcut {:first "alt R" :replace-all true}}
+   {:name "kill-sexp" :text "Kill sexpr" :description "Kill current sexpr" :keyboard-shortcut {:first "alt K" :replace-all true}}])
 
 (defn -runActivity [_this ^Project _project]
   (action/register-action! :id "ClojureLSP.FindReferences"

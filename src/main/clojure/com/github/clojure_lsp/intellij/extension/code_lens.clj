@@ -61,11 +61,11 @@
    file-type
    (.getText document)))
 
-(defn ^:private handle-command [^Editor editor command arguments]
+(defn ^:private handle-command [^Editor editor command arguments client]
   (case command
     "code-lens-references"
     (let [[line character] (rest arguments)]
-      (action.references/show-references editor (dec line) (dec character)))))
+      (action.references/show-references editor (dec line) (dec character) client))))
 
 (set! *warn-on-reflection* false)
 (defn ^:private code-lens-presentation
@@ -115,7 +115,7 @@
                                         factory
                                         title
                                         (fn onClick []
-                                          (handle-command editor command arguments)))
+                                          (handle-command editor command arguments client)))
                                        true))))
 
               (swap! lens-added-by-uri* assoc uri false)))

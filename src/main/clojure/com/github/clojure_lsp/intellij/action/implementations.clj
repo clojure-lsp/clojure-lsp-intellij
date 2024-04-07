@@ -24,7 +24,7 @@
 (set! *warn-on-reflection* true)
 
 (defn show-implementations [^Editor editor line character]
-  (when-let [client (lsp-client/connected-client (.getProject editor))]
+  (if-let [client (lsp-client/connected-client (.getProject editor))]
     (let [implementations @(lsp-client/request! client [:textDocument/implementation
                                                         {:text-document {:uri (editor/editor->uri editor)}
                                                          :position {:line line
@@ -51,7 +51,8 @@
                            (.setOpenInNewTab false)))))
         (.showErrorHint (HintManager/getInstance)
                         editor
-                        "No implementations found")))))
+                        "No implementations found")))
+    (.showErrorHint (HintManager/getInstance) ^Editor editor "LSP not connected" HintManager/RIGHT)))
 
 (defn find-implementations-action [^AnActionEvent event]
   (when-let [editor ^Editor (.getData event CommonDataKeys/EDITOR)]

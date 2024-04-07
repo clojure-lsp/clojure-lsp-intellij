@@ -53,6 +53,6 @@
                                                                       :character character}}])]
         (when-let [elements (if (and (= line (-> definition :range :start :line))
                                      (= character (-> definition :range :start :character)))
-                              (action.references/get-references editor line character)
+                              (action.references/get-references editor line character client)
                               (show-definition definition client project))]
           (into-array PsiElement elements))))))

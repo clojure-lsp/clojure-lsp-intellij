@@ -22,18 +22,17 @@
 
 (set! *warn-on-reflection* true)
 
-(defn get-references [^Editor editor line character]
+(defn get-references [^Editor editor line character client]
   (let [project ^Project (.getProject editor)]
-    (when-let [client (lsp-client/connected-client project)]
-      (->> (lsp-client/request! client [:textDocument/references
-                                        {:text-document {:uri (editor/editor->uri editor)}
-                                         :position {:line line
-                                                    :character character}}])
-           deref
-           (mapv #(psi/element->psi-element % project))))))
+    (->> (lsp-client/request! client [:textDocument/references
+                                      {:text-document {:uri (editor/editor->uri editor)}
+                                       :position {:line line
+                                                  :character character}}])
+         deref
+         (mapv #(psi/element->psi-element % project)))))
 
-(defn show-references [^Editor editor line character]
-  (when-let [references (get-references editor line character)]
+(defn show-references [^Editor editor line character client]
+  (when-let [references (get-references editor line character client)]
     (if (seq references)
       (if (= 1 (count references))
         (NavigationUtil/activateFileWithPsiElement (first references) true)
@@ -58,5 +57,7 @@
 
 (defn find-references-action [^AnActionEvent event]
   (when-let [editor ^Editor (.getData event CommonDataKeys/EDITOR)]
-    (let [[line character] (util/editor->cursor-position editor)]
-      (show-references editor line character))))
+    (if-let [client (lsp-client/connected-client (.getProject editor))]
+      (let [[line character] (util/editor->cursor-position editor)]
+        (show-references editor line character client))
+      (.showErrorHint (HintManager/getInstance) ^Editor editor "LSP not connected" HintManager/RIGHT))))
