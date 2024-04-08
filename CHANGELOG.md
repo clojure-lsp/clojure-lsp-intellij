@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.3.7
+
 - Fix minor exceptions happening with recent intellij versions.
 
 ## 2.3.6
