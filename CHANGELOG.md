@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.3.8
+
 - Fix exceptions introduced on 2.3.5 when opening multiple projects.
 
 ## 2.3.7
