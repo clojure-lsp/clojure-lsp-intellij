@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-- Fix completion of labels that start with non letters like `|`.
+- Fix completion of labels that start with non letters like `|`. #46
 
 ## 2.3.8
 
