@@ -10,7 +10,11 @@
    [com.github.ericdallo.clj4intellij.logger :as logger])
   (:import
    [com.github.clojure_lsp.intellij Icons]
-   [com.intellij.codeInsight.completion CompletionParameters CompletionResultSet]
+   [com.intellij.codeInsight.completion
+    CompletionParameters
+    CompletionResultSet
+    InsertHandler
+    InsertionContext]
    [com.intellij.codeInsight.lookup AutoCompletionPolicy]
    [com.intellij.codeInsight.lookup LookupElementBuilder]
    [com.intellij.openapi.progress ProcessCanceledException]))
@@ -57,10 +61,7 @@
 (defn ^:private completion-item->lookup-element [{:keys [label kind detail tags]}]
   (let [normalized-label (if-let [i (string/index-of label "/")]
                            (subs label (inc i))
-                           label)
-        normalized-label (if-let [first-char (second (re-find #"^([^a-zA-Z]).*" label))]
-                           (string/replace-first normalized-label first-char "")
-                           normalized-label)]
+                           label)]
     (cond-> (LookupElementBuilder/create normalized-label)
 
       (some #(identical? :deprecated %) (mapv tag-number->tag tags))
@@ -68,6 +69,17 @@
 
       :always
       (->
+       (.withInsertHandler (reify InsertHandler
+                             (handleInsert [_ context item]
+                               (let [context ^InsertionContext context]
+                                 ;; For some reason intellij duplicate the first char if a `|`, for example on `|foo` completion.
+                                 (when-not (= (.getText (.findElementAt (.getFile context) (.getStartOffset context)))
+                                              (.getLookupString item))
+                                   (.replaceString (.getDocument (.getEditor context))
+                                                   (dec (.getStartOffset context))
+                                                   (.getTailOffset context)
+                                                   normalized-label)
+                                   (.commitDocument context))))))
        (.withTypeText (or detail "") true)
        (.withPresentableText label)
        (.withIcon (completion-kind->icon kind))
@@ -86,4 +98,4 @@
         (.addAllElements result (mapv completion-item->lookup-element items)))
       (catch ProcessCanceledException _ignore)
       (catch Exception e
-        (logger/error "Completion exception:" e)))))
+        (logger/error "Completion exception:" (str e))))))

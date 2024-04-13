@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix completion of labels that start with non letters like `|`.
+
 ## 2.3.8
 
 - Fix exceptions introduced on 2.3.5 when opening multiple projects.
