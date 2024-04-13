@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.3.9
+
 - Fix completion of labels that start with non letters like `|`. #46
 - Scroll to proper position after finding definition/reference. #44
 
