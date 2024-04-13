@@ -7,6 +7,7 @@
    [com.github.clojure_lsp.intellij ClojureLanguage]
    [com.github.clojure_lsp.intellij Icons]
    [com.intellij.navigation ItemPresentation NavigationItem PsiElementNavigationItem]
+   [com.intellij.openapi.editor ScrollType]
    [com.intellij.openapi.fileEditor FileEditorManager]
    [com.intellij.openapi.project Project]
    [com.intellij.openapi.util TextRange]
@@ -106,10 +107,10 @@ VirtualFile
       (navigate [_ _]
         (let [editor (util/v-file->editor (.getVirtualFile file) project true)]
           (.openFile file-editor-manager (.getVirtualFile file) true)
-          (.moveToOffset (.getCaretModel editor) start-offset)))
+          (.moveToOffset (.getCaretModel editor) start-offset)
+          (.scrollToCaret (.getScrollingModel editor) ScrollType/CENTER)))
 
-      (getUserData [_ _]
-        nil)
+      (getUserData [_ _] nil)
       (putUserData [_ _ _])
       (getCopyableUserData [_ _])
       (putCopyableUserData [_ _ _])
