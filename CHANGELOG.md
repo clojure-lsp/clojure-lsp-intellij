@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix rename file exception. #48
+
 ## 2.3.9
 
 - Fix completion of labels that start with non letters like `|`. #46

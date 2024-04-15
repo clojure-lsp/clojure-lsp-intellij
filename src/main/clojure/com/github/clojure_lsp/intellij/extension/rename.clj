@@ -12,20 +12,16 @@
    [com.intellij.openapi.project Project]
    [com.intellij.openapi.ui Messages NonEmptyInputValidator]
    [com.intellij.openapi.util TextRange]
-   [com.intellij.psi PsiDocumentManager PsiFile]
-   [com.intellij.refactoring.rename PsiElementRenameHandler]))
+   [com.intellij.psi PsiDocumentManager PsiFile]))
 
 (set! *warn-on-reflection* true)
 
 (defn -isAvailableOnDataContext [_ ^DataContext data-context]
   (boolean
-   (when-let [element (or (and (.getData data-context CommonDataKeys/PSI_FILE)
-                               (PsiElementRenameHandler/getElement data-context))
-                          (and (.getData data-context CommonDataKeys/PROJECT)
-                               (.getData data-context CommonDataKeys/EDITOR)
-                               (.getPsiFile (PsiDocumentManager/getInstance (.getData data-context CommonDataKeys/PROJECT))
-                                            (.getDocument ^Editor (.getData data-context CommonDataKeys/EDITOR)))))]
-     (instance? PsiFile element))))
+   (and (.getData data-context CommonDataKeys/PROJECT)
+        (.getData data-context CommonDataKeys/EDITOR)
+        (.getPsiFile (PsiDocumentManager/getInstance (.getData data-context CommonDataKeys/PROJECT))
+                     (.getDocument ^Editor (.getData data-context CommonDataKeys/EDITOR))))))
 
 (defn -isRenaming [this data-context]
   (-isAvailableOnDataContext this data-context))
@@ -44,9 +40,9 @@
         (.getText document (TextRange. start end))))))
 
 (defn -invoke
-  ([this ^Project project ^"[Lcom.intellij.psi.PsiElement;" _elements ^DataContext data-context]
-   ;; TODO handle if only single element and do inPlaceRename instead.
-   (-invoke this project (.getData data-context CommonDataKeys/EDITOR) (.getData data-context CommonDataKeys/PSI_FILE) data-context))
+  ;; rename a file outside editor
+  ([_this ^Project _project ^"[Lcom.intellij.psi.PsiElement;" _elements ^DataContext _data-context])
+  ;; rename a element in a editor
   ([_ ^Project project ^Editor editor ^PsiFile _psi-file ^DataContext _data-context]
    (when-let [client (lsp-client/connected-client project)]
      (let [[line character] (util/editor->cursor-position editor)]
