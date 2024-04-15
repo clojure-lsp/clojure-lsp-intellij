@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.3.10
+
 - Fix rename file exception. #48
 
 ## 2.3.9
