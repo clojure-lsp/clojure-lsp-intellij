@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Support window/showDocument request, supporiting moving cursor after applying paredit command. #45
+
 ## 2.3.10
 
 - Fix rename file exception. #48

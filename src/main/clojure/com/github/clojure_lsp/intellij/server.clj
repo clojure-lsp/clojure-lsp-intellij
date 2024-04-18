@@ -23,7 +23,8 @@
 (def ^:private client-capabilities
   {:text-document {:hover {:content-format ["markdown"]}
                    :implementation {}}
-   :workspace {:workspace-edit {:document-changes true}}})
+   :workspace {:workspace-edit {:document-changes true}}
+   :window {:show-document true}})
 
 (def ^:private artifacts
   {:linux {:amd64 "clojure-lsp-native-static-linux-amd64.zip"

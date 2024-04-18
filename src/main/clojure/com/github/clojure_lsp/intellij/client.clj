@@ -15,6 +15,7 @@
 (set! *warn-on-reflection* true)
 
 (defmulti show-message (fn [_context args] args))
+(defmulti show-document (fn [_context args] args))
 (defmulti show-message-request identity)
 (defmulti progress (fn [_context {:keys [token]}] token))
 (defmulti workspace-apply-edit (fn [_context {:keys [label]}] label))
@@ -107,6 +108,7 @@
     (protocols.endpoint/log this :magenta "received request:" req)
     (when-let [response-body (case method
                                "window/showMessageRequest" (show-message-request params)
+                               "window/showDocument" (show-document context params)
                                "workspace/applyEdit" (workspace-apply-edit context params)
                                (logger/warn "Unknown LSP request method" method))]
       (let [resp (lsp.responses/response id response-body)]
