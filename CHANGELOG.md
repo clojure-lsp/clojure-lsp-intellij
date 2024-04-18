@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.4.0
+
 - Support window/showDocument request, supporiting moving cursor after applying paredit command. #45
 
 ## 2.3.10
