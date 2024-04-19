@@ -15,5 +15,8 @@
 (defn download-server-path ^File []
   (io/file (plugin-path) "clojure-lsp"))
 
+(defn download-server-version-path ^File []
+  (io/file (plugin-path) "clojure-lsp-version"))
+
 (defn project-cache-path ^File [^Project project]
   (io/file (plugin-path) "cache" (.getName project)))

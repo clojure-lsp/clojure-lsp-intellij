@@ -72,18 +72,18 @@
           (clojure.java.io/copy stream dest-file))
         (recur (.getNextEntry stream))))))
 
-(defn ^:private download-server! [project indicator ^File download-path]
+(defn ^:private download-server! [project indicator ^File download-path ^File server-version-path latest-version]
   (tasks/set-progress indicator "LSP: Downloading clojure-lsp")
-  (let [version (string/trim (slurp latest-version-uri))
-        platform (os-name)
+  (let [platform (os-name)
         arch (os-arch)
         artifact-name (get-in artifacts [platform arch])
-        uri (format download-artifact-uri version artifact-name)
-        dest-file download-path
-        dest-path (.getCanonicalPath dest-file)]
+        uri (format download-artifact-uri latest-version artifact-name)
+        dest-server-file download-path
+        dest-path (.getCanonicalPath dest-server-file)]
     (logger/info "Downloading clojure-lsp from" uri)
-    (unzip-file (io/input-stream uri) dest-file)
-    (doto (io/file dest-file)
+    (spit server-version-path latest-version)
+    (unzip-file (io/input-stream uri) dest-server-file)
+    (doto (io/file dest-server-file)
       (.setWritable true)
       (.setReadable true)
       (.setExecutable true))
@@ -139,16 +139,20 @@
    (fn [indicator]
      (ClojureClassLoader/bind)
      (let [download-path (config/download-server-path)
+           server-version-path (config/download-server-version-path)
+           latest-version* (delay (try (string/trim (slurp latest-version-uri)) (catch Exception _ nil)))
            custom-server-path (db/get-in project [:settings :server-path])]
        (cond
          custom-server-path
          (spawn-server! project indicator custom-server-path)
 
-         (.exists download-path)
+         (and (.exists download-path)
+              (or (not @latest-version*) ;; on internet connection issues we use any downloaded server
+                  (= (slurp server-version-path) @latest-version*)))
          (spawn-server! project indicator download-path)
 
          :else
-         (do (download-server! project indicator download-path)
+         (do (download-server! project indicator download-path server-version-path @latest-version*)
              (spawn-server! project indicator download-path)))
 
        (db/assoc-in project [:status] :connected)
