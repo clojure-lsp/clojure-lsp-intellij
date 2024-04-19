@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.4.2
+
 - Avoid Intellij freezing when processing edits from server during commands.
 
 ## 2.4.1
