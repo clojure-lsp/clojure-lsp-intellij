@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.4.1
+
 - Check if downloaded server is on latest version otherwise re-download it.
 
 ## 2.4.0
