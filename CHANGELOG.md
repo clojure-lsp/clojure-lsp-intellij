@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Avoid exception when clojure-lsp-version file is not present by previous plugin versions.
+
 ## 2.4.2
 
 - Avoid Intellij freezing when processing edits from server during commands.

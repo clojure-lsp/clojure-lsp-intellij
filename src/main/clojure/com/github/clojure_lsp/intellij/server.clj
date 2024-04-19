@@ -140,7 +140,7 @@
      (ClojureClassLoader/bind)
      (let [download-path (config/download-server-path)
            server-version-path (config/download-server-version-path)
-           latest-version* (delay (try (string/trim (slurp latest-version-uri)) (catch Exception _ nil)))
+           latest-version* (delay (try (string/trim (slurp latest-version-uri)) (catch Exception _ :error-checking-latest-version)))
            custom-server-path (db/get-in project [:settings :server-path])]
        (cond
          custom-server-path
@@ -148,7 +148,8 @@
 
          (and (.exists download-path)
               (or (not @latest-version*) ;; on internet connection issues we use any downloaded server
-                  (= (slurp server-version-path) @latest-version*)))
+                  (= (try (slurp server-version-path) (catch Exception _ :error-checking-local-version))
+                     @latest-version*)))
          (spawn-server! project indicator download-path)
 
          :else
