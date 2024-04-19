@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.4.3
+
 - Avoid exception when clojure-lsp-version file is not present by previous plugin versions.
 
 ## 2.4.2
