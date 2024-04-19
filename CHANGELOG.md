@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Avoid Intellij freezing when processing edits from server during commands.
+
 ## 2.4.1
 
 - Check if downloaded server is on latest version otherwise re-download it.

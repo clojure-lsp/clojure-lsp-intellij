@@ -89,7 +89,7 @@
                              :icon Icons/CLOJURE
                              :keyboard-shortcut keyboard-shortcut
                              :use-shortcut-of use-shortcut-of
-                             :on-performed (partial a.refactors/execute-refactor-action name)))
+                             :on-performed (partial #'a.refactors/execute-refactor-action name)))
 
   (action/register-group! :id "ClojureLSP.Refactors"
                           :popup true
