@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.4.4
+
 - Fix freeze after using paredit raise.
 
 ## 2.4.3
