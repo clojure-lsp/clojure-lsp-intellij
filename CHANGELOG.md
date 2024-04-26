@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.4.5
+
 - Only log server communication when trace-level matches.
 - Improve find definition of external files to consider opened files, avoiding exceptions.
 
