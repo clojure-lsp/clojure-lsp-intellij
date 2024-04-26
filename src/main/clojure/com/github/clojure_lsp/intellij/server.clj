@@ -93,11 +93,12 @@
 (defn ^:private spawn-server! [^Project project indicator server-path]
   (logger/info "Spawning LSP server process using path" server-path)
   (tasks/set-progress indicator "LSP: Starting server...")
-  (let [process (p/process [server-path "listen"]
+  (let [trace-level (keyword (db/get-in project [:settings :trace-level]))
+        process (p/process [server-path "listen"]
                            {:dir (.getBasePath project)
                             :env (EnvironmentUtil/getEnvironmentMap)
                             :err :string})
-        client (lsp-client/client (:in process) (:out process))]
+        client (lsp-client/client (:in process) (:out process) trace-level)]
     (db/assoc-in project [:server-process] process)
     (lsp-client/start-client! client {:progress-indicator indicator
                                       :project project})

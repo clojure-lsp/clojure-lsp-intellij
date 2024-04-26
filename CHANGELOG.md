@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- Only log server communication when trace-level matches.
+- Improve find definition of external files to consider opened files, avoiding exceptions.
+
 ## 2.4.4
 
 - Fix freeze after using paredit raise.

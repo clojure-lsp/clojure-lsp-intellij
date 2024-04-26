@@ -3,6 +3,7 @@
    :name com.github.clojure_lsp.intellij.extension.Definition
    :extends com.intellij.codeInsight.navigation.actions.GotoDeclarationHandlerBase)
   (:require
+   [clojure.java.io :as io]
    [clojure.string :as string]
    [com.github.clojure-lsp.intellij.action.references :as action.references]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
@@ -33,19 +34,23 @@
       (let [v-file (file-system/create-temp-file project path text)]
         (definition->psi-element v-file project definition text)))))
 
-(defn ^:private show-definition [definition client project]
+(defn ^:private show-definition [definition ^VirtualFile current-v-file client project]
   (when-let [uri (:uri definition)]
     (if (string/starts-with? uri "jar:")
       (let [jar-pattern (re-pattern (str "^(jar|zip):(file:.+)!" (System/getProperty "file.separator") "(.+)"))]
         (dependency-content client uri project definition (last (re-find jar-pattern uri))))
       ;; TODO improve this
-      (if-let [v-file (util/uri->v-file uri)]
+      (if-let [v-file (or (util/uri->v-file uri)
+                          (when (= uri (.getUrl current-v-file)) current-v-file))]
         (definition->psi-element v-file project definition nil)
-        (dependency-content client uri project definition (string/replace-first uri (str "file://" (config/project-cache-path project)) ""))))))
+        (dependency-content client uri project definition
+                            (str (.relativize (.toPath (io/file (config/project-cache-path project)))
+                                              (.toPath (io/file (java.net.URI. uri))))))))))
 
 (defn -getGotoDeclarationTargets [_ ^PsiElement element _ ^Editor editor]
   (let [[line character] (:start (editor/text-range->range (.getTextRange element) editor))
-        project ^Project (.getProject editor)]
+        project ^Project (.getProject editor)
+        current-v-file (some-> element .getContainingFile .getVirtualFile)]
     (when-let [client (lsp-client/connected-client project)]
       (when-let [definition @(lsp-client/request! client [:textDocument/definition
                                                           {:text-document {:uri (editor/editor->uri editor)}
@@ -54,5 +59,5 @@
         (when-let [elements (if (and (= line (-> definition :range :start :line))
                                      (= character (-> definition :range :start :character)))
                               (action.references/get-references editor line character client)
-                              (show-definition definition client project))]
+                              (show-definition definition current-v-file client project))]
           (into-array PsiElement elements))))))
