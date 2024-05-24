@@ -36,7 +36,7 @@ dependencies {
         exclude("org.clojure", "core.async")
     }
     implementation ("com.rpl:proxy-plus:0.0.9")
-    implementation ("markdown-clj:markdown-clj:1.11.4")
+    implementation ("markdown-clj:markdown-clj:1.12.1")
 }
 
 sourceSets {
