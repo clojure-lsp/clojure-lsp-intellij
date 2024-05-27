@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.5.0
+
 - Add syntax highlighting to Clojure documentation codeblocks
 
 ## 2.4.5
