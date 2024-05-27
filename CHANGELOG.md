@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add syntax highlighting to Clojure documentation codeblocks
+
 ## 2.4.5
 
 - Only log server communication when trace-level matches.
