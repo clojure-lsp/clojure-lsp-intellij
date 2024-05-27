@@ -22,7 +22,8 @@
 
 (defn ^:private html-style [prop value]
   (if (some? value)
-    (str prop ":" value ";") ""))
+    (str prop ":" value ";")
+    ""))
 
 (defn ^:private highlight-html-text
   [^String text {:keys [foreground-color background-color font-type]}]
@@ -44,11 +45,11 @@
   (let [highlighter  (SyntaxHighlighterFactory/getSyntaxHighlighter (ClojureLanguage/INSTANCE) nil nil)
         lexer        (.getHighlightingLexer highlighter)
         color-scheme (.getGlobalScheme (EditorColorsManager/getInstance))]
-    (loop [highlighted-code (str)]
+    (loop [highlighted-code ""]
       (if (empty? highlighted-code)
         (.start lexer code)
         (.advance lexer))
-      (let [lexer-not-finished? (some? (.getTokenType lexer))]
+      (let [lexer-not-finished? (.getTokenType lexer)]
         (if lexer-not-finished?
           (let [text             (.getTokenText lexer)
                 highlight        (first (.getTokenHighlights highlighter (.getTokenType lexer)))
