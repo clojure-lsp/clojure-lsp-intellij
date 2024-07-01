@@ -3,6 +3,7 @@
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.ericdallo.clj4intellij.app-manager :as app-manager]
+   [com.github.ericdallo.clj4intellij.logger :as logger]
    [com.github.ericdallo.clj4intellij.util :as util]))
 
 (set! *warn-on-reflection* true)
@@ -14,6 +15,7 @@
 (defmethod lsp-client/show-document :default [{:keys [project]} {:keys [uri take-focus selection]}]
   (app-manager/invoke-later!
    {:invoke-fn (fn []
+                 (logger/info "--------->" uri (util/uri->v-file uri))
                  (let [editor (util/uri->editor uri project (boolean take-focus))]
                    (.moveToOffset (.getCaretModel editor)
                                   (editor/document+position->offset (:start selection) (.getDocument editor)))))})

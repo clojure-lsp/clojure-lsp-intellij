@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Support Create workspace edit operation. Fixes #51
+
 ## 2.5.0
 
 - Add syntax highlighting to Clojure documentation codeblocks
