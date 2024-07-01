@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.6.0
+
 - Support Create workspace edit operation. Fixes #51
 - Support Rename workspace edit operation
 - Support workspace/willRenameFiles allowing to rename ns, renaming the files properly.
