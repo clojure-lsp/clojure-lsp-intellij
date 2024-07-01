@@ -1,9 +1,7 @@
 (ns com.github.clojure-lsp.intellij.editor
   (:require
    [clojure-lsp.shared :as lsp.shared]
-   [clojure.java.io :as io]
    [com.github.clojure-lsp.intellij.editor :as editor]
-   [com.github.ericdallo.clj4intellij.app-manager :as app-manager]
    [com.github.ericdallo.clj4intellij.util :as util])
   (:import
    [com.intellij.openapi.editor Document Editor]
@@ -12,7 +10,7 @@
    [com.intellij.openapi.project Project ProjectLocator]
    [com.intellij.openapi.util TextRange]
    [com.intellij.openapi.util.text StringUtil]
-   [com.intellij.openapi.vfs VfsUtil VirtualFile]
+   [com.intellij.openapi.vfs VirtualFile]
    [com.intellij.psi PsiFile]
    [com.intellij.psi PsiManager]))
 
@@ -56,56 +54,3 @@
 (defn v-file->project ^Project [^VirtualFile v-file]
   (.guessProjectForFile (ProjectLocator/getInstance)
                         v-file))
-
-(defn ^:private create-document
-  [{:keys [uri]}]
-  (let [f (io/file (java.net.URI. uri))
-        parent-vfile (VfsUtil/createDirectories (.getAbsolutePath (.getParentFile f)))]
-    (.findOrCreateChildData parent-vfile nil (.getName f))))
-
-(defn ^:private apply-document-change
-  [{{:keys [uri]} :text-document :keys [edits]} project move-caret?]
-  (let [editor (util/uri->editor uri project false)
-        document (.getDocument editor)
-        sorted-edits (sort-by (comp #(document+position->offset % document) :start :range) > edits)]
-    (doseq [{:keys [new-text range]} sorted-edits
-            :let [start (document+position->offset (:start range) document)
-                  end (document+position->offset (:end range) document)]]
-      (cond
-        (>= end 0)
-        (if (<= (- end start) 0)
-          (.insertString document start new-text)
-          (.replaceString document start end new-text))
-
-        (= 0 start)
-        (.setText document new-text)
-
-        (> start 0)
-        (.insertString document start new-text)
-
-        :else
-        (.insertString document (.getTextLength document) (str "\n" new-text)))
-      (when move-caret?
-        (.moveToOffset (.getCaretModel editor)
-                       (+ (count new-text) start))))
-    (.saveDocument (FileDocumentManager/getInstance) document)))
-
-(defn apply-workspace-edit ^Boolean
-  [^Project project label move-caret? {:keys [document-changes]}]
-  ;; TODO Handle more resourceOperations like renaming and deleting files
-  ;; TODO Improve to check version to known if file changed
-  (app-manager/invoke-later!
-   {:invoke-fn
-    (fn []
-      (app-manager/write-action!
-       {:run-fn
-        (fn []
-          (app-manager/execute-command!
-           {:name label
-            :project project
-            :command-fn
-            (fn []
-              (doseq [document-change document-changes]
-                (case (:kind document-change)
-                  "create" (create-document document-change)
-                  (apply-document-change document-change project move-caret?))))}))}))}))

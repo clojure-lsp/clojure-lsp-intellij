@@ -5,6 +5,7 @@
   (:require
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.editor :as editor]
+   [com.github.clojure-lsp.intellij.file-system :as file-system]
    [com.github.ericdallo.clj4intellij.util :as util])
   (:import
    [com.intellij.openapi.actionSystem CommonDataKeys DataContext]
@@ -53,4 +54,4 @@
                                                :position {:line line
                                                           :character character}
                                                :new-name new-name}])
-                (editor/apply-workspace-edit project "LSP Rename" true))))))))
+                (file-system/apply-workspace-edit project "LSP Rename" true))))))))

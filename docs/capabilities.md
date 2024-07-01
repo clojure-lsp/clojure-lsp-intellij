@@ -27,7 +27,7 @@ Below are all the currently supported LSP capabilities and their implementation 
 | workspace/symbol                       |      |       |
 | workspace/executeCommand               | √    |       |
 | workspace/applyEdit                    | √    |       |
-| workspace/willRenameFiles              |      |       |
+| workspace/willRenameFiles              | √    |       |
 | workspace/didRenameFiles               |      |       |
 | workspace/willCreateFiles              |      |       |
 | workspace/didCreateFiles               |      |       |

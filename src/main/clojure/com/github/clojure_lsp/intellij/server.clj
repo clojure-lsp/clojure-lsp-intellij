@@ -23,7 +23,9 @@
 (def ^:private client-capabilities
   {:text-document {:hover {:content-format ["markdown"]}
                    :implementation {}}
-   :workspace {:workspace-edit {:document-changes true}}
+   :workspace {:workspace-edit {:document-changes true
+                                :resource-operations ["create" "rename"]}
+               :file-operations {:will-rename true}}
    :window {:show-document true}})
 
 (def ^:private artifacts
