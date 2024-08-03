@@ -2,6 +2,7 @@
   (:require
    [clojure.string :as string]
    [com.github.clojure-lsp.intellij.editor :as editor]
+   [com.github.ericdallo.clj4intellij.logger :as logger]
    [com.github.ericdallo.clj4intellij.util :as util])
   (:import
    [com.github.clojure_lsp.intellij ClojureLanguage]
@@ -11,7 +12,6 @@
    [com.intellij.openapi.fileEditor FileEditorManager]
    [com.intellij.openapi.project Project]
    [com.intellij.openapi.util TextRange]
-   [com.intellij.openapi.vfs VirtualFile]
    [com.intellij.psi
     PsiElement
     PsiElementVisitor
@@ -22,21 +22,20 @@
 
 (set! *warn-on-reflection* true)
 
-VirtualFile
-
 (defn ->LSPPsiElement
-  [^String name ^Project project ^PsiFile file
+  [^String text ^Project project ^PsiFile file
    ^Integer start-offset ^Integer end-offset
    ^Integer start-line]
   (let [psi-manager (PsiManager/getInstance project)
         file-editor-manager (FileEditorManager/getInstance project)]
     (reify
       PsiNameIdentifierOwner
-      (getName [_] (str  (editor/filename->project-relative-filename
-                          (.getCanonicalPath (.getVirtualFile file))
-                          project)
-                         "  "
-                         start-line))
+      (getName [_]
+        (str (editor/filename->project-relative-filename
+               (.getCanonicalPath (.getVirtualFile file))
+               project)
+             "  "
+             start-line))
       (setName [_ _])
       (getNameIdentifier [this] this)
       (getIdentifyingElement [this] this)
@@ -55,7 +54,7 @@ VirtualFile
       (getTextLength [_] (- end-offset start-offset))
       (findElementAt [_ _])
       (findReferenceAt [_ _])
-      (textToCharArray [_] (char-array name))
+      (textToCharArray [_] (char-array text))
       (getNavigationElement [this] this)
       (getOriginalElement [this] this)
       (^boolean textMatches [this ^CharSequence text]
@@ -64,7 +63,7 @@ VirtualFile
         (.equals (.getText this) (.getText element)))
       (^boolean textContains [this ^char c]
         (string/includes? (.getText this) (str c)))
-      (getText [_] name)
+      (getText [_] text)
       (^void accept [this ^PsiElementVisitor visitor]
         (.visitElement visitor this))
       (acceptChildren [_ _])
@@ -91,7 +90,7 @@ VirtualFile
       (getUseScope [this] (.getResolveScope (.getContainingFile this)))
       (getNode [_])
       (isEquivalentTo [this other] (= this other))
-      (toString [_] (str name ":" start-offset ":" end-offset))
+      (toString [_] (str text ":" start-offset ":" end-offset))
       (getContainingFile [_] file)
 
       PsiElementNavigationItem

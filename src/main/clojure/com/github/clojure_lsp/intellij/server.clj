@@ -83,12 +83,12 @@
         dest-server-file download-path
         dest-path (.getCanonicalPath dest-server-file)]
     (logger/info "Downloading clojure-lsp from" uri)
-    (spit server-version-path latest-version)
     (unzip-file (io/input-stream uri) dest-server-file)
     (doto (io/file dest-server-file)
       (.setWritable true)
       (.setReadable true)
       (.setExecutable true))
+    (spit server-version-path latest-version)
     (db/assoc-in project [:downloaded-server-path] dest-path)
     (logger/info "Downloaded clojure-lsp to" dest-path)))
 
@@ -143,21 +143,27 @@
      (ClojureClassLoader/bind)
      (let [download-path (config/download-server-path)
            server-version-path (config/download-server-version-path)
-           latest-version* (delay (try (string/trim (slurp latest-version-uri)) (catch Exception _ :error-checking-latest-version)))
+           latest-version* (delay (try (string/trim (slurp latest-version-uri)) (catch Exception _ nil)))
            custom-server-path (db/get-in project [:settings :server-path])]
        (cond
          custom-server-path
          (spawn-server! project indicator custom-server-path)
 
          (and (.exists download-path)
-              (or (not @latest-version*) ;; on internet connection issues we use any downloaded server
+              (or (not @latest-version*) ;; on network connection issues we use any downloaded server
                   (= (try (slurp server-version-path) (catch Exception _ :error-checking-local-version))
                      @latest-version*)))
          (spawn-server! project indicator download-path)
 
-         :else
+         @latest-version*
          (do (download-server! project indicator download-path server-version-path @latest-version*)
-             (spawn-server! project indicator download-path)))
+             (spawn-server! project indicator download-path))
+
+         :else
+         (notification/show-notification! {:project project
+                                           :type :error
+                                           :title "Clojure LSP download error"
+                                           :message "There is no server downloaded and there was a network issue to download the latest one"}))
 
        (db/assoc-in project [:status] :connected)
        (run! #(% project :connected) (:on-status-changed-fns @db/db*))
