@@ -40,9 +40,10 @@ object ClojureTokens {
   @JvmField val CLJ_FILE_TYPE = IFileElementType("CLOJURE_FILE", ClojureLanguage)
 
   @JvmField val LINE_COMMENT = IElementType("C_LINE_COMMENT", ClojureLanguage)
+  @JvmField val FORM_COMMENT = IElementType("C_FORM_COMMENT", ClojureLanguage)
 
   @JvmField val WHITESPACES = TokenSet.create(C_COMMA, TokenType.WHITE_SPACE)
-  @JvmField val COMMENTS = TokenSet.create(LINE_COMMENT)
+  @JvmField val COMMENTS = TokenSet.create(LINE_COMMENT, FORM_COMMENT)
   @JvmField val STRINGS = TokenSet.create(C_STRING)
   @JvmField val SYM_ALIKE = TokenSet.create(C_BOOL, C_NIL, C_SYM)
   @JvmField val LITERALS = TokenSet.create(C_BOOL, C_CHAR, C_HEXNUM, C_NIL, C_NUMBER, C_RATIO, C_RDXNUM, C_STRING)

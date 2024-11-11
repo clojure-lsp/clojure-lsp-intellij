@@ -8,6 +8,7 @@ import static com.intellij.psi.TokenType.BAD_CHARACTER;
 import static com.intellij.psi.TokenType.WHITE_SPACE;
 import static com.github.clojure_lsp.intellij.language.psi.ClojureTypes.*;
 import static com.github.clojure_lsp.intellij.ClojureTokens.LINE_COMMENT;
+import static com.github.clojure_lsp.intellij.ClojureTokens.FORM_COMMENT;
 
 %%
 
@@ -31,6 +32,7 @@ import static com.github.clojure_lsp.intellij.ClojureTokens.LINE_COMMENT;
 
 WHITE_SPACE=\s+
 LINE_COMMENT=;.*
+FORM_COMMENT=#_\S*
 STR_CHAR=[^\\\"]|\\.|\\\"
 STRING=\" {STR_CHAR}* \"
 // octal numbers: 023, 023N, but not 023M
@@ -54,6 +56,7 @@ SYM_TAIL={SYM_PART}+ (":" {SYM_PART}+)?
 <YYINITIAL> {
   {WHITE_SPACE}          { return WHITE_SPACE; }
   {LINE_COMMENT}         { return LINE_COMMENT; }
+  {FORM_COMMENT}         { return FORM_COMMENT; }
 
   "#"                    { yybegin(DISPATCH); }
 

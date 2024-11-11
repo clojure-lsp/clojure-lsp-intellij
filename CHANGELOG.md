@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Basic support for form comments. #47
+
 ## 2.6.1
 
 - Support starting plugin even with network issues to download latest server when one is already present. #56

@@ -47,7 +47,7 @@ import com.github.clojure_lsp.intellij.language.psi.ClojureTypes.*
 // TODO migrate to clojure extension in com.github.clojure-lsp.intellij.extension.syntax-highlighter
 object ClojureColors {
   @JvmField val LINE_COMMENT = createTextAttributesKey("C_LINE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
-  @JvmField val FORM_COMMENT = createTextAttributesKey("C_FORM_COMMENT")
+  @JvmField val FORM_COMMENT = createTextAttributesKey("C_FORM_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
   @JvmField val STRING = createTextAttributesKey("C_STRING", DefaultLanguageHighlighterColors.STRING)
   @JvmField val CHARACTER = createTextAttributesKey("C_CHARACTER", DefaultLanguageHighlighterColors.STRING)
   @JvmField val NUMBER = createTextAttributesKey("C_NUMBER", DefaultLanguageHighlighterColors.METADATA)
@@ -101,6 +101,7 @@ class ClojureSyntaxHighlighter(val language: Language) : SyntaxHighlighterBase()
     return when (tokenType) {
       TokenType.BAD_CHARACTER -> pack(HighlighterColors.BAD_CHARACTER)
       ClojureTokens.LINE_COMMENT -> pack(ClojureColors.LINE_COMMENT)
+      ClojureTokens.FORM_COMMENT -> pack(ClojureColors.FORM_COMMENT)
       C_STRING -> pack(ClojureColors.STRING)
       C_CHAR -> pack(ClojureColors.CHARACTER)
       C_NUMBER, C_HEXNUM, C_RDXNUM, C_RATIO -> pack(ClojureColors.NUMBER)
