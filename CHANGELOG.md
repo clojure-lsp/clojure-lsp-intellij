@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.6.2
+
 - Basic support for form comments. #47
 
 ## 2.6.1
