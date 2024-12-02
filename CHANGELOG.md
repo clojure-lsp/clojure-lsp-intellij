@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased]
+
+## 2.6.3
  
 - Fix default shortcuts being added for already customized shortcuts.
 
