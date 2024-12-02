@@ -5,7 +5,7 @@ fun properties(key: String) = project.findProperty(key).toString()
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.9.0"
     id("dev.clojurephant.clojure") version "0.7.0"
-    id("org.jetbrains.intellij") version "1.15.0"
+    id("org.jetbrains.intellij") version "1.17.4"
     id("org.jetbrains.changelog") version "1.3.1"
     id("org.jetbrains.grammarkit") version "2021.2.2"
 }
@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     implementation ("org.clojure:clojure:1.11.1")
-    implementation ("com.github.ericdallo:clj4intellij:0.5.2")
+    implementation ("com.github.ericdallo:clj4intellij:0.5.3")
     implementation ("seesaw:seesaw:1.5.0")
     implementation ("camel-snake-kebab:camel-snake-kebab:0.4.3")
     implementation ("babashka:process:0.5.18")
@@ -138,7 +138,7 @@ tasks {
         // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
         // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
         // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
-        channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
+        channels.set(listOf("default"))
     }
 
     buildSearchableOptions {
