@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 2.6.4
+
 - Fix shortcuts not being added after 2.6.3.
 
 ## 2.6.3
