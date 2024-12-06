@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix shortcuts not being added after 2.6.3.
+
 ## 2.6.3
  
 - Fix default shortcuts being added for already customized shortcuts.
