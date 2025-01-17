@@ -4,6 +4,20 @@
     <vendor url="https://github.com/clojure-lsp/clojure-lsp-intellij">clojure-lsp</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.redhat.devtools.lsp4ij</depends>
+
+    <extensions defaultExtensionNs="com.redhat.devtools.lsp4ij">
+         <server id="clojure-lsp"
+              name="Clojure LSP"
+              factoryClass="com.github.clojure_lsp.intellij.extension.LanguageServerFactory">
+          <description><![CDATA[
+          Clojure LSP description
+          ]]>
+          </description>
+      </server>
+
+      <languageMapping language="clojure" serverId="clojure-lsp"/>
+    </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
         <fileType name="clojure" language="clojure" extensions="clj;cljs;cljc;cljd;edn;bb;clj_kondo"
@@ -18,64 +32,64 @@
 
         <postStartupActivity implementation="com.github.ericdallo.clj4intellij.extension.NREPLStartup"/>
         <postStartupActivity implementation="com.github.clojure_lsp.intellij.extension.InitDBStartup"/>
-        <postStartupActivity implementation="com.github.clojure_lsp.intellij.extension.RegisterActionsStartup"/>
-        <statusBarWidgetFactory
-            id="ClojureLSPStatusBar"
-            displayName="Clojure LSP"
-            order="first"
-            implementation="com.github.clojure_lsp.intellij.extension.StatusBarFactory" />
-        <editorFactoryDocumentListener
-            implementation="com.github.clojure_lsp.intellij.listener.FileListener"/>
-        <gotoDeclarationHandler language="clojure" implementation="com.github.clojure_lsp.intellij.extension.Definition"/>
-        <externalAnnotator language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.Annotator" />
-        <lang.documentationProvider implementationClass="com.github.clojure_lsp.intellij.extension.Documentation"
-                               language="clojure" order="first"/>
-        <formattingService implementation="com.github.clojure_lsp.intellij.extension.Formatting"/>
-        <renameHandler implementation="com.github.clojure_lsp.intellij.extension.RenameHandler"/>
-        <codeInsight.inlayProvider
-            language="clojure"
-            isEnabledByDefault="true"
-            implementationClass="com.github.clojure_lsp.intellij.extension.CodeLensProvider"/>
-        <completion.contributor language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.CompletionContributor"/>
-        <notificationGroup id="Clojure LSP notifications"
-                           displayType="BALLOON"/>
-        <fileDocumentManagerListener implementation="com.github.clojure_lsp.intellij.extension.FileDocumentManagerListener"/>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.AddMissingImport</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.AddMissingLibspec</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.AddRequireSuggestion</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.CycleColl</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.CycleKeywordAutoResolve</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.CleanNs</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.CyclePrivacy</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.CreateTest</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.DragParamBackward</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.DragParamForward</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.DragBackward</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.DragForward</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.DemoteFn</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.DestructureKeys</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.ExtractToDef</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.ExtractFunction</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.ExpandLet</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.CreateFunction</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.GetInAll</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.GetInLess</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.GetInMore</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.GetInNone</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.IntroduceLet</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.InlineSymbol</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.ResolveMacroAs</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.MoveForm</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.MoveToLet</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.PromoteFn</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.ReplaceReferAllWithRefer</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.ReplaceReferAllWithAlias</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.RestructureKeys</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.ChangeColl</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.SortClauses</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.ThreadFirstAll</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.ThreadLastAll</className></intentionAction>
-        <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.UnwindAll</className></intentionAction>
+        <!-- <postStartupActivity implementation="com.github.clojure_lsp.intellij.extension.RegisterActionsStartup"/> -->
+        <!-- <statusBarWidgetFactory -->
+        <!--     id="ClojureLSPStatusBar" -->
+        <!--     displayName="Clojure LSP" -->
+        <!--     order="first" -->
+        <!--     implementation="com.github.clojure_lsp.intellij.extension.StatusBarFactory" /> -->
+        <!-- <editorFactoryDocumentListener -->
+        <!--     implementation="com.github.clojure_lsp.intellij.listener.FileListener"/> -->
+        <!-- <gotoDeclarationHandler language="clojure" implementation="com.github.clojure_lsp.intellij.extension.Definition"/> -->
+        <!-- <externalAnnotator language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.Annotator" /> -->
+        <!-- <lang.documentationProvider implementationClass="com.github.clojure_lsp.intellij.extension.Documentation" -->
+        <!--                        language="clojure" order="first"/> -->
+        <!-- <formattingService implementation="com.github.clojure_lsp.intellij.extension.Formatting"/> -->
+        <!-- <renameHandler implementation="com.github.clojure_lsp.intellij.extension.RenameHandler"/> -->
+        <!-- <codeInsight.inlayProvider -->
+        <!--     language="clojure" -->
+        <!--     isEnabledByDefault="true" -->
+        <!--     implementationClass="com.github.clojure_lsp.intellij.extension.CodeLensProvider"/> -->
+        <!-- <completion.contributor language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.CompletionContributor"/> -->
+        <!-- <notificationGroup id="Clojure LSP notifications" -->
+        <!--                    displayType="BALLOON"/> -->
+        <!-- <fileDocumentManagerListener implementation="com.github.clojure_lsp.intellij.extension.FileDocumentManagerListener"/> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.AddMissingImport</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.AddMissingLibspec</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.AddRequireSuggestion</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.CycleColl</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.CycleKeywordAutoResolve</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.CleanNs</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.CyclePrivacy</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.CreateTest</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.DragParamBackward</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.DragParamForward</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.DragBackward</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.DragForward</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.DemoteFn</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.DestructureKeys</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.ExtractToDef</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.ExtractFunction</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.ExpandLet</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.CreateFunction</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.GetInAll</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.GetInLess</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.GetInMore</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.GetInNone</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.IntroduceLet</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.InlineSymbol</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.ResolveMacroAs</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.MoveForm</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.MoveToLet</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.PromoteFn</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.ReplaceReferAllWithRefer</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.ReplaceReferAllWithAlias</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.RestructureKeys</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.ChangeColl</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.SortClauses</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.ThreadFirstAll</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.ThreadLastAll</className></intentionAction> -->
+        <!-- <intentionAction><language>clojure</language><className>com.github.clojure_lsp.intellij.extension.code_action.UnwindAll</className></intentionAction> -->
 
         <!-- misc -->
         <moduleBuilder builderClass="com.github.clojure_lsp.intellij.extension.ClojureModuleBuilder"/>

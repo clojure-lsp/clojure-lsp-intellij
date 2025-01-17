@@ -133,7 +133,7 @@
             (logger/info "Checking if server initialized, try number:" count)
             (recur (inc count))))))))
 
-(defn start-server! [^Project project]
+#_(defn start-server! [^Project project]
   (db/assoc-in project [:status] :connecting)
   (run! #(% project :connecting) (:on-status-changed-fns @db/db*))
   (tasks/run-background-task!

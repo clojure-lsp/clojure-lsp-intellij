@@ -60,7 +60,7 @@
    DumbAwareAction
     (actionPerformed [_ _event]
       (server/shutdown! project)
-      (server/start-server! project))))
+      #_(server/start-server! project))))
 
 (defn ^:private status-bar-title [project]
   (str "Clojure LSP: " (name (db/get-in project [:status] "disconnected"))))

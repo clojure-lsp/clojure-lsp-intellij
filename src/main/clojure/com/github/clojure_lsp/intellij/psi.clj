@@ -2,7 +2,6 @@
   (:require
    [clojure.string :as string]
    [com.github.clojure-lsp.intellij.editor :as editor]
-   [com.github.ericdallo.clj4intellij.logger :as logger]
    [com.github.ericdallo.clj4intellij.util :as util])
   (:import
    [com.github.clojure_lsp.intellij ClojureLanguage]

@@ -5,7 +5,7 @@
   (:require
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
-   [markdown.core :as markdown])
+   #_[markdown.core :as markdown])
   (:import
    [com.intellij.openapi.util.text StringUtil]
    [com.intellij.openapi.util.text HtmlBuilder]
@@ -80,7 +80,7 @@
                                                               :position {:line (.line line-col)
                                                                          :character (.column line-col)}}])]
 
-        (when-let [html (markdown/md-to-html-string (:value contents)
+        (when-let [html "" #_(markdown/md-to-html-string (:value contents)
                                                     :codeblock-no-escape? true
                                                     :codeblock-callback (fn [code language]
                                                                           (if (= language "clojure")

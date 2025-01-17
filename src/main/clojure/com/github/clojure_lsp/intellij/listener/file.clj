@@ -38,7 +38,7 @@
     (do
       (db/init-db-for-project project)
       (db/load-settings-from-state! project (SettingsState/get))
-      (server/start-server! project))))
+      #_(server/start-server! project))))
 
 (defn -fileOpened [_this ^FileEditorManager source ^VirtualFile file]
   (let [project (.getProject source)]

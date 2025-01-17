@@ -8,11 +8,13 @@
    [com.github.ericdallo.clj4intellij.logger :as logger])
   (:import
    [com.github.clojure_lsp.intellij.extension SettingsState]
-   [com.intellij.openapi.project Project]))
+   [com.intellij.openapi.project Project]
+   [com.redhat.devtools.lsp4ij LanguageServerManager LanguageServerManager$StartOptions]))
 
 (set! *warn-on-reflection* true)
 
 (defn -runActivity [_this ^Project project]
   (db/init-db-for-project project)
   (db/load-settings-from-state! project (SettingsState/get))
+  #_(.start (LanguageServerManager/getInstance (first (db/all-projects))) "clojure-lsp" )
   (logger/info "Loaded settings to memory:" (db/get-in project [:settings])))
