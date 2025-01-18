@@ -51,7 +51,7 @@
   (let [[line character] (:start (editor/text-range->range (.getTextRange element) editor))
         project ^Project (.getProject editor)
         current-v-file (some-> element .getContainingFile .getVirtualFile)]
-    (when-let [client (lsp-client/connected-client project)]
+    (when-let [client (lsp-client/connected-server project)]
       (when-let [definition @(lsp-client/request! client [:textDocument/definition
                                                           {:text-document {:uri (editor/editor->uri editor)}
                                                            :position {:line line

@@ -7,8 +7,7 @@
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.editor :as editor]
-   [com.github.clojure-lsp.intellij.project-lsp :as project]
-   [com.github.clojure-lsp.intellij.server :as server])
+   [com.github.clojure-lsp.intellij.project-lsp :as project])
   (:import
    [com.github.clojure_lsp.intellij.extension SettingsState]
    [com.intellij.openapi.editor.event DocumentEvent]
@@ -34,11 +33,10 @@
     (not (project/clojure-project? project))
     false
 
-    :else
+    #_#_:else
     (do
       (db/init-db-for-project project)
-      (db/load-settings-from-state! project (SettingsState/get))
-      #_(server/start-server! project))))
+      (db/load-settings-from-state! project (SettingsState/get)))))
 
 (defn -fileOpened [_this ^FileEditorManager source ^VirtualFile file]
   (let [project (.getProject source)]
@@ -86,7 +84,7 @@
   (let [file-document-manager (FileDocumentManager/getInstance)]
     (when-let [vfile (.getFile file-document-manager (.getDocument event))]
       (when-let [project (editor/v-file->project vfile)]
-        (when-let [client (lsp-client/connected-client project)]
+        (when-let [client (lsp-client/connected-server project)]
           (let [url (.getUrl vfile)]
             (when-let [{:keys [version]} (db/get-in project [:documents url])]
               (lsp-client/notify!

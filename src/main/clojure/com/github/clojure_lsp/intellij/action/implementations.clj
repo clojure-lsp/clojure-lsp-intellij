@@ -24,7 +24,7 @@
 (set! *warn-on-reflection* true)
 
 (defn show-implementations [^Editor editor line character]
-  (if-let [client (lsp-client/connected-client (.getProject editor))]
+  (if-let [client (lsp-client/connected-server (.getProject editor))]
     (let [implementations @(lsp-client/request! client [:textDocument/implementation
                                                         {:text-document {:uri (editor/editor->uri editor)}
                                                          :position {:line line

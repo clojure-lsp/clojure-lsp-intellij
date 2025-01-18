@@ -57,7 +57,7 @@
 
 (defn find-references-action [^AnActionEvent event]
   (when-let [editor ^Editor (.getData event CommonDataKeys/EDITOR)]
-    (if-let [client (lsp-client/connected-client (.getProject editor))]
+    (if-let [client (lsp-client/connected-server (.getProject editor))]
       (let [[line character] (util/editor->cursor-position editor)]
         (show-references editor line character client))
       (.showErrorHint (HintManager/getInstance) ^Editor editor "LSP not connected" HintManager/RIGHT))))

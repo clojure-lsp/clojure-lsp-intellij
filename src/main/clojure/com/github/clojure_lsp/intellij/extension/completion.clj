@@ -86,7 +86,7 @@
        (.withAutoCompletionPolicy AutoCompletionPolicy/SETTINGS_DEPENDENT)))))
 
 (defn -fillCompletionVariants [_ ^CompletionParameters params ^CompletionResultSet result]
-  (when-let [client (lsp-client/connected-client (.getProject (.getEditor params)))]
+  (when-let [client (lsp-client/connected-server (.getProject (.getEditor params)))]
     (try
       (let [file (.getOriginalFile params)
             uri (.getUrl (.getVirtualFile file))

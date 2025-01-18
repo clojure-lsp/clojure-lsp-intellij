@@ -21,6 +21,6 @@
 
 (defn -beforeDocumentSaving [_ ^Document document]
   (let [vfile (.getFile (FileDocumentManager/getInstance) document)]
-    (when-let [client (some-> vfile editor/v-file->project lsp-client/connected-client)]
+    (when-let [client (some-> vfile editor/v-file->project lsp-client/connected-server)]
       (lsp-client/notify! client [:textDocument/didSave
                                   {:textDocument {:uri (.getUrl vfile)}}]))))

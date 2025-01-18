@@ -47,7 +47,7 @@
 (declare apply-workspace-edit-sync)
 
 (defn will-rename-file [project old-uri new-uri]
-  (let [client (lsp-client/connected-client project)]
+  (let [client (lsp-client/connected-server project)]
     (->> (lsp-client/request! client [:workspace/willRenameFiles
                                       {:files [{:old-uri old-uri
                                                 :new-uri new-uri}]}])

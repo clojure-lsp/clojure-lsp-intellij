@@ -15,7 +15,7 @@
 (defonce code-action-name->title* (atom {}))
 
 (defn ^:private req-code-actions [project uri [line character]]
-  (when-let [client (lsp-client/connected-client project)]
+  (when-let [client (lsp-client/connected-server project)]
     (let [diagnostics (->> (db/get-in project [:diagnostics uri])
                            (filterv (fn [{{:keys [start end]} :range}]
                                       (and (<= (:line start) line (:line end))

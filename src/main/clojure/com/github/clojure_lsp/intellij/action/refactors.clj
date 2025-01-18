@@ -14,7 +14,7 @@
 
 (defn execute-refactor-action [command-name ^AnActionEvent event]
   (when-let [editor ^Editor (.getData event CommonDataKeys/EDITOR)]
-    (if-let [client (lsp-client/connected-client (.getProject editor))]
+    (if-let [client (lsp-client/connected-server (.getProject editor))]
       (let [[line character] (util/editor->cursor-position editor)]
         (tasks/run-background-task!
          (.getProject editor)

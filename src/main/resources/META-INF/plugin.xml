@@ -11,7 +11,7 @@
               name="Clojure LSP"
               factoryClass="com.github.clojure_lsp.intellij.extension.LanguageServerFactory">
           <description><![CDATA[
-          Clojure LSP description
+          Clojure LSP description TODO
           ]]>
           </description>
       </server>
@@ -33,11 +33,20 @@
         <postStartupActivity implementation="com.github.ericdallo.clj4intellij.extension.NREPLStartup"/>
         <postStartupActivity implementation="com.github.clojure_lsp.intellij.extension.InitDBStartup"/>
         <!-- <postStartupActivity implementation="com.github.clojure_lsp.intellij.extension.RegisterActionsStartup"/> -->
-        <!-- <statusBarWidgetFactory -->
-        <!--     id="ClojureLSPStatusBar" -->
-        <!--     displayName="Clojure LSP" -->
-        <!--     order="first" -->
-        <!--     implementation="com.github.clojure_lsp.intellij.extension.StatusBarFactory" /> -->
+        <statusBarWidgetFactory
+            id="ClojureLSPStatusBar"
+            displayName="Clojure LSP"
+            order="first"
+            implementation="com.github.clojure_lsp.intellij.extension.StatusBarFactory" />
+        <lang.foldingBuilder language="clojure"
+                             implementationClass="com.redhat.devtools.lsp4ij.features.foldingRange.LSPFoldingRangeBuilder"
+                             order="first"/>
+        <codeInsight.parameterInfo
+            language="clojure"
+            implementationClass="com.redhat.devtools.lsp4ij.features.signatureHelp.LSPParameterInfoHandler"/>
+        <lang.psiStructureViewFactory
+            language="clojure"
+            implementationClass="com.redhat.devtools.lsp4ij.features.documentSymbol.LSPDocumentSymbolStructureViewFactory"/>
         <!-- <editorFactoryDocumentListener -->
         <!--     implementation="com.github.clojure_lsp.intellij.listener.FileListener"/> -->
         <!-- <gotoDeclarationHandler language="clojure" implementation="com.github.clojure_lsp.intellij.extension.Definition"/> -->
@@ -112,8 +121,8 @@
     </applicationListeners>
 
     <projectListeners>
-        <listener topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"
-                  class="com.github.clojure_lsp.intellij.listener.FileListener"/>
+        <!-- <listener topic="com.intellij.openapi.fileEditor.FileEditorManagerListener" -->
+        <!--           class="com.github.clojure_lsp.intellij.listener.FileListener"/> -->
         <listener topic="com.intellij.openapi.project.ProjectManagerListener"
                   class="com.github.clojure_lsp.intellij.listener.ProjectManagerListener"/>
         <!-- TODO listen to vfs events outside editor -->

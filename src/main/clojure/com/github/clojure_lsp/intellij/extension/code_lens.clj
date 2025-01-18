@@ -95,7 +95,7 @@
 
 (defn -getCollectorFor [_ _file ^Editor editor _settings ^InlayHintsSink sink]
   (let [uri (editor/editor->uri editor)]
-    (when-let [client (lsp-client/connected-client (.getProject editor))]
+    (when-let [client (lsp-client/connected-server (.getProject editor))]
       ;; For some reason `(PresentationFactory. editor)` does not work
       (proxy+ [editor] FactoryInlayHintsCollector
         (collect [^FactoryInlayHintsCollector this _ _ _]

@@ -17,7 +17,7 @@
 
 (defn -canFormat [_ ^PsiFile psi-file]
   (and (instance? ClojureFileType (.getFileType psi-file))
-       (boolean (lsp-client/connected-client (.getProject psi-file)))))
+       (boolean (lsp-client/connected-server (.getProject psi-file)))))
 
 (defn -getName [_]
   "LSP format")
@@ -29,7 +29,7 @@
   (let [context (.getContext request)
         file (.getContainingFile context)
         uri (.getUrl (.getVirtualFile file))]
-    (when-let [client (lsp-client/connected-client (.getProject file))]
+    (when-let [client (lsp-client/connected-server (.getProject file))]
       (reify AsyncDocumentFormattingService$FormattingTask
         (run [_]
           (try

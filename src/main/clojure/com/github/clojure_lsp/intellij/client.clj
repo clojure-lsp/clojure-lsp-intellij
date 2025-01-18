@@ -10,7 +10,8 @@
    [lsp4clj.lsp.responses :as lsp.responses]
    [lsp4clj.protocols.endpoint :as protocols.endpoint])
   (:import
-   [com.intellij.openapi.project Project]))
+   [com.intellij.openapi.project Project]
+   [com.redhat.devtools.lsp4ij LanguageServerManager]))
 
 (set! *warn-on-reflection* true)
 
@@ -145,6 +146,10 @@
 (defn notify! [client [method body]]
   (protocols.endpoint/send-notification client (subs (str method) 1) body))
 
-(defn connected-client [^Project project]
-  (when (identical? :connected (db/get-in project [:status]))
-    (db/get-in project [:client])))
+(defn connected-server [^Project project]
+  (when-let [manager (LanguageServerManager/getInstance project)]
+    @(.getLanguageServer manager "clojure-lsp")))
+
+(defn server-status [^Project project]
+  (when-let [manager (LanguageServerManager/getInstance project)]
+    (keyword (.toString (.getServerStatus manager "clojure-lsp")))))

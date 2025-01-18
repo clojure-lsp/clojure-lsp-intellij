@@ -11,15 +11,15 @@
 (def ^:private empty-project
   {:status :disconnected
    :downloaded-server-path nil
-   :client nil
    :server-process nil
+   :server nil
    :project nil
    :diagnostics {}
    :settings {:trace-level "off"
-              :server-path nil}})
+              :server-path nil}
+   :on-status-changed-fns []})
 
-(defonce db* (atom {:projects {}
-                    :on-status-changed-fns []}))
+(defonce db* (atom {:projects {}}))
 
 (defn empty-db? []
   (empty? (:projects @db*)))
@@ -38,9 +38,9 @@
 
 (defn init-db-for-project [^Project project]
   (swap! db* update :projects (fn [projects]
-                                (if (clojure.core/get projects (.getBasePath project))
+                                (if (clojure.core/get-in projects [(.getBasePath project) :project])
                                   projects
-                                  (assoc projects (.getBasePath project) (assoc empty-project :project project))))))
+                                  (update projects (.getBasePath project) #(merge (assoc empty-project :project project) %))))))
 
 (defn await-field [project field fn]
   (async/thread

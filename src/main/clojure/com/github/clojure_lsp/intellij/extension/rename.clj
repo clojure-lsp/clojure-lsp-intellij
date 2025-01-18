@@ -45,7 +45,7 @@
   ([_this ^Project _project ^"[Lcom.intellij.psi.PsiElement;" _elements ^DataContext _data-context])
   ;; rename a element in a editor
   ([_ ^Project project ^Editor editor ^PsiFile _psi-file ^DataContext _data-context]
-   (when-let [client (lsp-client/connected-client project)]
+   (when-let [client (lsp-client/connected-server project)]
      (let [[line character] (util/editor->cursor-position editor)]
        (when-let [current-name ^String (prepare-rename-current-name client editor line character)]
          (when-let [new-name (Messages/showInputDialog project "Enter new name: " "Rename" (Messages/getQuestionIcon) current-name (NonEmptyInputValidator.))]

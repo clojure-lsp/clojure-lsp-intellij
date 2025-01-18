@@ -74,6 +74,12 @@ java {
     sourceCompatibility = JavaVersion.VERSION_17
 }
 
+tasks.register("classpath") {
+    doFirst {
+        println(sourceSets["main"].compileClasspath.asPath)
+    }
+}
+
 tasks {
     compileKotlin {
         kotlinOptions {
