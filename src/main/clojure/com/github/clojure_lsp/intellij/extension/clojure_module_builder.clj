@@ -17,7 +17,11 @@
    [com.intellij.openapi.module ModifiableModuleModel ModuleType]
    [com.intellij.openapi.project Project]
    [com.intellij.openapi.roots ModifiableRootModel]
-   [java.io File]))
+   [java.io File]
+   [java.net JarURLConnection]
+   [java.util.jar JarEntry]))
+
+(set! *warn-on-reflection* true)
 
 (def clojure-module
   (proxy+ ClojureModuleType ["CLOJURE_MODULE"] ModuleType
@@ -77,8 +81,7 @@
           (updateDataModel [_]
             (swap! wizard* assoc :project-type (s/id-of (s/selection (:button-group @wizard*)))))))
 
-(defn -setupRootModel [^ModuleBuilder this ^ModifiableRootModel model]
-  (.doAddContentEntry this model))
+(defn -setupRootModel [^ModuleBuilder _ ^ModifiableRootModel _])
 
 (defn ^:private normalize-entry-name [entry-name project-template project-name]
   (-> entry-name
@@ -98,10 +101,10 @@
   ;; We need to update current thread class loader to be able to
   ;; load resource-paths from our plugin.
   (.setContextClassLoader (Thread/currentThread) (.getClassLoader clojure.lang.Symbol))
-  (let [connection (.openConnection (io/resource project-template))
+  (let [connection ^JarURLConnection (.openConnection (io/resource project-template))
         project-root-entry (.getJarEntry connection)]
     (with-open [jar (.getJarFile connection)]
-      (doseq [entry (enumeration-seq (.entries jar))]
+      (doseq [^JarEntry entry (enumeration-seq (.entries jar))]
         (when (and (not (.isDirectory entry))
                    (string/starts-with? (str entry) (str project-root-entry)))
           (with-open [stream (.getInputStream jar entry)]
@@ -110,9 +113,13 @@
               (io/make-parents new-file)
               (spit new-file content))))))))
 
+(set! *warn-on-reflection* false)
+
 (defn -commitModule [this ^Project project ^ModifiableModuleModel model]
   (let [project-path (.getBasePath project)
         project-name (.getName project)
         template (project-template (:project-type @wizard*))]
     (copy-template template project-path project-name)
     (.superCommitModule this project model)))
+
+(set! *warn-on-reflection* true)

@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    implementation ("org.clojure:clojure:1.11.1")
+    implementation ("org.clojure:clojure:1.12.0")
     implementation ("com.github.ericdallo:clj4intellij:0.5.4")
     implementation ("seesaw:seesaw:1.5.0")
     implementation ("camel-snake-kebab:camel-snake-kebab:0.4.3")
@@ -36,7 +36,10 @@ dependencies {
         exclude("org.clojure", "core.async")
     }
     implementation ("com.rpl:proxy-plus:0.0.9")
-    // implementation ("markdown-clj:markdown-clj:1.12.1")
+    implementation ("markdown-clj:markdown-clj:1.12.1") {
+        exclude("clj-commons", "clj-yaml")
+    }
+    implementation ("clj-commons:clj-yaml:1.0.29")
 }
 
 sourceSets {

@@ -121,13 +121,7 @@
     </applicationListeners>
 
     <projectListeners>
-        <!-- <listener topic="com.intellij.openapi.fileEditor.FileEditorManagerListener" -->
-        <!--           class="com.github.clojure_lsp.intellij.listener.FileListener"/> -->
         <listener topic="com.intellij.openapi.project.ProjectManagerListener"
                   class="com.github.clojure_lsp.intellij.listener.ProjectManagerListener"/>
-        <!-- TODO listen to vfs events outside editor -->
-        <!-- <listener topic="com.intellij.openapi.vfs.newvfs.BulkFileListener" -->
-        <!--           class="com.github.clojure_lsp.intellij.listener.FileListener"/> -->
-
     </projectListeners>
 </idea-plugin>

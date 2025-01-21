@@ -5,14 +5,14 @@
   (:require
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
-   #_[markdown.core :as markdown])
+   [markdown.core :as markdown])
   (:import
+   [com.github.clojure_lsp.intellij ClojureLanguage]
+   [com.intellij.openapi.editor.colors EditorColorsManager]
+   [com.intellij.openapi.fileTypes SyntaxHighlighterFactory]
    [com.intellij.openapi.util.text StringUtil]
    [com.intellij.openapi.util.text HtmlBuilder]
    [com.intellij.psi PsiDocumentManager PsiElement PsiFile]
-   [com.intellij.openapi.fileTypes SyntaxHighlighterFactory]
-   [com.intellij.openapi.editor.colors EditorColorsManager]
-   [com.github.clojure_lsp.intellij ClojureLanguage]
    [java.awt Color]))
 
 (set! *warn-on-reflection* true)
@@ -57,10 +57,10 @@
                 foreground-color (some-> highlight-attrs .getForegroundColor)
                 background-color (some-> highlight-attrs .getBackgroundColor)
                 font-type        (some-> highlight-attrs .getFontType (#(case (int %)
-                                                                         1 :bold
-                                                                         2 :italic
-                                                                         3 :bold-italic
-                                                                         nil)))]
+                                                                          1 :bold
+                                                                          2 :italic
+                                                                          3 :bold-italic
+                                                                          nil)))]
             (if (some some? [foreground-color background-color font-type])
               (recur (str highlighted-code (highlight-html-text text {:foreground-color foreground-color
                                                                       :background-color background-color
@@ -80,7 +80,7 @@
                                                               :position {:line (.line line-col)
                                                                          :character (.column line-col)}}])]
 
-        (when-let [html "" #_(markdown/md-to-html-string (:value contents)
+        (when-let [html (markdown/md-to-html-string (:value contents)
                                                     :codeblock-no-escape? true
                                                     :codeblock-callback (fn [code language]
                                                                           (if (= language "clojure")
