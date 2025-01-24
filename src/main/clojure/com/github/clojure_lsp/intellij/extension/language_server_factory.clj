@@ -10,7 +10,10 @@
    [com.redhat.devtools.lsp4ij.client LanguageClientImpl]
    [com.redhat.devtools.lsp4ij.client.features LSPClientFeatures]
    [com.redhat.devtools.lsp4ij.server OSProcessStreamConnectionProvider]
+   [org.eclipse.lsp4j InitializeParams]
    [org.eclipse.lsp4j.services LanguageServer]))
+
+(set! *warn-on-reflection* true)
 
 (defn -createConnectionProvider [_ ^Project project]
   (doto (proxy+
@@ -27,4 +30,8 @@
 
 ;; TODO client features
 (defn -createClientFeatures [_]
-  (LSPClientFeatures.))
+  (proxy+ [] LSPClientFeatures
+    (initializeParams [_ ^InitializeParams params]
+      (.setWorkDoneToken params "clojure-lsp-startup")
+      (.setInitializationOptions params {"dependency-scheme" "jar"
+                                         "hover" {"arity-on-same-line?" true}}))))

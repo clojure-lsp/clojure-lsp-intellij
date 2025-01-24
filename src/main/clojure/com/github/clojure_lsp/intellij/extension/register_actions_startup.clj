@@ -4,19 +4,21 @@
    :implements [com.intellij.openapi.startup.StartupActivity
                 com.intellij.openapi.project.DumbAware])
   (:require
-   [camel-snake-kebab.core :as csk]
-   [com.github.clojure-lsp.intellij.action.implementations :as a.implementations]
-   [com.github.clojure-lsp.intellij.action.refactors :as a.refactors]
-   [com.github.clojure-lsp.intellij.action.references :as a.references]
    [com.github.ericdallo.clj4intellij.action :as action]
-   [com.github.ericdallo.clj4intellij.logger :as logger])
+   [com.github.ericdallo.clj4intellij.logger :as logger]
+   [com.rpl.proxy-plus :refer [proxy+]])
   (:import
    [com.github.clojure_lsp.intellij Icons]
-   [com.intellij.openapi.project Project]))
+   [com.intellij.openapi.actionSystem ActionManager AnActionEvent KeyboardShortcut]
+   [com.intellij.openapi.keymap KeymapManager]
+   [com.intellij.openapi.project Project]
+   [com.redhat.devtools.lsp4ij.commands CommandExecutor LSPCommandAction LSPCommandContext]
+   [javax.swing Icon KeyStroke]
+   [org.eclipse.lsp4j Command]))
 
 (set! *warn-on-reflection* true)
 
-(def clojure-lsp-refactors
+(def clojure-lsp-commands
   [{:name "add-missing-import" :text "Add import to namespace" :description "Add import to namespace"}
    {:name "add-missing-libspec" :text "Add missing require" :description "Add missing require"}
    {:name "add-require-suggestion" :text "Add require suggestion" :description "Add require suggestion"}
@@ -63,39 +65,53 @@
    {:name "raise-sexp" :text "Raise sexpr" :description "Raise current sexpr (Paredit)" :keyboard-shortcut {:first "alt R" :replace-all true}}
    {:name "kill-sexp" :text "Kill sexpr" :description "Kill current sexpr (Paredit)" :keyboard-shortcut {:first "alt K" :replace-all true}}])
 
-(defn -runActivity [_this ^Project _project]
-  (action/register-action! :id "ClojureLSP.FindReferences"
-                           :title "Find references"
-                           :description "Find all references of the element at cursor."
-                           :icon Icons/CLOJURE
-                           :use-shortcut-of "FindUsages"
-                           :on-performed a.references/find-references-action)
-  (action/register-action! :id "ClojureLSP.FindImplementations"
-                           :title "Find implementations"
-                           :description "Find all implementations of the element at cursor if any."
-                           :icon Icons/CLOJURE
-                           :use-shortcut-of "GotoImplementation"
-                           :on-performed a.implementations/find-implementations-action)
-  (action/register-group! :id "ClojureLSP.Find"
-                          :children [{:type :add-to-group :group-id "EditorPopupMenu.GoTo" :anchor :first}
-                                     {:type :add-to-group :group-id "GoToMenu" :anchor :before :relative-to "GotoDeclaration"}
-                                     {:type :reference :ref "ClojureLSP.FindReferences"}
-                                     {:type :reference :ref "ClojureLSP.FindImplementations"}
-                                     {:type :separator}])
-  (doseq [{:keys [name text description use-shortcut-of keyboard-shortcut]} clojure-lsp-refactors]
-    (action/register-action! :id (str "ClojureLSP." (csk/->PascalCase name))
-                             :title text
-                             :description description
-                             :icon Icons/CLOJURE
-                             :keyboard-shortcut keyboard-shortcut
-                             :use-shortcut-of use-shortcut-of
-                             :on-performed (partial #'a.refactors/execute-refactor-action name)))
+#_{:clj-kondo/ignore [:unused-binding]}
+(defn register-command!
+  [& {:keys [project id title description icon args use-shortcut-of keyboard-shortcut on-performed]}]
+  (let [manager (ActionManager/getInstance)
+        keymap-manager (KeymapManager/getInstance)
+        keymap (.getActiveKeymap keymap-manager)
+        action (proxy+ ClojureLSPCommand [] LSPCommandAction
+                       (commandPerformed [_ _command ^AnActionEvent event]
+                                         (-> (CommandExecutor/executeCommand
+                                               (doto (LSPCommandContext. (Command. title id) project)
+                                                 (.setPreferredLanguageServerId "clojure-lsp")))
+                                             (.response)
+                                             )))]
+    (.setText (.getTemplatePresentation action) ^String title)
+    (.setIcon (.getTemplatePresentation action) ^Icon icon)
+    (when-not (.getAction manager id)
+      (.registerAction manager id action)
+      (when use-shortcut-of
+        (.addShortcut keymap
+                      id
+                      (first (.getShortcuts (.getShortcutSet (.getAction manager use-shortcut-of))))))
+      (when keyboard-shortcut
+        (let [k-shortcut (KeyboardShortcut. (KeyStroke/getKeyStroke ^String (:first keyboard-shortcut))
+                                            (some-> ^String (:second keyboard-shortcut) KeyStroke/getKeyStroke))]
+          (when (empty? (.getShortcuts keymap id))
+            (.addShortcut keymap id k-shortcut))
+          (when (:replace-all keyboard-shortcut)
+            (doseq [[conflict-action-id shortcuts] (.getConflicts keymap id k-shortcut)]
+              (doseq [shortcut shortcuts]
+                (.removeShortcut keymap conflict-action-id shortcut))))))
+      action)))
 
+(defn -runActivity [_this ^Project project]
+  (doseq [{:keys [name text args description use-shortcut-of keyboard-shortcut]} clojure-lsp-commands]
+    (register-command! :id name
+                       :project project
+                       :title text
+                       :description description
+                       :args args
+                       :icon Icons/CLOJURE
+                       :keyboard-shortcut keyboard-shortcut
+                       :use-shortcut-of use-shortcut-of))
   (action/register-group! :id "ClojureLSP.Refactors"
                           :popup true
                           :text "Clojure refactors"
                           :icon Icons/CLOJURE
                           :children (concat [{:type :add-to-group :group-id "RefactoringMenu" :anchor :first}]
-                                            (mapv (fn [{:keys [name]}] {:type :reference :ref (str "ClojureLSP." (csk/->PascalCase name))}) clojure-lsp-refactors)
+                                            (mapv (fn [{:keys [name]}] {:type :reference :ref name}) clojure-lsp-commands)
                                             [{:type :separator}]))
   (logger/info "Actions registered"))
