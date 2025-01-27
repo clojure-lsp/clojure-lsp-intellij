@@ -1,7 +1,5 @@
 (ns com.github.clojure-lsp.intellij.db
   (:refer-clojure :exclude [get-in assoc-in update-in])
-  (:require
-   [clojure.core.async :as async])
   (:import
    [com.github.clojure_lsp.intellij.extension SettingsState]
    [com.intellij.openapi.project Project]))
@@ -21,9 +19,6 @@
 
 (defonce db* (atom {:projects {}}))
 
-(defn empty-db? []
-  (empty? (:projects @db*)))
-
 (defn get-in
   ([project fields]
    (get-in project fields nil))
@@ -41,15 +36,6 @@
                                 (if (clojure.core/get-in projects [(.getBasePath project) :project])
                                   projects
                                   (update projects (.getBasePath project) #(merge (assoc empty-project :project project) %))))))
-
-(defn await-field [project field fn]
-  (async/thread
-    (loop []
-      (Thread/sleep 100)
-      (let [value (get-in project [field])]
-        (if value
-          (fn value)
-          (recur))))))
 
 (defn load-settings-from-state! [^Project project ^SettingsState settings-state]
   (update-in project [:settings] (fn [settings]

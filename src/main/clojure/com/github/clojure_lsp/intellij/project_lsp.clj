@@ -7,9 +7,6 @@
 
 (set! *warn-on-reflection* true)
 
-(defn project->root-uri ^String [^Project project]
-  (-> (.getBasePath project) io/file .toPath .toUri str))
-
 (defn clojure-project?
   "If a project file was not opened before, we didn't start the server yet,
    so we guess if it's Clojure project checking for common deps management files."

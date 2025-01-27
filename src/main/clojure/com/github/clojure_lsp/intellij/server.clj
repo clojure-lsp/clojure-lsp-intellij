@@ -1,7 +1,6 @@
 (ns com.github.clojure-lsp.intellij.server
   (:require
-   [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.clojure-lsp.intellij.workspace-edit])
+   [com.github.clojure-lsp.intellij.db :as db])
   (:import
    [com.intellij.openapi.project Project]
    [com.redhat.devtools.lsp4ij LanguageServerItem LanguageServerManager]))

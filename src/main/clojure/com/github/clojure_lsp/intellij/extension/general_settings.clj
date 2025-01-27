@@ -5,8 +5,6 @@
   (:require
    [clojure.pprint :as pprint]
    [clojure.string :as str]
-   [clojure.walk :as walk]
-   [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.config :as config]
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.server :as server]
@@ -95,11 +93,8 @@
                             :foreground (s.color/color 110 110 110)) "wrap"]]
                  (remove nil?)))))
 
-(defn ^:private server-info! [^Project project]
-  (some-> (lsp-client/connected-server project)
-          (lsp-client/request! [":clojure/serverInfo/raw" {}])
-          deref
-          walk/keywordize-keys))
+;; TODO
+(defn ^:private server-info! [^Project project])
 
 (defn -createComponent [_]
   (let [project (first (db/all-projects))
