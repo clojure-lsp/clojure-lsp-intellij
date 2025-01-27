@@ -53,7 +53,7 @@
         (recur (.getNextEntry stream))))))
 
 (defn ^:private download-server! [project indicator ^File download-path ^File server-version-path latest-version]
-  (tasks/set-progress indicator "LSP: Downloading clojure-lsp")
+  (tasks/set-progress indicator "Clojure LSP: downloading server")
   (let [platform (os-name)
         arch (os-arch)
         artifact-name (get-in artifacts [platform arch])
@@ -75,7 +75,6 @@
    project
    "Clojure LSP download"
    (fn [indicator]
-     (tasks/set-progress indicator "Clojure LSP: downloading server")
      (let [download-path (config/download-server-path)
            server-version-path (config/download-server-version-path)
            latest-version* (delay (try (string/trim (slurp latest-version-uri)) (catch Exception _ nil)))

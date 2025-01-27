@@ -5,7 +5,6 @@
   (:require
    [clojure.string :as string]
    [com.github.clojure-lsp.intellij.server :as server]
-   [com.github.ericdallo.clj4intellij.logger :as logger]
    [com.rpl.proxy-plus :refer [proxy+]])
   (:import
    [com.intellij.execution.configurations GeneralCommandLine]
@@ -26,12 +25,11 @@
                                  :path nil}))
 
 (defn -createConnectionProvider [_ ^Project _project]
-  (logger/info "---> connection" (:path @server))
-  (let [server-path (or (some-> ^File (:path @server)
-                                (.getCanonicalPath))
-                        "mocked-server-path")
+  (let [server-path (loop []
+                      (Thread/sleep 100)
+                      (or (some-> ^File (:path @server) .getCanonicalPath)
+                          (recur)))
         command [server-path "listen"]]
-    (logger/info "--------> starting" command)
     (doto (proxy+
            []
            OSProcessStreamConnectionProvider)
@@ -51,23 +49,19 @@
      (swap! server assoc :status status :path path)))
   (server/start! project))
 
-;; TODO client features
 (defn -createClientFeatures [_]
   (proxy+ [] LSPClientFeatures
     (isEnabled [_this ^VirtualFile file]
-      (logger/info "---> checking isEnabled")
-      (let [r (case (:status @server)
-                :installing
-                false
+      (case (:status @server)
+        :installing
+        false
 
-                :installed
-                true
+        :installed
+        true
 
-                :not-found
-                (do (install-server (.guessProjectForFile (ProjectLocator/getInstance) file))
-                    false))]
-        (logger/info "-----> isEnabled result" r)
-        r))
+        :not-found
+        (do (install-server (.guessProjectForFile (ProjectLocator/getInstance) file))
+            false)))
     (initializeParams [_ ^InitializeParams params]
       (.setWorkDoneToken params "clojure-lsp-startup")
       (.setInitializationOptions params {"dependency-scheme" "jar"

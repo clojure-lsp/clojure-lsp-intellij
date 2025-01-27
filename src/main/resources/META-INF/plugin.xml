@@ -11,7 +11,9 @@
               name="Clojure LSP"
               factoryClass="com.github.clojure_lsp.intellij.extension.LanguageServerFactory">
           <description><![CDATA[
-          Clojure LSP description TODO
+          <h3>Clojure LSP: The Clojure language server that provides features using static analysis.</h3>
+
+          <h4>For more details, check <a href="https://clojure-lsp.io">clojure-lsp.io</a></h4>
           ]]>
           </description>
       </server>
