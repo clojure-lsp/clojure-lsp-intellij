@@ -4,6 +4,7 @@
    :implements [com.intellij.openapi.startup.StartupActivity
                 com.intellij.openapi.project.DumbAware])
   (:require
+   [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.ericdallo.clj4intellij.action :as action]
    [com.github.ericdallo.clj4intellij.logger :as logger]
    [com.rpl.proxy-plus :refer [proxy+]])
@@ -12,9 +13,8 @@
    [com.intellij.openapi.actionSystem ActionManager AnActionEvent KeyboardShortcut]
    [com.intellij.openapi.keymap KeymapManager]
    [com.intellij.openapi.project Project]
-   [com.redhat.devtools.lsp4ij.commands CommandExecutor LSPCommandAction LSPCommandContext]
-   [javax.swing Icon KeyStroke]
-   [org.eclipse.lsp4j Command]))
+   [com.redhat.devtools.lsp4ij.commands LSPCommandAction]
+   [javax.swing Icon KeyStroke]))
 
 (set! *warn-on-reflection* true)
 
@@ -73,11 +73,8 @@
         keymap (.getActiveKeymap keymap-manager)
         action (proxy+ ClojureLSPCommand [] LSPCommandAction
                        (commandPerformed [_ _command ^AnActionEvent event]
-                                         (-> (CommandExecutor/executeCommand
-                                               (doto (LSPCommandContext. (Command. title id) project)
-                                                 (.setPreferredLanguageServerId "clojure-lsp")))
-                                             (.response)
-                                             )))]
+                         (lsp-client/execute-command id title)))]
+
     (.setText (.getTemplatePresentation action) ^String title)
     (.setIcon (.getTemplatePresentation action) ^Icon icon)
     (when-not (.getAction manager id)
