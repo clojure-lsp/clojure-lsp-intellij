@@ -3,6 +3,7 @@
    :name com.github.clojure_lsp.intellij.extension.LanguageServerFactory
    :implements [com.redhat.devtools.lsp4ij.LanguageServerFactory])
   (:require
+   [clojure.string :as string]
    [com.github.clojure-lsp.intellij.server :as server]
    [com.github.ericdallo.clj4intellij.logger :as logger]
    [com.rpl.proxy-plus :refer [proxy+]])
@@ -10,6 +11,7 @@
    [com.intellij.execution.configurations GeneralCommandLine]
    [com.intellij.openapi.project Project ProjectLocator]
    [com.intellij.openapi.vfs VirtualFile]
+   [com.redhat.devtools.lsp4ij LSPIJUtils]
    [com.redhat.devtools.lsp4ij.client LanguageClientImpl]
    [com.redhat.devtools.lsp4ij.client.features LSPClientFeatures]
    [com.redhat.devtools.lsp4ij.server OSProcessStreamConnectionProvider]
@@ -69,4 +71,9 @@
     (initializeParams [_ ^InitializeParams params]
       (.setWorkDoneToken params "clojure-lsp-startup")
       (.setInitializationOptions params {"dependency-scheme" "jar"
-                                         "hover" {"arity-on-same-line?" true}}))))
+                                         "hover" {"arity-on-same-line?" true}}))
+    (findFileByUri [_ ^String uri]
+      (if (and (string/starts-with? uri "file:")
+               (string/includes? uri ".jar!"))
+        (LSPIJUtils/findResourceFor (string/replace-first uri "file:" "jar:file:"))
+        (LSPIJUtils/findResourceFor uri)))))
