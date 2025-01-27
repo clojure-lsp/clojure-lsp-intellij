@@ -5,7 +5,6 @@
   (:require
    [com.github.clojure-lsp.intellij.server :as server]
    [com.github.ericdallo.clj4intellij.logger :as logger]
-   [com.github.ericdallo.clj4intellij.tasks :as tasks]
    [com.rpl.proxy-plus :refer [proxy+]])
   (:import
    [com.intellij.execution.configurations GeneralCommandLine]
@@ -14,16 +13,27 @@
    [com.redhat.devtools.lsp4ij.client LanguageClientImpl]
    [com.redhat.devtools.lsp4ij.client.features LSPClientFeatures]
    [com.redhat.devtools.lsp4ij.server OSProcessStreamConnectionProvider]
+   [java.io File]
+   [java.util List]
    [org.eclipse.lsp4j InitializeParams]
    [org.eclipse.lsp4j.services LanguageServer]))
 
 (set! *warn-on-reflection* true)
 
-(defn -createConnectionProvider [_ ^Project project]
-  (doto (proxy+
-         []
-         OSProcessStreamConnectionProvider)
-    (.setCommandLine (GeneralCommandLine. ["/home/greg/dev/clojure-lsp/clojure-lsp" "listen"]))))
+(defonce ^:private server (atom {:status :not-found
+                                 :path nil}))
+
+(defn -createConnectionProvider [_ ^Project _project]
+  (logger/info "---> connection" (:path @server))
+  (let [server-path (or (some-> ^File (:path @server)
+                                (.getCanonicalPath))
+                        "mocked-server-path")
+        command [server-path "listen"]]
+    (logger/info "--------> starting" command)
+    (doto (proxy+
+           []
+           OSProcessStreamConnectionProvider)
+      (.setCommandLine (GeneralCommandLine. ^List command)))))
 
 (defn -createLanguageClient [_ ^Project project]
   (LanguageClientImpl. project))
@@ -31,35 +41,31 @@
 ;; TODO custom server methods
 (defn -getServerInterface [_] LanguageServer)
 
-(defonce ^:private server (atom {:status :not-found}))
-
 (defn ^:private install-server [project]
   (swap! server assoc :status :installing)
-  (tasks/run-background-task!
+  (server/install-server
    project
-   "Installing clojure-lsp"
-   (fn [indicator]
-     (tasks/set-progress indicator "Clojure LSP: downloading server")
-     (Thread/sleep 5000) ;; Simulate download server
-
-     (swap! server assoc :status :installed)
-     (server/start-server! project))))
+   (fn [{:keys [status path]}]
+     (swap! server assoc :status status :path path)))
+  (server/start! project))
 
 ;; TODO client features
 (defn -createClientFeatures [_]
   (proxy+ [] LSPClientFeatures
     (isEnabled [_this ^VirtualFile file]
-      (logger/info "-----> isEnabled" @server)
-      (case (:status @server)
-        :installing
-        false
+      (logger/info "---> checking isEnabled")
+      (let [r (case (:status @server)
+                :installing
+                false
 
-        :installed
-        true
+                :installed
+                true
 
-        :not-found
-        (do (install-server (.guessProjectForFile (ProjectLocator/getInstance) file))
-            false)))
+                :not-found
+                (do (install-server (.guessProjectForFile (ProjectLocator/getInstance) file))
+                    false))]
+        (logger/info "-----> isEnabled result" r)
+        r))
     (initializeParams [_ ^InitializeParams params]
       (.setWorkDoneToken params "clojure-lsp-startup")
       (.setInitializationOptions params {"dependency-scheme" "jar"

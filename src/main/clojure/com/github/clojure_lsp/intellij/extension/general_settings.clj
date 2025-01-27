@@ -87,7 +87,7 @@
                                                        :listen [:action (fn [_]
                                                                           (doseq [project (db/all-projects)]
                                                                             (server/shutdown! project)
-                                                                            (server/start-server! project)))]) "wrap"]]) "span"]
+                                                                            (server/start! project)))]) "wrap"]]) "span"]
                   [(s/label :text "*  requires LSP restart"
                             :font (s.font/font  :size 14)
                             :foreground (s.color/color 110 110 110)) "wrap"]]

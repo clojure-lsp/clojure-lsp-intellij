@@ -56,7 +56,7 @@
    DumbAwareAction
     (actionPerformed [_ _event]
       (server/shutdown! project)
-      (server/start-server! project))))
+      (server/start! project))))
 
 (defn ^:private status-bar-title [project]
   (str "Clojure LSP: " (name (lsp-client/server-status project))))
