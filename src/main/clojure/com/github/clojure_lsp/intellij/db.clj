@@ -10,7 +10,6 @@
   {:status :disconnected
    :downloaded-server-path nil
    :server-process nil
-   :server nil
    :project nil
    :diagnostics {}
    :settings {:trace-level "off"

@@ -13,6 +13,6 @@
 
 (defn execute-command [^String name ^String text ^Project project]
   (-> (CommandExecutor/executeCommand
-        (doto (LSPCommandContext. (Command. text name) project)
-          (.setPreferredLanguageServerId "clojure-lsp")))
+       (doto (LSPCommandContext. (Command. text name) project)
+         (.setPreferredLanguageServerId "clojure-lsp")))
       (.response)))

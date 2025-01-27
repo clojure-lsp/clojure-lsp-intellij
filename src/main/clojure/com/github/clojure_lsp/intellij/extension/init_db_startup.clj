@@ -10,7 +10,7 @@
   (:import
    [com.github.clojure_lsp.intellij.extension SettingsState]
    [com.intellij.openapi.project Project]
-   [com.redhat.devtools.lsp4ij LanguageServerManager LanguageServerWrapper]
+   [com.redhat.devtools.lsp4ij LanguageServerWrapper]
    [com.redhat.devtools.lsp4ij.lifecycle LanguageServerLifecycleListener LanguageServerLifecycleManager]))
 
 (set! *warn-on-reflection* true)
@@ -25,9 +25,6 @@
      (handleStatusChanged [_ ^LanguageServerWrapper server-wrapper]
        (let [status (keyword (.toString (.getServerStatus server-wrapper)))]
          (db/assoc-in project [:status] status)
-         (when (= :started status)
-           (db/assoc-in project [:server] (.getLanguageServer (LanguageServerManager/getInstance project)
-                                                              "clojure-lsp")))
          (run! #(% status) (db/get-in project [:on-status-changed-fns]))))
      (handleLSPMessage [_ _ _ _])
      (handleError [_ _ _])

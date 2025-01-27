@@ -1,18 +1,12 @@
 (ns com.github.clojure-lsp.intellij.server
-  (:require
-   [com.github.clojure-lsp.intellij.db :as db])
   (:import
    [com.intellij.openapi.project Project]
-   [com.redhat.devtools.lsp4ij LanguageServerItem LanguageServerManager]))
+   [com.redhat.devtools.lsp4ij LanguageServerManager]))
 
 (set! *warn-on-reflection* true)
 
 (defn start-server! [^Project project]
-  (when-let [item ^LanguageServerItem @(db/get-in project [:server])]
-    (when-let [server ^LanguageServerManager (.getServer item)]
-      (.start server "clojure-lsp"))))
+  (.start (LanguageServerManager/getInstance project) "clojure-lsp"))
 
 (defn shutdown! [^Project project]
-  (when-let [item ^LanguageServerItem @(db/get-in project [:server])]
-    (when-let [server ^LanguageServerManager (.getServer item)]
-      (.stop server "clojure-lsp"))))
+  (.stop (LanguageServerManager/getInstance project) "clojure-lsp"))
