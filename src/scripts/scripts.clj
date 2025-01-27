@@ -1,7 +1,10 @@
 (ns scripts
   (:require
+   [babashka.fs :as fs]
    [babashka.tasks :refer [shell]]
    [clojure.string :as string]))
+
+(def version-regex #"pluginVersion = ([0-9]+.[0-9]+.[0-9]+.*)")
 
 (defn ^:private replace-in-file [file regex content]
   (as-> (slurp file) $
@@ -17,7 +20,7 @@
 
 (defn ^:private replace-tag [tag]
   (replace-in-file "gradle.properties"
-                   #"pluginVersion = [0-9]+.[0-9]+.[0-9]+.*"
+                   version-regex
                    (format "pluginVersion = %s" tag)))
 
 #_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
@@ -35,6 +38,17 @@
 #_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
 (defn build-plugin []
   (shell "./gradlew buildPlugin"))
+
+#_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
+(defn install-plugin [& [intellij-plugins-path]]
+  (if-not intellij-plugins-path
+    (println "Specify the Intellij plugins path\ne.g: bb install-plugin /home/greg/.local/share/JetBrains/IdeaIC2024.3")
+    (let [version (last (re-find version-regex (slurp "gradle.properties")))]
+      (build-plugin)
+      (fs/unzip (format "./build/distributions/clojure-lsp-%s.zip" version)
+                intellij-plugins-path
+                {:replace-existing true})
+      (println "Installed!"))))
 
 #_{:clj-kondo/ignore [:clojure-lsp/unused-public-var]}
 (defn publish-plugin []
