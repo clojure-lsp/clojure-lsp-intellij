@@ -4,7 +4,7 @@
 
 or
 
-`./gradlew buildPlugin` to build the plugin, then install it from disk in Intellij, the zip should be on `./build/distributions/*.zip`.
+`bb install-plugin` to build and install the plugin.
 
 ## NREPL
 

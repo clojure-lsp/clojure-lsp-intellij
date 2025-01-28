@@ -1,0 +1,29 @@
+name: Publish plugin
+
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+*'
+
+jobs:
+  publish-plugin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      - name: Install Babashka
+        uses: DeLaGuardo/setup-clojure@master
+        with:
+          bb: '1.12.196'
+
+      - name: Publish to Jetbrains
+        env:
+          JETBRAINS_TOKEN: ${{ secrets.JETBRAINS_TOKEN }}
+        run: bb publish-plugin
