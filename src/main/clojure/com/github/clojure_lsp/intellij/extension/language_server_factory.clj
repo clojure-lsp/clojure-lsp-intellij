@@ -8,11 +8,12 @@
    [com.rpl.proxy-plus :refer [proxy+]])
   (:import
    [com.intellij.execution.configurations GeneralCommandLine]
+   [com.intellij.openapi.progress ProgressIndicator]
    [com.intellij.openapi.project Project ProjectLocator]
    [com.intellij.openapi.vfs VirtualFile]
    [com.redhat.devtools.lsp4ij LSPIJUtils]
    [com.redhat.devtools.lsp4ij.client LanguageClientImpl]
-   [com.redhat.devtools.lsp4ij.client.features LSPClientFeatures]
+   [com.redhat.devtools.lsp4ij.client.features LSPClientFeatures LSPProgressFeature]
    [com.redhat.devtools.lsp4ij.server OSProcessStreamConnectionProvider]
    [java.io File]
    [java.util List]
@@ -50,24 +51,28 @@
      (server/start! project))))
 
 (defn -createClientFeatures [_]
-  (proxy+ [] LSPClientFeatures
-    (isEnabled [_this ^VirtualFile file]
-      (case (:status @server)
-        :installing
-        false
+  (doto
+   (proxy+ [] LSPClientFeatures
+     (isEnabled [_this ^VirtualFile file]
+       (case (:status @server)
+         :installing
+         false
 
-        :installed
-        true
+         :installed
+         true
 
-        :not-found
-        (do (install-server (.guessProjectForFile (ProjectLocator/getInstance) file))
-            false)))
-    (initializeParams [_ ^InitializeParams params]
-      (.setWorkDoneToken params "clojure-lsp-startup")
-      (.setInitializationOptions params {"dependency-scheme" "jar"
-                                         "hover" {"arity-on-same-line?" true}}))
-    (findFileByUri [_ ^String uri]
-      (if (and (string/starts-with? uri "file:")
-               (string/includes? uri ".jar!"))
-        (LSPIJUtils/findResourceFor (string/replace-first uri "file:" "jar:file:"))
-        (LSPIJUtils/findResourceFor uri)))))
+         :not-found
+         (do (install-server (.guessProjectForFile (ProjectLocator/getInstance) file))
+             false)))
+     (initializeParams [_ ^InitializeParams params]
+       (.setWorkDoneToken params "clojure-lsp-startup")
+       (.setInitializationOptions params {"dependency-scheme" "jar"
+                                          "hover" {"arity-on-same-line?" true}}))
+     (findFileByUri [_ ^String uri]
+       (if (and (string/starts-with? uri "file:")
+                (string/includes? uri ".jar!"))
+         (LSPIJUtils/findResourceFor (string/replace-first uri "file:" "jar:file:"))
+         (LSPIJUtils/findResourceFor uri))))
+    (.setProgressFeature (proxy+ [] LSPProgressFeature
+                           (updateMessage [_ ^String message ^ProgressIndicator indicator]
+                             (.setText indicator (str "LSP: " message)))))))
