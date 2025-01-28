@@ -46,8 +46,8 @@
   (server/install-server
    project
    (fn [{:keys [status path]}]
-     (swap! server assoc :status status :path path)))
-  (server/start! project))
+     (swap! server assoc :status status :path path)
+     (server/start! project))))
 
 (defn -createClientFeatures [_]
   (proxy+ [] LSPClientFeatures
