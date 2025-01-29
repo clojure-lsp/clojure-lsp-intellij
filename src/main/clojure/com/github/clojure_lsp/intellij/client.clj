@@ -3,6 +3,7 @@
    [com.intellij.openapi.project Project]
    [com.redhat.devtools.lsp4ij LanguageServerManager]
    [com.redhat.devtools.lsp4ij.commands CommandExecutor LSPCommandContext]
+   [java.util List]
    [org.eclipse.lsp4j Command]))
 
 (set! *warn-on-reflection* true)
@@ -11,8 +12,9 @@
   (when-let [manager (LanguageServerManager/getInstance project)]
     (keyword (.toString (.getServerStatus manager "clojure-lsp")))))
 
-(defn execute-command [^String name ^String text ^Project project]
+(defn execute-command [^String name ^String text ^List args ^Project project]
   (-> (CommandExecutor/executeCommand
-       (doto (LSPCommandContext. (Command. text name) project)
+       (doto (LSPCommandContext. (Command. text name args) project)
          (.setPreferredLanguageServerId "clojure-lsp")))
-      (.response)))
+      (.response)
+      deref))
