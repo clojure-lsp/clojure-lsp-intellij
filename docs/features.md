@@ -1,6 +1,6 @@
 # Features
 
-This plugin relies on clojure-lsp features, so most work is done there, for more detailed information about all clojure-lsp features, check the [server documentation](https://clojure-lsp.io/features/).
+This plugin relies on clojure-lsp features and lsp4ij, so most work is done there, for more detailed information about all clojure-lsp features, check the [server documentation](https://clojure-lsp.io/features/).
 
 ### Find a function/var definition
 
@@ -10,13 +10,13 @@ This plugin relies on clojure-lsp features, so most work is done there, for more
 
 ### Find all references of a function, var, keyword or namespace alias
 
-> <kbd>Alt</kbd> + <kbd>F7</kbd>
+> <kbd>Ctrl/Cmd</kbd> <kbd>Alt</kbd> + <kbd>H</kbd>
 
 ![](../images/find-references.png)
 
 ### Find all implementations of a defmulti or defprotocol
 
-> <kbd>Ctrl/Cmd</kbd> + <kbd>Alt</kbd> + <kbd>B</kbd>
+> <kbd>Ctrl/Cmd</kbd> + <kbd>Alt</kbd> + <kbd>G</kbd>
 
 ![](../images/find-implementations.png)
 
