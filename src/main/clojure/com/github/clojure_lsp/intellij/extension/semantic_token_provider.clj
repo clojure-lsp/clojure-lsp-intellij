@@ -10,6 +10,8 @@
    [java.util List]
    [org.eclipse.lsp4j SemanticTokenModifiers SemanticTokenTypes]))
 
+(set! *warn-on-reflection* true)
+
 (def ^:private default-provider (DefaultSemanticTokensColorsProvider.))
 
 (defn ^:private modifier? [modifier token-modifiers]
@@ -35,4 +37,4 @@
     SemanticTokenTypes/Type SemanticTokensHighlightingColors/STATIC_PROPERTY
     SemanticTokenTypes/Variable SemanticTokensHighlightingColors/READONLY_VARIABLE
     SemanticTokenTypes/Keyword SemanticTokensHighlightingColors/NUMBER
-    (.getTextAttributesKey default-provider token-type token-modifiers psi-file)))
+    (.getTextAttributesKey ^DefaultSemanticTokensColorsProvider default-provider token-type token-modifiers psi-file)))
