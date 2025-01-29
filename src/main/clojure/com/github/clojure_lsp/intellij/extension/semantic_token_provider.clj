@@ -21,14 +21,16 @@
    (doto (.clone (.getDefaultAttributes text-attribute-key))
      (.setFontType Font/BOLD))))
 
-(def ^:private bold-function-declaration
+(defn ^:private bold-function-declaration* []
   (make-bold SemanticTokensHighlightingColors/FUNCTION_DECLARATION))
+
+(def ^:private bold-function-declaration (memoize bold-function-declaration*))
 
 (defn -getTextAttributesKey [_ ^String token-type ^List token-modifiers ^PsiFile psi-file]
   (condp = token-type
     SemanticTokenTypes/Namespace SemanticTokensHighlightingColors/STATIC_PROPERTY
     SemanticTokenTypes/Function (if (modifier? SemanticTokenModifiers/Definition token-modifiers)
-                                  bold-function-declaration
+                                  (bold-function-declaration)
                                   SemanticTokensHighlightingColors/MACRO)
     SemanticTokenTypes/Type SemanticTokensHighlightingColors/STATIC_PROPERTY
     SemanticTokenTypes/Variable SemanticTokensHighlightingColors/READONLY_VARIABLE
