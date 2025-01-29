@@ -15,7 +15,7 @@
 (defn ^:private modifier? [modifier token-modifiers]
   (some #(= modifier %) token-modifiers))
 
-(defn make-bold [^TextAttributesKey text-attribute-key]
+(defn ^:private make-bold [^TextAttributesKey text-attribute-key]
   (TextAttributesKey/createTextAttributesKey
    (str (.getExternalName text-attribute-key) "_BOLD")
    (doto (.clone (.getDefaultAttributes text-attribute-key))
