@@ -18,8 +18,7 @@
    [com.redhat.devtools.lsp4ij.server OSProcessStreamConnectionProvider]
    [java.io File]
    [java.util List]
-   [org.eclipse.lsp4j InitializeParams]
-   [org.eclipse.lsp4j.services LanguageServer]))
+   [org.eclipse.lsp4j InitializeParams]))
 
 (set! *warn-on-reflection* true)
 
@@ -40,8 +39,8 @@
 (defn -createLanguageClient [_ ^Project project]
   (LanguageClientImpl. project))
 
-;; TODO custom server methods
-(defn -getServerInterface [_] LanguageServer)
+(defn -getServerInterface [_]
+  com.github.clojure_lsp.intellij.ClojureLanguageServer)
 
 (defn ^:private install-server [project]
   (swap! server assoc :status :installing)

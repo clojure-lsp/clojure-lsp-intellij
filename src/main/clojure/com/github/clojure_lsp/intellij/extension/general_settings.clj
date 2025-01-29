@@ -5,6 +5,7 @@
   (:require
    [clojure.pprint :as pprint]
    [clojure.string :as str]
+   [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.config :as config]
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.server :as server]
@@ -14,7 +15,6 @@
    [seesaw.mig :as s.mig])
   (:import
    [com.github.clojure_lsp.intellij.extension SettingsState]
-   [com.intellij.openapi.project Project]
    [com.intellij.ui IdeBorderFactory]
    [java.awt Toolkit]
    [java.awt.datatransfer StringSelection]))
@@ -93,12 +93,9 @@
                             :foreground (s.color/color 110 110 110)) "wrap"]]
                  (remove nil?)))))
 
-;; TODO
-(defn ^:private server-info! [^Project project])
-
 (defn -createComponent [_]
   (let [project (first (db/all-projects))
-        server-info (server-info! project)
+        server-info (lsp-client/server-info project)
         component (build-component server-info (db/get-in project [:settings]))]
     (reset! component* component)
     component))
