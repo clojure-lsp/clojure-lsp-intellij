@@ -4,6 +4,7 @@
    :implements [com.redhat.devtools.lsp4ij.LanguageServerFactory])
   (:require
    [clojure.string :as string]
+   [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.server :as server]
    [com.rpl.proxy-plus :refer [proxy+]])
   (:import
@@ -62,7 +63,8 @@
          true
 
          :not-found
-         (do (install-server (.guessProjectForFile (ProjectLocator/getInstance) file))
+         (do (install-server (or (.guessProjectForFile (ProjectLocator/getInstance) file)
+                                 (first (db/all-projects))))
              false)))
      (initializeParams [_ ^InitializeParams params]
        (.setWorkDoneToken params "clojure-lsp-startup")
