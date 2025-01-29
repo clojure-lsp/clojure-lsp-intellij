@@ -17,8 +17,10 @@
           ]]>
           </description>
       </server>
-
       <languageMapping language="clojure" serverId="clojure-lsp"/>
+      <semanticTokensColorsProvider
+          serverId="clojure-lsp"
+          class="com.github.clojure_lsp.intellij.extension.ClojureSemanticTokensColorsProvider" />
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
