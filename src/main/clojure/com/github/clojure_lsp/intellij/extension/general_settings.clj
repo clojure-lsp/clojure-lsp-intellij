@@ -118,7 +118,7 @@
 
 (defn -reset [_]
   (let [project (first (db/all-projects))
-        server-info (server-info! project)
+        server-info (lsp-client/server-info project)
         trace-level-combo-box (db/get-in project [:settings :trace-level])
         server-log-path (or (db/get-in project [:settings :log-path]) (:log-path server-info))
         server-path (or (db/get-in project [:settings :server-path]) (.getCanonicalPath (config/download-server-path)))]
