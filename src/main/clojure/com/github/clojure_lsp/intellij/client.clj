@@ -23,6 +23,12 @@
                (into {})
                walk/keywordize-keys))))
 
+(defn dependency-contents [^String uri ^Project project]
+  (when-let [manager (LanguageServerManager/getInstance project)]
+    (when-let [server (.getServer ^LanguageServerItem @(.getLanguageServer manager "clojure-lsp"))]
+      (some->> (.dependencyContents ^ClojureLanguageServer server {"uri" uri})
+               deref))))
+
 (defn execute-command [^String name ^String text ^List args ^Project project]
   (-> (CommandExecutor/executeCommand
        (doto (LSPCommandContext. (Command. text name args) project)

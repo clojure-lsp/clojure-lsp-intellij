@@ -3,15 +3,18 @@
    :name com.github.clojure_lsp.intellij.extension.LanguageServerFactory
    :implements [com.redhat.devtools.lsp4ij.LanguageServerFactory])
   (:require
+   [clojure.java.io :as io]
    [clojure.string :as string]
-   [com.github.clojure-lsp.intellij.db :as db]
+   [com.github.clojure-lsp.intellij.client :as lsp-client]
+   [com.github.clojure-lsp.intellij.config :as config]
+   [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.clojure-lsp.intellij.server :as server]
    [com.rpl.proxy-plus :refer [proxy+]])
   (:import
    [com.intellij.execution.configurations GeneralCommandLine]
    [com.intellij.openapi.progress ProgressIndicator]
-   [com.intellij.openapi.project Project ProjectLocator]
-   [com.intellij.openapi.vfs VirtualFile]
+   [com.intellij.openapi.project Project]
+   [com.intellij.openapi.vfs LocalFileSystem VirtualFile]
    [com.redhat.devtools.lsp4ij LSPIJUtils]
    [com.redhat.devtools.lsp4ij.client LanguageClientImpl]
    [com.redhat.devtools.lsp4ij.client.features LSPClientFeatures LSPProgressFeature]
@@ -50,6 +53,41 @@
      (swap! server assoc :status status :path path)
      (server/start! project))))
 
+(defn ^:private create-temp-file ^VirtualFile
+  [^Project project ^String path ^String text]
+  (let [temp-file (io/file (config/project-cache-path project) path)]
+    (io/make-parents temp-file)
+    (spit temp-file text)
+    (proxy+ [] VirtualFile
+      (getName [_] (.getName temp-file))
+      (getFileSystem [_] (LocalFileSystem/getInstance))
+      (getPath [_] (.getCanonicalPath temp-file))
+      (isWritable [_] false)
+      (isDirectory [_] false)
+      (isValid [_] true)
+      (getParent [_] nil)
+      (getChildren [_] [])
+      (contentsToByteArray [_] (.getBytes text))
+      (getTimeStamp [_] 0)
+      (getLength [_] (count (.getBytes text)))
+      (refresh [_ _ _ _])
+      (getInputStream [_] (io/input-stream temp-file))
+      (getOutputStream [_ _ _ _] (io/output-stream temp-file))
+      (getModificationStamp [_] -1))))
+
+(defn ^:private find-file-by-uri [^String uri]
+  (if (and (string/starts-with? uri "file:")
+           (string/includes? uri ".jar!"))
+    (let [fixed-uri (string/replace-first uri "file:" "jar:file:")
+          old-vfile (LSPIJUtils/findResourceFor fixed-uri)
+          project (editor/guess-project-for old-vfile)
+          dependency-contents (lsp-client/dependency-contents fixed-uri project)
+          jar-pattern (re-pattern (str "^(jar|zip):(file:.+)!" (System/getProperty "file.separator") "(.+)"))
+          path  (last (re-find jar-pattern fixed-uri))
+          tmp-file (create-temp-file project path dependency-contents)]
+      tmp-file)
+    (LSPIJUtils/findResourceFor uri)))
+
 (defn -createClientFeatures [_]
   (doto
    (proxy+ [] LSPClientFeatures
@@ -62,18 +100,14 @@
          true
 
          :not-found
-         (do (install-server (or (.guessProjectForFile (ProjectLocator/getInstance) file)
-                                 (first (db/all-projects))))
+         (do (install-server (editor/guess-project-for file))
              false)))
      (initializeParams [_ ^InitializeParams params]
        (.setWorkDoneToken params "clojure-lsp-startup")
        (.setInitializationOptions params {"dependency-scheme" "jar"
                                           "hover" {"arity-on-same-line?" true}}))
-     (findFileByUri [_ ^String uri]
-       (if (and (string/starts-with? uri "file:")
-                (string/includes? uri ".jar!"))
-         (LSPIJUtils/findResourceFor (string/replace-first uri "file:" "jar:file:"))
-         (LSPIJUtils/findResourceFor uri))))
+     (findFileByUri ^VirtualFile [_ ^String uri]
+       (find-file-by-uri uri)))
     (.setProgressFeature (proxy+ [] LSPProgressFeature
                            (updateMessage [_ ^String message ^ProgressIndicator indicator]
                              (.setText indicator (str "LSP: " message)))))))

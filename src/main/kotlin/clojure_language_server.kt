@@ -6,6 +6,9 @@ import java.util.concurrent.CompletableFuture
 
 interface ClojureLanguageServer : LanguageServer {
 
+    @JsonRequest("clojure/dependencyContents")
+    fun dependencyContents(params: Any): CompletableFuture<String>
+
     @JsonRequest("clojure/serverInfo/raw")
-    fun serverInfo(): CompletableFuture<Object>
+    fun serverInfo(): CompletableFuture<Any>
 }
