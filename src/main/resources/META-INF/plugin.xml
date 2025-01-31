@@ -5,6 +5,9 @@
 
     <depends>com.intellij.modules.platform</depends>
 
+    <incompatible-with>org.jetbrains.idea.clojure</incompatible-with>
+    <incompatible-with>com.cursiveclojure.cursive</incompatible-with>
+
     <extensions defaultExtensionNs="com.intellij">
         <fileType name="clojure" language="clojure" extensions="clj;cljs;cljc;cljd;edn;bb;clj_kondo"
                   implementationClass="com.github.clojure_lsp.intellij.ClojureFileType" fieldName="INSTANCE"/>
