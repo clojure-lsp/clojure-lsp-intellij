@@ -1,6 +1,7 @@
 (ns com.github.clojure-lsp.intellij.client
   (:require
-   [clojure.walk :as walk])
+   [clojure.walk :as walk]
+   [com.github.clojure-lsp.intellij.client :as lsp-client])
   (:import
    [com.github.clojure_lsp.intellij ClojureLanguageServer]
    [com.intellij.openapi.project Project]
@@ -16,12 +17,13 @@
     (keyword (.toString (.getServerStatus manager "clojure-lsp")))))
 
 (defn server-info [^Project project]
-  (when-let [manager (LanguageServerManager/getInstance project)]
-    (when-let [server (.getServer ^LanguageServerItem @(.getLanguageServer manager "clojure-lsp"))]
-      (some->> (.serverInfo ^ClojureLanguageServer server)
-               deref
-               (into {})
-               walk/keywordize-keys))))
+  (when (identical? :started (lsp-client/server-status project))
+    (when-let [manager (LanguageServerManager/getInstance project)]
+      (when-let [server (.getServer ^LanguageServerItem @(.getLanguageServer manager "clojure-lsp"))]
+        (some->> (.serverInfo ^ClojureLanguageServer server)
+                 deref
+                 (into {})
+                 walk/keywordize-keys)))))
 
 (defn dependency-contents [^String uri ^Project project]
   (when-let [manager (LanguageServerManager/getInstance project)]
