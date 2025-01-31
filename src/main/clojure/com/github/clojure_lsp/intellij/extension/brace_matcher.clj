@@ -4,7 +4,6 @@
    :implements [com.intellij.lang.PairedBraceMatcher])
   (:import
    [com.github.clojure_lsp.intellij ClojureTokens]
-   [com.github.clojure_lsp.intellij.language.psi ClojureTypes]
    [com.intellij.lang BracePair]
    [com.intellij.psi.tree IElementType]))
 
@@ -15,13 +14,7 @@
 
 (defn -isPairedBracesAllowedBeforeType
   [_ _ ^IElementType context-type]
-  (or (not context-type)
-      (.contains ClojureTokens/WHITESPACES context-type)
-      (.contains ClojureTokens/COMMENTS context-type)
-      (= ClojureTypes/C_COMMA context-type)
-      (= ClojureTypes/C_PAREN2 context-type)
-      (= ClojureTypes/C_BRACE2 context-type)
-      (= ClojureTypes/C_BRACKET2 context-type)))
+  (not context-type))
 
 (defn -getCodeConstructStart [_ _psi-file opening-brace-offset]
   opening-brace-offset)

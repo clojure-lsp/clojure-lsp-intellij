@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix brace matcher to insert closing brace for some missing cases.
+
 ## 2.6.4
 
 - Fix shortcuts not being added after 2.6.3.
