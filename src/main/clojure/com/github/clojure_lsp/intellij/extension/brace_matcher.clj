@@ -14,7 +14,7 @@
 
 (defn -isPairedBracesAllowedBeforeType
   [_ _ ^IElementType context-type]
-  (not context-type))
+  (boolean context-type))
 
 (defn -getCodeConstructStart [_ _psi-file opening-brace-offset]
   opening-brace-offset)
