@@ -5,10 +5,8 @@
                 com.intellij.openapi.project.DumbAware])
   (:require
    [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.ericdallo.clj4intellij.logger :as logger]
    [com.rpl.proxy-plus :refer [proxy+]])
   (:import
-   [com.github.clojure_lsp.intellij.extension SettingsState]
    [com.intellij.openapi.project Project]
    [com.redhat.devtools.lsp4ij LanguageServerWrapper]
    [com.redhat.devtools.lsp4ij.lifecycle LanguageServerLifecycleListener LanguageServerLifecycleManager]))
@@ -17,8 +15,6 @@
 
 (defn -runActivity [_this ^Project project]
   (db/init-db-for-project project)
-  (db/load-settings-from-state! project (SettingsState/get))
-  (logger/info "Loaded settings to memory:" (db/get-in project [:settings]))
   (.addLanguageServerLifecycleListener
    (LanguageServerLifecycleManager/getInstance project)
    (proxy+ [] LanguageServerLifecycleListener

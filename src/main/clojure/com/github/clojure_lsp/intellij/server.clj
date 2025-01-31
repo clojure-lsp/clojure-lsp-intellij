@@ -6,6 +6,7 @@
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.notification :as notification]
    [com.github.clojure-lsp.intellij.server :as server]
+   [com.github.clojure-lsp.intellij.settings :as settings]
    [com.github.ericdallo.clj4intellij.logger :as logger]
    [com.github.ericdallo.clj4intellij.tasks :as tasks])
   (:import
@@ -78,7 +79,7 @@
      (let [download-path (config/download-server-path)
            server-version-path (config/download-server-version-path)
            latest-version* (delay (try (string/trim (slurp latest-version-uri)) (catch Exception _ nil)))
-           custom-server-path (db/get-in project [:settings :server-path])]
+           custom-server-path (settings/server-path)]
        (cond
          custom-server-path
          (installed-fn {:status :installed :path custom-server-path})

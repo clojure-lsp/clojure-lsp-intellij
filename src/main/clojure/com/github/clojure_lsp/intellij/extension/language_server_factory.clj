@@ -9,6 +9,7 @@
    [com.github.clojure-lsp.intellij.config :as config]
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.clojure-lsp.intellij.server :as server]
+   [com.github.clojure-lsp.intellij.settings :as settings]
    [com.rpl.proxy-plus :refer [proxy+]])
   (:import
    [com.intellij.execution.configurations GeneralCommandLine]
@@ -31,7 +32,8 @@
 (defn -createConnectionProvider [_ ^Project _project]
   (let [server-path (loop []
                       (Thread/sleep 100)
-                      (or (some-> ^File (:path @server) .getCanonicalPath)
+                      (or (settings/server-path)
+                          (some-> ^File (:path @server) .getCanonicalPath)
                           (recur)))
         command [server-path "listen"]]
     (doto (proxy+
