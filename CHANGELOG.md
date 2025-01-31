@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Fix brace matcher to insert closing brace for some missing cases.
+- Add imcompatible tag with Cursive and Clojure-Kit plugins.
 
 ## 2.6.4
 
