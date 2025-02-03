@@ -85,9 +85,11 @@
           project (editor/guess-project-for old-vfile)
           dependency-contents (lsp-client/dependency-contents fixed-uri project)
           jar-pattern (re-pattern (str "^(jar|zip):(file:.+)!" (System/getProperty "file.separator") "(.+)"))
-          path  (last (re-find jar-pattern fixed-uri))
-          tmp-file (create-temp-file project path dependency-contents)]
-      tmp-file)
+          path (last (re-find jar-pattern fixed-uri))
+          _tmp-file (create-temp-file project path dependency-contents)]
+      ;; TODO fix support for clojure/dependencyContents
+      #_tmp-file
+      (LSPIJUtils/findResourceFor fixed-uri))
     (LSPIJUtils/findResourceFor uri)))
 
 (defn -createClientFeatures [_]
