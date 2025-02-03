@@ -11,12 +11,21 @@
    [com.github.ericdallo.clj4intellij.action :as action]
    [com.github.ericdallo.clj4intellij.logger :as logger]
    [com.github.ericdallo.clj4intellij.tasks :as tasks]
-   [com.github.ericdallo.clj4intellij.util :as util])
+   [com.github.ericdallo.clj4intellij.util :as util]
+   [com.rpl.proxy-plus :refer [proxy+]])
   (:import
    [com.github.clojure_lsp.intellij Icons]
-   [com.intellij.openapi.actionSystem AnActionEvent CommonDataKeys]
+   [com.google.gson JsonPrimitive]
+   [com.intellij.openapi.actionSystem
+    ActionManager
+    ActionUpdateThread
+    AnActionEvent
+    CommonDataKeys]
    [com.intellij.openapi.editor Editor]
-   [com.intellij.openapi.project Project]))
+   [com.intellij.openapi.project Project]
+   [com.redhat.devtools.lsp4ij LanguageServerManager]
+   [com.redhat.devtools.lsp4ij.commands LSPCommand LSPCommandAction]
+   [com.redhat.devtools.lsp4ij.usages LSPUsageType LSPUsagesManager LocationData]))
 
 (set! *warn-on-reflection* true)
 
@@ -76,6 +85,29 @@
        (fn [_]
          (lsp-client/execute-command command-name text [(editor/editor->uri editor) line character] project))))))
 
+(defn register-command!
+  [& {:keys [id on-performed]}]
+  (let [manager (ActionManager/getInstance)
+        action (proxy+ [] LSPCommandAction
+                 (commandPerformed [_ command event] (on-performed command event))
+                 (getCommandPerformedThread [_] ActionUpdateThread/EDT))]
+    (when-not (.getAction manager id)
+      (.registerAction manager id action)
+      action)))
+
+(defn ^:private code-lens-references-performed [^Project project ^LSPCommand command ^AnActionEvent event]
+  (let [uri (.getAsString ^JsonPrimitive (.getArgumentAt command 0))
+        line (dec (.getAsInt ^JsonPrimitive (.getArgumentAt command 1)))
+        character (dec (.getAsInt ^JsonPrimitive (.getArgumentAt command 2)))
+        references (lsp-client/references uri line character project)
+        language-server @(.getLanguageServer (LanguageServerManager/getInstance project) "clojure-lsp")]
+    (.findShowUsagesInPopup
+     (LSPUsagesManager/getInstance project)
+     (mapv #(LocationData. % language-server) references)
+     LSPUsageType/References
+     (.getDataContext event)
+     (.getInputEvent event))))
+
 (defn -runActivity [_this ^Project project]
   (doseq [{:keys [name text description use-shortcut-of keyboard-shortcut]} clojure-lsp-commands]
     (action/register-action! :id (str "ClojureLSP." (csk/->PascalCase name))
@@ -85,6 +117,8 @@
                              :keyboard-shortcut keyboard-shortcut
                              :use-shortcut-of use-shortcut-of
                              :on-performed (partial on-action-performed name text project)))
+  (register-command! :id "code-lens-references"
+                     :on-performed (partial code-lens-references-performed project))
   (action/register-group! :id "ClojureLSP.Refactors"
                           :popup true
                           :text "Clojure refactors"
