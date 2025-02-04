@@ -70,17 +70,25 @@ This plugin relies on clojure-lsp features and lsp4ij, so most work is done ther
 
 > <kbd>Alt</kbd> + <kbd>]</kbd>
 
+![](../images/paredit-slurp-forward.gif)
+
 ##### Forward barf
 
 > <kbd>Alt</kbd> + <kbd>[</kbd>
+
+![](../images/paredit-barf-forward.gif)
 
 ##### Backward slurp
 
 > <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>]</kbd>
 
+![](../images/paredit-slurp-backward.gif)
+
 ##### Backward barf
 
 > <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>[</kbd>
+
+![](../images/paredit-barf-backward.gif)
 
 ##### Raise sexpr
 
