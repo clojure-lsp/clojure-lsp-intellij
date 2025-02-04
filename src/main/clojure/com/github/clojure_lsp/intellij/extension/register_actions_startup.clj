@@ -77,7 +77,7 @@
    {:name "kill-sexp" :text "Kill sexpr" :description "Kill current sexpr (Paredit)" :keyboard-shortcut {:first "alt K" :replace-all true}}])
 
 (defn ^:private on-action-performed [command-name text project ^AnActionEvent event]
-  (when-let [editor ^Editor (.getData event CommonDataKeys/EDITOR)]
+  (when-let [editor ^Editor (.getData event CommonDataKeys/EDITOR_EVEN_IF_INACTIVE)]
     (let [[line character] (util/editor->cursor-position editor)]
       (tasks/run-background-task!
        project
@@ -129,4 +129,7 @@
   (logger/info "Actions registered"))
 
 (comment
-  (-runActivity nil (first (db/all-projects))))
+  (do
+    (.unregisterAction (ActionManager/getInstance) "ClojureLSP.ForwardSlurp")
+    (.unregisterAction (ActionManager/getInstance) "ClojureLSP.ForwardBarf")
+    (-runActivity nil (first (db/all-projects)))))

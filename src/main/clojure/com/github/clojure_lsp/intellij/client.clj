@@ -47,8 +47,11 @@
               deref))))
 
 (defn execute-command [^String name ^String text ^List args ^Project project]
-  (-> (CommandExecutor/executeCommand
-        (doto (LSPCommandContext. (Command. text name args) project)
-          (.setPreferredLanguageServerId "clojure-lsp")))
-      (.response)
-      deref))
+  (try
+    (-> (CommandExecutor/executeCommand
+         (doto (LSPCommandContext. (Command. text name args) project)
+           (.setPreferredLanguageServerId "clojure-lsp")))
+        (.response)
+        deref)
+    (catch Exception e
+      (logger/error "Error appllying command" name (with-out-str (.printStackTrace e))))))
