@@ -10,13 +10,13 @@ This plugin relies on clojure-lsp features and lsp4ij, so most work is done ther
 
 ### Find all references of a function, var, keyword or namespace alias
 
-> <kbd>Ctrl/Cmd</kbd> <kbd>Alt</kbd> + <kbd>H</kbd>
+> <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>h</kbd>
 
 ![](../images/find-references.png)
 
 ### Find all implementations of a defmulti or defprotocol
 
-> <kbd>Ctrl/Cmd</kbd> + <kbd>Alt</kbd> + <kbd>G</kbd>
+> <kbd>Ctrl/Cmd</kbd> + <kbd>Alt</kbd> + <kbd>g</kbd>
 
 ![](../images/find-implementations.png)
 
