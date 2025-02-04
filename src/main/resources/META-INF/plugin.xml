@@ -52,6 +52,7 @@
             implementationClass="com.redhat.devtools.lsp4ij.features.signatureHelp.LSPParameterInfoHandler"/>
         <lang.psiStructureViewFactory
             language="clojure"
+            order="first"
             implementationClass="com.redhat.devtools.lsp4ij.features.documentSymbol.LSPDocumentSymbolStructureViewFactory"/>
         <callHierarchyProvider
             language="clojure"

@@ -56,6 +56,12 @@ This plugin relies on clojure-lsp features and lsp4ij, so most work is done ther
 
 ![](../images/call-hierarchy.png)
 
+### Document symbols
+
+> <kbd>Ctrl/Cmd</kbd> + <kbd>F12</kbd>
+
+![](../images/document-symbols.png)
+
 ### Wizard to create new Clojure projects
 
 ![](../images/wizard.png)
