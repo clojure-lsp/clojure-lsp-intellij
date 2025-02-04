@@ -94,6 +94,10 @@ This plugin relies on clojure-lsp features and lsp4ij, so most work is done ther
 
 > <kbd>Alt</kbd> + <kbd>r</kbd>
 
+![](../images/paredit-raise.gif)
+
 ##### Kill sexpr
 
 > <kbd>Alt</kbd> + <kbd>k</kbd>
+
+![](../images/paredit-kill.gif)
