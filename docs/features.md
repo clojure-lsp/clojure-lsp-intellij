@@ -60,7 +60,7 @@ This plugin relies on clojure-lsp features and lsp4ij, so most work is done ther
 
 ![](../images/code-actions.png)
 
-#### Clean namespaces
+#### Clean namespaces (Organize/Optimize imports)
 
 > <kbd>Ctrl/Cmd</kbd> + <kbd>Alt</kbd> + <kbd>o</kbd>
 
