@@ -57,6 +57,10 @@
         <callHierarchyProvider
             language="clojure"
             implementationClass="com.redhat.devtools.lsp4ij.features.callHierarchy.LSPCallHierarchyProvider" />
+        <codeBlockProvider
+            language="clojure"
+            implementationClass="com.redhat.devtools.lsp4ij.features.codeBlockProvider.LSPCodeBlockProvider"
+            order="first"/>
 
         <!-- misc -->
         <moduleBuilder builderClass="com.github.clojure_lsp.intellij.extension.ClojureModuleBuilder"/>
