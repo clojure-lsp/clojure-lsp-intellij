@@ -4,6 +4,8 @@
 
 - Fix brace matcher to insert closing brace for some missing cases.
 - Add imcompatible tag with Cursive and Clojure-Kit plugins.
+- Integrate with lsp4ij, a LSP client plugin, removing lots of logics to this plugin and fixing multiple bugs and issues.
+- Drop support for older intellijs, supporting 2023.3 onwards.
 
 ## 2.6.4
 
