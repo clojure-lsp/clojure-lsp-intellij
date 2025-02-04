@@ -50,6 +50,12 @@ This plugin relies on clojure-lsp features and lsp4ij, so most work is done ther
 
 > <kbd>Ctrl/Cmd</kbd> + <kbd>Alt</kbd> + <kbd>l</kbd>
 
+### Call hierarchy
+
+> <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>h</kbd>
+
+![](../images/call-hierarchy.png)
+
 ### Wizard to create new Clojure projects
 
 ![](../images/wizard.png)

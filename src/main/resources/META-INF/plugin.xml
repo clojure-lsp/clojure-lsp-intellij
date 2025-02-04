@@ -53,6 +53,9 @@
         <lang.psiStructureViewFactory
             language="clojure"
             implementationClass="com.redhat.devtools.lsp4ij.features.documentSymbol.LSPDocumentSymbolStructureViewFactory"/>
+        <callHierarchyProvider
+            language="clojure"
+            implementationClass="com.redhat.devtools.lsp4ij.features.callHierarchy.LSPCallHierarchyProvider" />
 
         <!-- misc -->
         <moduleBuilder builderClass="com.github.clojure_lsp.intellij.extension.ClojureModuleBuilder"/>
