@@ -8,9 +8,7 @@
 (def ^:private empty-project
   {:status :disconnected
    :downloaded-server-path nil
-   :server-process nil
    :project nil
-   :diagnostics {}
    :on-status-changed-fns []})
 
 (defonce db* (atom {:projects {}}))
