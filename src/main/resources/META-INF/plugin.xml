@@ -37,8 +37,8 @@
 
         <!-- Features -->
         <postStartupActivity implementation="com.github.ericdallo.clj4intellij.extension.NREPLStartup"/>
-        <postStartupActivity implementation="com.github.clojure_lsp.intellij.extension.InitDBStartup"/>
-        <postStartupActivity implementation="com.github.clojure_lsp.intellij.extension.RegisterActionsStartup"/>
+        <postStartupActivity id="clojure-lsp-init-db" implementation="com.github.clojure_lsp.intellij.extension.InitDBStartup"/>
+        <postStartupActivity order="after clojure-lsp-init-db" implementation="com.github.clojure_lsp.intellij.extension.RegisterActionsStartup"/>
         <statusBarWidgetFactory
             id="ClojureLSPStatusBar"
             displayName="Clojure LSP"

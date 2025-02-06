@@ -60,7 +60,7 @@
   (or (= key ClojureColors/FN_ARGUMENT)
       (= key ClojureColors/LET_BINDING)))
 
-(defn -getDisplayName [_] "clojure")
+(defn -getDisplayName [_] "Clojure")
 
 (defn -getIcon [_] Icons/CLOJURE)
 
