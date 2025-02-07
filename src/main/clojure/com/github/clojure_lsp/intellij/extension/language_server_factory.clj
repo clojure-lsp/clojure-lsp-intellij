@@ -7,6 +7,7 @@
    [clojure.string :as string]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.config :as config]
+   [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.clojure-lsp.intellij.server :as server]
    [com.github.clojure-lsp.intellij.settings :as settings]
@@ -16,7 +17,7 @@
    [com.intellij.openapi.progress ProgressIndicator]
    [com.intellij.openapi.project Project]
    [com.intellij.openapi.vfs LocalFileSystem VirtualFile]
-   [com.redhat.devtools.lsp4ij LSPIJUtils]
+   [com.redhat.devtools.lsp4ij LSPIJUtils ServerStatus]
    [com.redhat.devtools.lsp4ij.client LanguageClientImpl]
    [com.redhat.devtools.lsp4ij.client.features LSPClientFeatures LSPProgressFeature]
    [com.redhat.devtools.lsp4ij.server OSProcessStreamConnectionProvider]
@@ -111,7 +112,12 @@
        (.setInitializationOptions params {"dependency-scheme" "jar"
                                           "hover" {"arity-on-same-line?" true}}))
      (findFileByUri ^VirtualFile [_ ^String uri]
-       (find-file-by-uri uri)))
+       (find-file-by-uri uri))
+     (keepServerAlive [_] true)
+     (handleServerStatusChanged [^LSPClientFeatures this ^ServerStatus server-status]
+       (let [status (keyword (.toString server-status))]
+         (db/assoc-in (.getProject this) [:status] status)
+         (run! #(% status) (db/get-in (.getProject this) [:on-status-changed-fns])))))
     (.setProgressFeature (proxy+ [] LSPProgressFeature
                            (updateMessage [_ ^String message ^ProgressIndicator indicator]
                              (.setText indicator (str "LSP: " message)))))))
