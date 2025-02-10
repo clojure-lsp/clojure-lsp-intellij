@@ -18,7 +18,6 @@
 <p align="center">
   <a href="https://clojure-lsp.io"><strong>homepage</strong></a> •
   <a href="docs/features.md"><strong>features</strong></a> •
-  <a href="docs/capabilities.md"><strong>capabilities</strong></a> •
   <a href="docs/developing.md"><strong>developing</strong></a> •
   <!-- <a href="https://clojure-lsp.io/settings"><strong>settings</strong></a> • -->
   <a href="docs/troubleshooting.md"><strong>troubleshooting</strong></a> •
@@ -30,7 +29,7 @@
 
 IntelliJ is the only mainstream editor without a plugin with good, free, and dedicated support for LSP, there are already excellent plugins for Clojure like [Cursive](https://cursive-ide.com/) which provides lots of features with REPL support or [ClojureKit](https://github.com/gregsh/Clojure-Kit) which adds basic Clojure support for the language, but none uses clojure-lsp or follows the LSP standard which some users may prefer as [some features](https://clojure-lsp.io/features/) are only available in clojure-lsp.
 
-Keep in mind that this plugin provides only LSP features relying on clojure-lsp (and clj-kondo under the hood) static analysis, so no runtime features exist, like REPL integration or support, for that a separated plugin is needed as it's not possible to use only the REPL part of other plugins like Cursive together with this plugin.
+Keep in mind that this plugin provides only LSP features relying on clojure-lsp (and clj-kondo under the hood) static analysis, so no runtime features exist, like REPL integration or support, for that a separated plugin like [clojure-repl-intellij](https://github.com/afucher/clojure-repl-intellij) is recommended as it's not possible to use only the REPL part of other plugins like Cursive together with this plugin.
 
 Also, this plugin does not use official IntelliJ's LSP support yet for 2 reasons:
   - It's only available for Ultimate Edition (paid edition), making this plugin only available for those editions.

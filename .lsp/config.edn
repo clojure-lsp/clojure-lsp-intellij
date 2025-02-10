@@ -1,1 +1,5 @@
-{:cljfmt {:indents {proxy+ [[:block 2] [:inner 1]]}}}
+{:cljfmt {:indents {proxy+ [[:block 2] [:inner 1]]}}
+ :project-specs [{:classpath-cmd ["./gradlew" "-q" "classpath"]
+                  :project-path "build.gradle.kts"}
+                 {:classpath-cmd ["clojure" "-Spath"]
+                  :project-path "deps.edn"}]}
