@@ -1,6 +1,6 @@
 # Features
 
-This plugin relies on clojure-lsp features and lsp4ij, so most work is done there, for more detailed information about all clojure-lsp features, check the [server documentation](https://clojure-lsp.io/features/).
+This plugin relies on [clojure-lsp](https://clojure-lsp.io/) features and [lsp4ij](https://github.com/redhat-developer/lsp4ij), so most work is done there, for more detailed information about all clojure-lsp features, check the [server documentation](https://clojure-lsp.io/features/).
 
 ### Find a function/var definition
 
