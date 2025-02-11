@@ -1,6 +1,6 @@
 # Features
 
-This plugin relies on clojure-lsp features, so most work is done there, for more detailed information about all clojure-lsp features, check the [server documentation](https://clojure-lsp.io/features/).
+This plugin relies on [clojure-lsp](https://clojure-lsp.io/) features and [lsp4ij](https://github.com/redhat-developer/lsp4ij), so most work is done there, for more detailed information about all clojure-lsp features, check the [server documentation](https://clojure-lsp.io/features/).
 
 ### Find a function/var definition
 
@@ -10,13 +10,13 @@ This plugin relies on clojure-lsp features, so most work is done there, for more
 
 ### Find all references of a function, var, keyword or namespace alias
 
-> <kbd>Alt</kbd> + <kbd>F7</kbd>
+> <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>h</kbd>
 
 ![](../images/find-references.png)
 
 ### Find all implementations of a defmulti or defprotocol
 
-> <kbd>Ctrl/Cmd</kbd> + <kbd>Alt</kbd> + <kbd>B</kbd>
+> <kbd>Ctrl/Cmd</kbd> + <kbd>Alt</kbd> + <kbd>g</kbd>
 
 ![](../images/find-implementations.png)
 
@@ -50,6 +50,18 @@ This plugin relies on clojure-lsp features, so most work is done there, for more
 
 > <kbd>Ctrl/Cmd</kbd> + <kbd>Alt</kbd> + <kbd>l</kbd>
 
+### Call hierarchy
+
+> <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>h</kbd>
+
+![](../images/call-hierarchy.png)
+
+### Document symbols
+
+> <kbd>Ctrl/Cmd</kbd> + <kbd>F12</kbd>
+
+![](../images/document-symbols.png)
+
 ### Wizard to create new Clojure projects
 
 ![](../images/wizard.png)
@@ -60,7 +72,7 @@ This plugin relies on clojure-lsp features, so most work is done there, for more
 
 ![](../images/code-actions.png)
 
-#### Clean namespaces
+#### Clean namespaces (Organize/Optimize imports)
 
 > <kbd>Ctrl/Cmd</kbd> + <kbd>Alt</kbd> + <kbd>o</kbd>
 
@@ -70,22 +82,34 @@ This plugin relies on clojure-lsp features, so most work is done there, for more
 
 > <kbd>Alt</kbd> + <kbd>]</kbd>
 
+![](../images/paredit-slurp-forward.gif)
+
 ##### Forward barf
 
 > <kbd>Alt</kbd> + <kbd>[</kbd>
+
+![](../images/paredit-barf-forward.gif)
 
 ##### Backward slurp
 
 > <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>]</kbd>
 
+![](../images/paredit-slurp-backward.gif)
+
 ##### Backward barf
 
 > <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>[</kbd>
+
+![](../images/paredit-barf-backward.gif)
 
 ##### Raise sexpr
 
 > <kbd>Alt</kbd> + <kbd>r</kbd>
 
+![](../images/paredit-raise.gif)
+
 ##### Kill sexpr
 
 > <kbd>Alt</kbd> + <kbd>k</kbd>
+
+![](../images/paredit-kill.gif)

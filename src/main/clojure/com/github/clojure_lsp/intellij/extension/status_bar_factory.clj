@@ -1,6 +1,5 @@
 (ns com.github.clojure-lsp.intellij.extension.status-bar-factory
   (:gen-class
-   :post-init post-init
    :name com.github.clojure_lsp.intellij.extension.StatusBarFactory
    :implements [com.intellij.openapi.wm.StatusBarWidgetFactory])
   (:require
@@ -24,7 +23,8 @@
    [com.intellij.ui.awt RelativePoint]
    [com.intellij.util Consumer]
    [java.awt Point]
-   [java.awt.event MouseEvent]))
+   [java.awt.event MouseEvent]
+   [kotlinx.coroutines CoroutineScope]))
 
 (set! *warn-on-reflection* true)
 
@@ -50,46 +50,47 @@
     (.updateWidget status-bar widget-id)
     (.updateWidget ^StatusBarWidgetsManager (.getService project StatusBarWidgetsManager) factory)))
 
-(defn -post-init [this]
-  (swap! db/db* update :on-status-changed-fns conj (fn [project _status]
-                                                     (refresh-status-bar this project))))
-
 (defn ^:private restart-lsp-action [^Project project]
   (proxy+
    ["Restart server"]
    DumbAwareAction
     (actionPerformed [_ _event]
       (server/shutdown! project)
-      (server/start-server! project))))
+      (server/start! project))))
 
 (defn ^:private status-bar-title [project]
-  (str "Clojure LSP: " (name (db/get-in project [:status] "disconnected"))))
+  (str "Clojure LSP: " (name (lsp-client/server-status project))))
 
-(defn -createWidget ^StatusBarWidget [_this ^Project project]
-  (proxy+
-   []
-   StatusBarWidget
-    (ID [_] widget-id)
-    (dispose [_])
-    (install [_ _])
-    (getPresentation [this] this)
-    StatusBarWidget$IconPresentation
-    (getClickConsumer [_]
-      (reify Consumer
-        (consume [_ e]
-          (let [component (.getComponent ^MouseEvent e)
-                popup (.createActionGroupPopup
-                       (JBPopupFactory/getInstance)
-                       (status-bar-title project)
-                       (doto (DefaultActionGroup.)
-                         (.add (restart-lsp-action project)))
-                       (.getDataContext (DataManager/getInstance) component)
-                       JBPopupFactory$ActionSelectionAid/SPEEDSEARCH
-                       true)]
-            (.show popup (RelativePoint. component (Point. 0 (-> popup .getContent .getPreferredSize .getHeight -)))))
-          true)))
-    (getTooltipText [_] (status-bar-title project))
-    (getIcon [_]
-      (if (lsp-client/connected-client project)
-        Icons/STATUS_CONNECTED
-        Icons/STATUS_DISCONNECTED))))
+(defn -createWidget ^StatusBarWidget
+  ([this ^Project project ^CoroutineScope _]
+   (-createWidget this project))
+  ([this ^Project project]
+   (db/update-in project [:on-status-changed-fns] #(conj % (fn [_status]
+                                                             (refresh-status-bar this project))))
+   (proxy+
+    []
+    StatusBarWidget
+     (ID [_] widget-id)
+     (dispose [_])
+     (install [_ _])
+     (getPresentation [this] this)
+     StatusBarWidget$IconPresentation
+     (getClickConsumer [_]
+       (reify Consumer
+         (consume [_ e]
+           (let [component (.getComponent ^MouseEvent e)
+                 popup (.createActionGroupPopup
+                        (JBPopupFactory/getInstance)
+                        (status-bar-title project)
+                        (doto (DefaultActionGroup.)
+                          (.add (restart-lsp-action project)))
+                        (.getDataContext (DataManager/getInstance) component)
+                        JBPopupFactory$ActionSelectionAid/SPEEDSEARCH
+                        true)]
+             (.show popup (RelativePoint. component (Point. 0 (-> popup .getContent .getPreferredSize .getHeight -)))))
+           true)))
+     (getTooltipText [_] (status-bar-title project))
+     (getIcon [_]
+       (if (= :started (lsp-client/server-status project))
+         Icons/STATUS_CONNECTED
+         Icons/STATUS_DISCONNECTED)))))

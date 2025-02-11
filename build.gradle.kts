@@ -23,20 +23,13 @@ repositories {
 }
 
 dependencies {
-    implementation ("org.clojure:clojure:1.11.1")
+    implementation ("org.clojure:clojure:1.12.0")
     implementation ("com.github.ericdallo:clj4intellij:0.5.4")
     implementation ("seesaw:seesaw:1.5.0")
     implementation ("camel-snake-kebab:camel-snake-kebab:0.4.3")
-    implementation ("babashka:process:0.5.18")
-    implementation ("com.github.clojure-lsp:lsp4clj:1.9.3")
-    implementation ("org.clojure:core.async:1.5.648") {
-        because("issue https://clojure.atlassian.net/browse/ASYNC-248")
-    }
-    implementation ("com.github.clojure-lsp:clojure-lsp:2024.03.01-11.37.51") {
-        exclude("org.clojure", "core.async")
-    }
     implementation ("com.rpl:proxy-plus:0.0.9")
-    implementation ("markdown-clj:markdown-clj:1.12.1")
+    implementation ("dev.weavejester:cljfmt:0.13.0")
+    implementation ("com.github.clojure-lsp:clojure-lsp:2025.01.22-23.28.23")
 }
 
 sourceSets {
@@ -70,16 +63,22 @@ changelog {
 }
 
 java {
-    targetCompatibility = JavaVersion.VERSION_11
-    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.register("classpath") {
+    doFirst {
+        println(sourceSets["main"].compileClasspath.asPath)
+    }
 }
 
 tasks {
     compileKotlin {
         kotlinOptions {
-            jvmTarget = "11"
-            apiVersion = "1.5"
-            languageVersion = "1.5"
+            jvmTarget = "17"
+            apiVersion = "1.9"
+            languageVersion = "1.9"
             freeCompilerArgs = listOf("-Xjvm-default=all")
         }
     }
