@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 3.0.0
+
 - Fix brace matcher to insert closing brace for some missing cases.
 - Add imcompatible tag with Cursive and Clojure-Kit plugins.
 - Integrate with lsp4ij, a LSP client plugin, removing lots of logics from this plugin and fixing multiple bugs and issues. Fixes #63, #61, #59, #57, #53, #36, #21, #9, #5
