@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-- Bump clj4intellij to 0.6.2.
+- Bump clj4intellij to 0.6.3.
 
 ## 3.0.0
 

@@ -24,7 +24,7 @@ repositories {
 
 dependencies {
     implementation ("org.clojure:clojure:1.12.0")
-    implementation ("com.github.ericdallo:clj4intellij:0.6.2")
+    implementation ("com.github.ericdallo:clj4intellij:0.6.3")
     implementation ("seesaw:seesaw:1.5.0")
     implementation ("camel-snake-kebab:camel-snake-kebab:0.4.3")
     implementation ("com.rpl:proxy-plus:0.0.9")
