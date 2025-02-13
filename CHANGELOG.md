@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Bump clj4intellij to 0.6.1.
+
 ## 3.0.0
 
 - Fix brace matcher to insert closing brace for some missing cases.
