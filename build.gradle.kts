@@ -1,17 +1,28 @@
 import org.jetbrains.changelog.markdownToHTML
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.time.Duration
+import java.time.temporal.ChronoUnit
+import java.util.regex.Pattern
 
-fun properties(key: String) = project.findProperty(key).toString()
+fun properties(key: String) = providers.gradleProperty(key)
+fun environment(key: String) = providers.environmentVariable(key)
+fun prop(name: String): String {
+    return properties(name).get()
+}
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.9.0"
+    id("org.jetbrains.kotlin.jvm") version "1.9.10"
     id("dev.clojurephant.clojure") version "0.7.0"
     id("org.jetbrains.intellij") version "1.17.4"
     id("org.jetbrains.changelog") version "1.3.1"
     id("org.jetbrains.grammarkit") version "2021.2.2"
 }
 
-group = properties("pluginGroup")
-version = properties("pluginVersion")
+group = prop("pluginGroup")
+version = prop("pluginVersion")
 
 repositories {
     mavenLocal()
@@ -45,16 +56,26 @@ sourceSets {
     }
 }
 
-// Useful to override another IC platforms from env
-val platformVersion = System.getenv("PLATFORM_VERSION") ?: properties("platformVersion")
-val platformPlugins = System.getenv("PLATFORM_PLUGINS") ?: properties("platformPlugins")
-
 intellij {
-    pluginName.set(properties("pluginName"))
-    version.set(platformVersion)
-    type.set(properties("platformType"))
-    plugins.set(platformPlugins.split(',').map(String::trim).filter(String::isNotEmpty))
+    pluginName.set(prop("pluginName"))
+    version.set(prop("platformVersion"))
+    type.set(prop("platformType"))
     updateSinceUntilBuild.set(false)
+
+    val platformPlugins =  ArrayList<Any>()
+    val localLsp4ij = file("../lsp4ij/build/idea-sandbox/plugins/LSP4IJ").absoluteFile
+    if (localLsp4ij.isDirectory) {
+        // In case Gradle fails to build because it can't find some missing jar, try deleting
+        // ~/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/unzipped.com.jetbrains.plugins/com.redhat.devtools.lsp4ij*
+        platformPlugins.add(localLsp4ij)
+    } else {
+        // When running on CI or when there's no local lsp4ij
+        val latestLsp4ijNightlyVersion = fetchLatestLsp4ijNightlyVersion()
+        platformPlugins.add("com.redhat.devtools.lsp4ij:$latestLsp4ijNightlyVersion@nightly")
+    }
+    //Uses `platformPlugins` property from the gradle.properties file.
+    platformPlugins.addAll(properties("platformPlugins").map { it.split(',').map(String::trim).filter(String::isNotEmpty) }.get())
+    plugins.set(platformPlugins)
 }
 
 changelog {
@@ -84,7 +105,7 @@ tasks {
     }
 
     wrapper {
-        gradleVersion = properties("gradleVersion")
+        gradleVersion = prop("gradleVersion")
     }
 
     patchPluginXml {
@@ -107,13 +128,13 @@ tasks {
         // Get the latest available change notes from the changelog file
         changeNotes.set(provider {
             changelog.run {
-                getOrNull(properties("pluginVersion")) ?: getLatest()
+                getOrNull(prop("pluginVersion")) ?: getLatest()
             }.toHTML()
         })
     }
 
     runPluginVerifier {
-        ideVersions.set(properties("pluginVerifierIdeVersions").split(',').map(String::trim).filter(String::isNotEmpty))
+        ideVersions.set(prop("pluginVerifierIdeVersions").split(',').map(String::trim).filter(String::isNotEmpty))
     }
 
     // Configure UI tests plugin
@@ -170,4 +191,28 @@ clojure.builds.named("main") {
     checkAll()
     aotAll()
     reflection.set("fail")
+}
+
+fun fetchLatestLsp4ijNightlyVersion(): String {
+    val client = HttpClient.newBuilder().build();
+    var onlineVersion = ""
+    try {
+        val request: HttpRequest = HttpRequest.newBuilder()
+            .uri(URI("https://plugins.jetbrains.com/api/plugins/23257/updates?channel=nightly&size=1"))
+            .GET()
+            .timeout(Duration.of(10, ChronoUnit.SECONDS))
+            .build()
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        val pattern = Pattern.compile("\"version\":\"([^\"]+)\"")
+        val matcher = pattern.matcher(response.body())
+        if (matcher.find()) {
+            onlineVersion = matcher.group(1)
+            println("Latest approved nightly build: $onlineVersion")
+        }
+    } catch (e:Exception) {
+        println("Failed to fetch LSP4IJ nightly build version: ${e.message}")
+    }
+
+    val minVersion = "0.0.1-20231213-012910"
+    return if (minVersion < onlineVersion) onlineVersion else minVersion
 }
