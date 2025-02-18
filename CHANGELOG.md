@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Improve server installation fixing concurrency bugs + using lsp4ij install API.
+
 ## 3.0.1
 
 - Bump clj4intellij to 0.6.3.
