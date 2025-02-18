@@ -7,7 +7,8 @@
    [com.github.clojure-lsp.intellij.notification :as notification]
    [com.github.clojure-lsp.intellij.server :as server]
    [com.github.clojure-lsp.intellij.settings :as settings]
-   [com.github.ericdallo.clj4intellij.logger :as logger])
+   [com.github.ericdallo.clj4intellij.logger :as logger]
+   [com.github.ericdallo.clj4intellij.tasks :as tasks])
   (:import
    [com.intellij.openapi.project Project]
    [com.intellij.openapi.project Project]
@@ -52,7 +53,8 @@
           (clojure.java.io/copy stream dest-file))
         (recur (.getNextEntry stream))))))
 
-(defn ^:private download-server! [project ^File download-path ^File server-version-path latest-version]
+(defn ^:private download-server! [project indicator ^File download-path ^File server-version-path latest-version]
+  (tasks/set-progress indicator "LSP: downloading clojure-lsp")
   (let [platform (os-name)
         arch (os-arch)
         artifact-name (get-in artifacts [platform arch])
@@ -69,37 +71,34 @@
     (db/assoc-in project [:downloaded-server-path] dest-path)
     (logger/info "Downloaded clojure-lsp to" dest-path)))
 
-(defn server-install-status []
-  (let [download-path (config/download-server-path)
-        server-version-path (config/download-server-version-path)
-        latest-version* (delay (try (string/trim (slurp latest-version-uri)) (catch Exception _ nil)))
-        custom-server-path (settings/server-path)]
-    (cond
-      custom-server-path
-      {:status :installed :path custom-server-path}
+(defn install-server [project installed-fn]
+  (tasks/run-background-task!
+   project
+   "LSP: install clojure-lsp"
+   (fn [indicator]
+     (let [download-path (config/download-server-path)
+           server-version-path (config/download-server-version-path)
+           latest-version* (delay (try (string/trim (slurp latest-version-uri)) (catch Exception _ nil)))
+           custom-server-path (settings/server-path)]
+       (cond
+         custom-server-path
+         (installed-fn {:status :installed :path custom-server-path})
 
-      (and (.exists download-path)
-           (or (not @latest-version*) ;; on network connection issues we use any downloaded server
-               (= (try (slurp server-version-path) (catch Exception _ :error-checking-local-version))
-                  @latest-version*)))
-      {:status :installed :path download-path}
+         (and (.exists download-path)
+              (or (not @latest-version*) ;; on network connection issues we use any downloaded server
+                  (= (try (slurp server-version-path) (catch Exception _ :error-checking-local-version))
+                     @latest-version*)))
+         (installed-fn {:status :installed :path download-path})
 
-      @latest-version*
-      {:status :not-installed :path download-path :version @latest-version* :version-path server-version-path}
+         @latest-version*
+         (do (download-server! project indicator download-path server-version-path @latest-version*)
+             (installed-fn {:status :installed :path download-path}))
 
-      :else
-      {:status :error})))
-
-(defn install-server! [project]
-  (let [{:keys [status path version version-path]} (server-install-status)]
-    (case status
-      :installed path
-      :not-installed (do (download-server! project path version-path version)
-                         path)
-      (notification/show-notification! {:project project
-                                        :type :error
-                                        :title "Clojure LSP download error"
-                                        :message "There is no server downloaded and there was a network issue to download the latest one"}))))
+         :else
+         (notification/show-notification! {:project project
+                                           :type :error
+                                           :title "Clojure LSP download error"
+                                           :message "There is no server downloaded and there was a network issue to download the latest one"}))))))
 
 (defn start! [^Project project]
   (.start (LanguageServerManager/getInstance project) "clojure-lsp"))
