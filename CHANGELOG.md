@@ -4,7 +4,6 @@
 
 - Bump clj4intellij to 0.6.3.
 - Improve server installation fixing concurrency bugs + using lsp4ij install API.
-- Fix code lens references not working when more than a project is opened. #67
 
 ## 3.0.0
 
