@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix Settings page exception when more than a project was opened and closed.
+
 ## 3.0.1
 
 - Bump clj4intellij to 0.6.3.

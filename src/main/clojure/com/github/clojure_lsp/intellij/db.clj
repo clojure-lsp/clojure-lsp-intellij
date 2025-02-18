@@ -32,5 +32,9 @@
                                   (update projects (.getBasePath project) #(merge (assoc empty-project :project project) %))))))
 
 (defn all-projects []
-  (remove nil?
-          (mapv :project (vals (:projects @db*)))))
+  (->> @db*
+       :projects
+       vals
+       (mapv :project)
+       (remove nil?)
+       (remove #(.isDisposed %))))
