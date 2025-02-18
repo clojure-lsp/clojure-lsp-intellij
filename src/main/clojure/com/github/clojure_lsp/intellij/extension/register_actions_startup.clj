@@ -95,8 +95,9 @@
       (.registerAction manager id action)
       action)))
 
-(defn ^:private code-lens-references-performed [^Project project ^LSPCommand command ^AnActionEvent event]
-  (let [uri (.getAsString ^JsonPrimitive (.getArgumentAt command 0))
+(defn ^:private code-lens-references-performed [^LSPCommand command ^AnActionEvent event]
+  (let [project (.getProject event)
+        uri (.getAsString ^JsonPrimitive (.getArgumentAt command 0))
         line (dec (.getAsInt ^JsonPrimitive (.getArgumentAt command 1)))
         character (dec (.getAsInt ^JsonPrimitive (.getArgumentAt command 2)))
         references (lsp-client/references uri line character project)
@@ -118,7 +119,7 @@
                              :use-shortcut-of use-shortcut-of
                              :on-performed (partial on-action-performed name text project)))
   (register-command! :id "code-lens-references"
-                     :on-performed (partial code-lens-references-performed project))
+                     :on-performed #'code-lens-references-performed)
   (action/register-group! :id "ClojureLSP.Refactors"
                           :popup true
                           :text "Clojure refactors"
