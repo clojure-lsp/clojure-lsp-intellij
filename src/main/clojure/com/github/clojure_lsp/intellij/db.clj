@@ -37,4 +37,4 @@
        vals
        (mapv :project)
        (remove nil?)
-       (remove #(.isDisposed %))))
+       (remove #(.isDisposed ^Project %))))
