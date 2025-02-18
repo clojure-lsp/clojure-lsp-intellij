@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 3.0.1
+
 - Bump clj4intellij to 0.6.3.
 - Fix code lens references not working when more than a project is opened. #67
 
