@@ -78,7 +78,7 @@
 
 (defn ^:private on-action-performed [command-name text ^AnActionEvent event]
   (when-let [editor ^Editor (.getData event CommonDataKeys/EDITOR_EVEN_IF_INACTIVE)]
-    (let [project (.getProejct event)
+    (let [project (.getProject event)
           [line character] (util/editor->cursor-position editor)]
       (tasks/run-background-task!
        project
