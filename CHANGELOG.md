@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 3.0.2
+
 - Fix Settings page exception when more than a project was opened and closed.
 
 ## 3.0.1
