@@ -76,9 +76,10 @@
    {:name "raise-sexp" :text "Raise sexpr" :description "Raise current sexpr (Paredit)" :keyboard-shortcut {:first "alt R" :replace-all true}}
    {:name "kill-sexp" :text "Kill sexpr" :description "Kill current sexpr (Paredit)" :keyboard-shortcut {:first "alt K" :replace-all true}}])
 
-(defn ^:private on-action-performed [command-name text project ^AnActionEvent event]
+(defn ^:private on-action-performed [command-name text ^AnActionEvent event]
   (when-let [editor ^Editor (.getData event CommonDataKeys/EDITOR_EVEN_IF_INACTIVE)]
-    (let [[line character] (util/editor->cursor-position editor)]
+    (let [project (.getProejct event)
+          [line character] (util/editor->cursor-position editor)]
       (tasks/run-background-task!
        project
        "LSP: refactoring"
@@ -109,7 +110,7 @@
      (.getDataContext event)
      (.getInputEvent event))))
 
-(defn -runActivity [_this ^Project project]
+(defn -runActivity [_this ^Project _project]
   (doseq [{:keys [name text description use-shortcut-of keyboard-shortcut]} clojure-lsp-commands]
     (action/register-action! :id (str "ClojureLSP." (csk/->PascalCase name))
                              :title text
@@ -117,7 +118,7 @@
                              :icon Icons/CLOJURE
                              :keyboard-shortcut keyboard-shortcut
                              :use-shortcut-of use-shortcut-of
-                             :on-performed (partial on-action-performed name text project)))
+                             :on-performed (partial on-action-performed name text)))
   (register-command! :id "code-lens-references"
                      :on-performed #'code-lens-references-performed)
   (action/register-group! :id "ClojureLSP.Refactors"
