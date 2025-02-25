@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix comment form complain about missing paren.
+
 ## 3.0.2
 
 - Fix Settings page exception when more than a project was opened and closed.

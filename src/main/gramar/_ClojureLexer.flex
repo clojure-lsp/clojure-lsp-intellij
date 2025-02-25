@@ -32,7 +32,7 @@ import static com.github.clojure_lsp.intellij.ClojureTokens.FORM_COMMENT;
 
 WHITE_SPACE=\s+
 LINE_COMMENT=;.*
-FORM_COMMENT=#_\S*
+FORM_COMMENT=#_
 STR_CHAR=[^\\\"]|\\.|\\\"
 STRING=\" {STR_CHAR}* \"
 // octal numbers: 023, 023N, but not 023M
