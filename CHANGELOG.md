@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Fix comment form complain about missing paren.
+- Improve server installation fixing concurrency bugs + using lsp4ij install API.
 
 ## 3.0.2
 
