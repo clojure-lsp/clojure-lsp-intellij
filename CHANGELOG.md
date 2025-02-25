@@ -2,7 +2,12 @@
 
 ## [Unreleased]
 
+- Fix comment form complain about missing paren.
 - Improve server installation fixing concurrency bugs + using lsp4ij install API.
+
+## 3.0.2
+
+- Fix Settings page exception when more than a project was opened and closed.
 
 ## 3.0.1
 
