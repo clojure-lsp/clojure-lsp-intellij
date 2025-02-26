@@ -63,7 +63,7 @@ intellij {
     updateSinceUntilBuild.set(false)
 
     val platformPlugins =  ArrayList<Any>()
-    val localLsp4ij = file("../lsp4ij/build/idea-sandbox/plugins/LSP4IJ").absoluteFile
+    val localLsp4ij = file("../lsp4ij/build/idea-sandbox/IC-2023.3/plugins/lsp4ij").absoluteFile
     if (localLsp4ij.isDirectory) {
         // In case Gradle fails to build because it can't find some missing jar, try deleting
         // ~/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/unzipped.com.jetbrains.plugins/com.redhat.devtools.lsp4ij*
