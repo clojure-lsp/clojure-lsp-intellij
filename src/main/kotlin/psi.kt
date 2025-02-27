@@ -31,7 +31,11 @@ class ClojureTokenType(name: String) : IElementType(name, ClojureLanguage), ILea
   override fun createLeafNode(leafText: CharSequence) = CToken(this, leafText)
 }
 class ClojureNodeType(name: String) : IElementType(name, ClojureLanguage), ClojureElementType
-class CToken(tokenType: ClojureTokenType, text: CharSequence) : LeafPsiElement(tokenType, text)
+class CToken(tokenType: ClojureTokenType, text: CharSequence) : LeafPsiElement(tokenType, text), PsiNameIdentifierOwner {
+    override fun getNameIdentifier() = this
+    override fun getName() = this.getText()
+    override fun setName(name: String) = this
+}
 
 open class CFileImpl(viewProvider: FileViewProvider, language: Language) :
     PsiFileBase(viewProvider, language), PsiFile {
