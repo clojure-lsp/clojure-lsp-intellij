@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Remove `:` lexer check since this is delegated to clojure-lsp/clj-kondo already.
+
 ## 3.1.0
 
 - Fix comment form complain about missing paren.

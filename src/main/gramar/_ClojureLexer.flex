@@ -103,7 +103,6 @@ SYM_TAIL={SYM_PART}+ (":" {SYM_PART}+)?
 }
 
 <SYMBOL1> {
-  ":"                    { yybegin(YYINITIAL); return BAD_CHARACTER; }
   "/"                    { yybegin(SYMBOL2); return C_SLASH; }
   "."                    { yybegin(YYINITIAL); return C_DOT; }
   [^]                    { yybegin(YYINITIAL); yypushback(yylength()); }
