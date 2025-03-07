@@ -121,7 +121,4 @@
                                (reset! server-installing* true)
                                (reset! server-path* (server/install-server! (.getProject (.getClientFeatures this))))
                                (reset! server-installing* false)))))
-    (.setEditorBehaviorFeature lsp-client-features
-                               (proxy+ [lsp-client-features] EditorBehaviorFeature
-                                 (isEnableSemanticTokensFileViewProvider [_ _] true)))
     lsp-client-features))
