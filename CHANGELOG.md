@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Bump clj4intellij to 0.7.1
+
 ## 3.1.1
 
 - Remove `:` lexer check since this is delegated to clojure-lsp/clj-kondo already.
