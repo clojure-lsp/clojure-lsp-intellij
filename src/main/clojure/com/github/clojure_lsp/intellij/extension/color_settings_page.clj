@@ -1,7 +1,6 @@
 (ns com.github.clojure-lsp.intellij.extension.color-settings-page
-  (:gen-class
-   :name com.github.clojure_lsp.intellij.extension.ColorSettingsPage
-   :implements [com.intellij.openapi.options.colors.RainbowColorSettingsPage])
+  (:require
+   [com.github.ericdallo.clj4intellij.extension :refer [def-extension]])
   (:import
    [com.github.clojure_lsp.intellij ClojureLanguage]
    [com.github.clojure_lsp.intellij Icons]
@@ -9,12 +8,12 @@
    [com.github.clojure_lsp.intellij.language ClojureSyntaxHighlighter]
    [com.intellij.codeHighlighting RainbowHighlighter]
    [com.intellij.openapi.editor.colors TextAttributesKey]
-   [com.intellij.openapi.options.colors ColorDescriptor]
+   [com.intellij.openapi.options.colors ColorDescriptor RainbowColorSettingsPage]
    [com.intellij.openapi.options.colors AttributesDescriptor]))
 
 (set! *warn-on-reflection* true)
 
-(def descriptors
+(def ^:private descriptors
   (->> {"Comments//Line comment" ClojureColors/LINE_COMMENT
         "Comments//Form comment" ClojureColors/FORM_COMMENT
         "Literals//Symbol" ClojureColors/SYMBOL
@@ -54,44 +53,46 @@
        (mapv #(AttributesDescriptor. ^String (first %) ^TextAttributesKey (second %)))
        (into-array AttributesDescriptor)))
 
-(defn -getLanguage [_] (ClojureLanguage/INSTANCE))
+(def-extension ClojureColorSettingsPage []
+  RainbowColorSettingsPage
+  (getLanguage [_] (ClojureLanguage/INSTANCE))
 
-(defn -isRainbowType [_ ^TextAttributesKey key]
-  (or (= key ClojureColors/FN_ARGUMENT)
-      (= key ClojureColors/LET_BINDING)))
+  (isRainbowType [_ ^TextAttributesKey key]
+    (or (= key ClojureColors/FN_ARGUMENT)
+        (= key ClojureColors/LET_BINDING)))
 
-(defn -getDisplayName [_] "Clojure")
+  (getDisplayName [_] "Clojure")
 
-(defn -getIcon [_] Icons/CLOJURE)
+  (getIcon [_] Icons/CLOJURE)
 
-(defn -getAttributeDescriptors [_] descriptors)
+  (getAttributeDescriptors [_] descriptors)
 
-(defn -getColorDescriptors [_] ColorDescriptor/EMPTY_ARRAY)
+  (getColorDescriptors [_] ColorDescriptor/EMPTY_ARRAY)
 
-(defn -getHighlighter [_] (ClojureSyntaxHighlighter. (ClojureLanguage/INSTANCE)))
+  (getHighlighter [_] (ClojureSyntaxHighlighter. (ClojureLanguage/INSTANCE)))
 
-(defn -getAdditionalHighlightingTagToDescriptorMap [_]
-  (merge {"ns" ClojureColors/NAMESPACE
-          "def" ClojureColors/DEFINITION
-          "alias" ClojureColors/ALIAS
-          "keyword" ClojureColors/KEYWORD
-          "sym" ClojureColors/QUOTED_SYM
-          "dynamic" ClojureColors/DYNAMIC
-          "data-reader" ClojureColors/DATA_READER
-          "fn-arg" ClojureColors/FN_ARGUMENT
-          "binding" ClojureColors/LET_BINDING
-          "form-comment" ClojureColors/FORM_COMMENT
-          "call" ClojureColors/CALLABLE
-          "str" ClojureColors/STRING
-          "java-class" ClojureColors/JAVA_CLASS
-          "java-static-method" ClojureColors/JAVA_STATIC_METHOD
-          "java-static-field" ClojureColors/JAVA_STATIC_FIELD
-          "java-instance-field" ClojureColors/JAVA_INSTANCE_FIELD
-          "java-instance-method" ClojureColors/JAVA_INSTANCE_METHOD}
-         (RainbowHighlighter/createRainbowHLM)))
+  (getAdditionalHighlightingTagToDescriptorMap [_]
+    (merge {"ns" ClojureColors/NAMESPACE
+            "def" ClojureColors/DEFINITION
+            "alias" ClojureColors/ALIAS
+            "keyword" ClojureColors/KEYWORD
+            "sym" ClojureColors/QUOTED_SYM
+            "dynamic" ClojureColors/DYNAMIC
+            "data-reader" ClojureColors/DATA_READER
+            "fn-arg" ClojureColors/FN_ARGUMENT
+            "binding" ClojureColors/LET_BINDING
+            "form-comment" ClojureColors/FORM_COMMENT
+            "call" ClojureColors/CALLABLE
+            "str" ClojureColors/STRING
+            "java-class" ClojureColors/JAVA_CLASS
+            "java-static-method" ClojureColors/JAVA_STATIC_METHOD
+            "java-static-field" ClojureColors/JAVA_STATIC_FIELD
+            "java-instance-field" ClojureColors/JAVA_INSTANCE_FIELD
+            "java-instance-method" ClojureColors/JAVA_INSTANCE_METHOD}
+           (RainbowHighlighter/createRainbowHLM)))
 
-(defn -getDemoText [_]
-  "
+  (getDemoText [_]
+    "
 (ns <ns>my-awesome-namespace</ns>
   (<keyword>:require</keyword>
    [clojure.string <keyword>:as</keyword> string]
@@ -128,7 +129,7 @@ nil
 (def <def>INIT</def> <data-reader>#js</data-reader> {})
 ")
 
-(defn -getPreviewEditorCustomizer [_])
-(defn -customizeColorScheme [_ scheme] scheme)
-(defn -getAdditionalInlineElementToDescriptorMap [_])
-(defn -getAdditionalHighlightingTagToColorKeyMap [_])
+  (getPreviewEditorCustomizer [_])
+  (customizeColorScheme [_ scheme] scheme)
+  (getAdditionalInlineElementToDescriptorMap [_])
+  (getAdditionalHighlightingTagToColorKeyMap [_]))

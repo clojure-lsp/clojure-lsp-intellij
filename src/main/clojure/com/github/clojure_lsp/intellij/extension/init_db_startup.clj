@@ -1,14 +1,14 @@
 (ns com.github.clojure-lsp.intellij.extension.init-db-startup
-  (:gen-class
-   :name com.github.clojure_lsp.intellij.extension.InitDBStartup
-   :implements [com.intellij.openapi.startup.StartupActivity
-                com.intellij.openapi.project.DumbAware])
   (:require
-   [com.github.clojure-lsp.intellij.db :as db])
+   [com.github.clojure-lsp.intellij.db :as db]
+   [com.github.ericdallo.clj4intellij.extension :refer [def-extension]])
   (:import
-   [com.intellij.openapi.project Project]))
+   [com.intellij.openapi.project Project]
+   [com.intellij.openapi.startup StartupActivity]))
 
 (set! *warn-on-reflection* true)
 
-(defn -runActivity [_this ^Project project]
-  (db/init-db-for-project project))
+(def-extension InitDBStartup []
+  StartupActivity
+  (runActivity [_this ^Project project]
+    (db/init-db-for-project project)))

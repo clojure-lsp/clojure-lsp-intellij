@@ -1,16 +1,20 @@
 (ns com.github.clojure-lsp.intellij.extension.commenter
-  (:gen-class
-   :name com.github.clojure_lsp.intellij.extension.Commenter
-   :implements [com.intellij.lang.Commenter])
+  (:require
+   [com.github.ericdallo.clj4intellij.extension :refer [def-extension]])
   (:import
+   [com.intellij.lang Commenter]
    [com.intellij.util.containers ContainerUtil]))
 
 (set! *warn-on-reflection* true)
 
-(defn -getLineCommentPrefix [_] ";;")
-(defn -getBlockCommentPrefix [_] nil)
-(defn -getBlockCommentSuffix [_] nil)
-(defn -getCommentedBlockCommentPrefix [_] nil)
-(defn -getCommentedBlockCommentSuffix [_] nil)
-(defn -getLineCommentPrefixes [this]
-  (ContainerUtil/createMaybeSingletonList (-getLineCommentPrefix this)))
+(def ^:private comment-single-line ";; ")
+
+(def-extension ClojureCommenter []
+  Commenter
+  (getLineCommentPrefix [_] comment-single-line)
+  (getBlockCommentPrefix [_] nil)
+  (getBlockCommentSuffix [_] nil)
+  (getCommentedBlockCommentPrefix [_] nil)
+  (getCommentedBlockCommentSuffix [_] nil)
+  (getLineCommentPrefixes [_]
+    (ContainerUtil/createMaybeSingletonList comment-single-line)))
