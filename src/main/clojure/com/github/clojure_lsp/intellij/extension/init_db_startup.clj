@@ -4,11 +4,12 @@
    [com.github.ericdallo.clj4intellij.extension :refer [def-extension]])
   (:import
    [com.intellij.openapi.project Project]
-   [com.intellij.openapi.startup StartupActivity]))
+   [com.intellij.openapi.startup ProjectActivity]
+   [kotlinx.coroutines CoroutineScope]))
 
 (set! *warn-on-reflection* true)
 
 (def-extension InitDBStartup []
-  StartupActivity
-  (runActivity [_this ^Project project]
+  ProjectActivity
+  (execute [_this ^Project project ^CoroutineScope _]
     (db/init-db-for-project project)))

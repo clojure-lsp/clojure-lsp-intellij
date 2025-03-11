@@ -19,10 +19,11 @@
     CommonDataKeys]
    [com.intellij.openapi.editor Editor]
    [com.intellij.openapi.project Project]
-   [com.intellij.openapi.startup StartupActivity]
+   [com.intellij.openapi.startup ProjectActivity]
    [com.redhat.devtools.lsp4ij LanguageServerManager]
    [com.redhat.devtools.lsp4ij.commands LSPCommand LSPCommandAction]
-   [com.redhat.devtools.lsp4ij.usages LSPUsageType LSPUsagesManager LocationData]))
+   [com.redhat.devtools.lsp4ij.usages LSPUsageType LSPUsagesManager LocationData]
+   [kotlinx.coroutines CoroutineScope]))
 
 (set! *warn-on-reflection* true)
 
@@ -108,8 +109,8 @@
      (.getInputEvent event))))
 
 (def-extension RegisterActionsStartup []
-  StartupActivity
-  (runActivity [_this ^Project _project]
+  ProjectActivity
+  (execute [_this ^Project _project ^CoroutineScope _]
     (doseq [{:keys [name text description use-shortcut-of keyboard-shortcut]} clojure-lsp-commands]
       (action/register-action! :id (str "ClojureLSP." (csk/->PascalCase name))
                                :title text
