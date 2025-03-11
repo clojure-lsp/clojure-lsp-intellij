@@ -69,6 +69,7 @@
         <lang.quoteHandler language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.QuoteHandler"/>
         <lang.braceMatcher language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.brace_matcher.BraceMatcher"/>
         <applicationService serviceImplementation="com.github.clojure_lsp.intellij.extension.SettingsState"/>
+        <searchEverywhereContributor implementation="com.github.clojure_lsp.intellij.extension.search_contributors.NamespaceSearchContributorFactory"/>
         <applicationConfigurable
             parentId="tools"
             instance="com.github.clojure_lsp.intellij.extension.general_settings.ClojureGeneralSettingsConfigurable"
