@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 3.2.0
+
 - Bump clj4intellij to 0.7.1
 - Support Namespaces on search everywhere (Shift + shift). #64
 
