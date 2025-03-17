@@ -72,7 +72,11 @@
    {:name "backward-slurp" :text "Slurp backward" :description "Slurp backward (Paredit)" :keyboard-shortcut {:first "alt shift CLOSE_BRACKET" :replace-all true}}
    {:name "backward-barf" :text "Barf backward" :description "Barf backward (Paredit)" :keyboard-shortcut {:first "alt shift OPEN_BRACKET" :replace-all true}}
    {:name "raise-sexp" :text "Raise sexpr" :description "Raise current sexpr (Paredit)" :keyboard-shortcut {:first "alt R" :replace-all true}}
-   {:name "kill-sexp" :text "Kill sexpr" :description "Kill current sexpr (Paredit)" :keyboard-shortcut {:first "alt K" :replace-all true}}])
+   {:name "kill-sexp" :text "Kill sexpr" :description "Kill current sexpr (Paredit)" :keyboard-shortcut {:first "alt K" :replace-all true}}
+   {:name "forward" :text "Move forward" :description "Move cursor forward a sexpr (Paredit)" :keyboard-shortcut {:first "ctrl alt CLOSE_BRACKET" :replace-all true}}
+   {:name "forward-select" :text "Select forward" :description "Select forward a sexpr (Paredit)" :keyboard-shortcut {:first "ctrl shift alt CLOSE_BRACKET" :replace-all true}}
+   {:name "backward" :text "Move backward" :description "Move cursor backward a sexpr (Paredit)" :keyboard-shortcut {:first "ctrl alt OPEN_BRACKET" :replace-all true}}
+   {:name "backward-select" :text "Select backward" :description "Select backward a sexpr (Paredit)" :keyboard-shortcut {:first "ctrl shift alt OPEN_BRACKET" :replace-all true}}])
 
 (defn ^:private on-action-performed [command-name text ^AnActionEvent event]
   (when-let [editor ^Editor (.getData event CommonDataKeys/EDITOR_EVEN_IF_INACTIVE)]

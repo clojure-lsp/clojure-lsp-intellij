@@ -92,7 +92,7 @@
                             :foreground (s.color/color 110 110 110)) "wrap"]]
                  (remove nil?)))))
 
-(def-extension GeneralSettingsConfigurable []
+(def-extension ClojureGeneralSettingsConfigurable []
   Configurable
   (createComponent [_]
     (let [project (first (db/all-projects))

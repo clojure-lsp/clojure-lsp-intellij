@@ -113,3 +113,19 @@ This plugin relies on [clojure-lsp](https://clojure-lsp.io/) features and [lsp4i
 > <kbd>Alt</kbd> + <kbd>k</kbd>
 
 ![](../images/paredit-kill.gif)
+
+##### Forward sexpr
+
+> <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>]</kbd>
+
+##### Forward select sexpr
+
+> <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>]</kbd>
+
+##### Backward sexpr
+
+> <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>[</kbd>
+
+##### Backward select sexpr
+
+> <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>[</kbd>

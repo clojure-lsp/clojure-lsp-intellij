@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add support for `forward`, `backward`, `forward-select`, `backward-select` paredit actions. #72
+
 ## 3.2.0
 
 - Bump clj4intellij to 0.7.1
