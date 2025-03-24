@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 3.3.0
+
 - Add support for `forward`, `backward`, `forward-select`, `backward-select` paredit actions. #72
 
 ## 3.2.0
