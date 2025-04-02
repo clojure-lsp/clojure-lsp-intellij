@@ -1,7 +1,4 @@
 (ns com.github.clojure-lsp.intellij.extension.language-server-factory
-  (:gen-class
-   :name com.github.clojure_lsp.intellij.extension.LanguageServerFactory
-   :implements [com.redhat.devtools.lsp4ij.LanguageServerFactory])
   (:require
    [clojure.java.io :as io]
    [clojure.string :as string]
@@ -11,6 +8,7 @@
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.clojure-lsp.intellij.server :as server]
    [com.github.clojure-lsp.intellij.settings :as settings]
+   [com.github.ericdallo.clj4intellij.extension :refer [def-extension]]
    [com.github.ericdallo.clj4intellij.tasks :as tasks]
    [com.rpl.proxy-plus :refer [proxy+]])
   (:import
@@ -18,7 +16,7 @@
    [com.intellij.openapi.progress ProgressIndicator]
    [com.intellij.openapi.project Project]
    [com.intellij.openapi.vfs LocalFileSystem VirtualFile]
-   [com.redhat.devtools.lsp4ij LSPIJUtils ServerStatus]
+   [com.redhat.devtools.lsp4ij LSPIJUtils LanguageServerFactory ServerStatus]
    [com.redhat.devtools.lsp4ij.client LanguageClientImpl]
    [com.redhat.devtools.lsp4ij.client.features EditorBehaviorFeature LSPClientFeatures LSPProgressFeature]
    [com.redhat.devtools.lsp4ij.installation LanguageServerInstallerBase]
@@ -31,24 +29,6 @@
 
 (defonce ^:private server-path* (atom nil))
 (defonce ^:private server-installing* (atom false))
-
-(defn -createConnectionProvider [_ ^Project _project]
-  (let [path (loop []
-               (Thread/sleep 100)
-               (or (settings/server-path)
-                   (some-> ^File @server-path* .getCanonicalPath)
-                   (recur)))
-        command [path "listen"]]
-    (doto (proxy+
-           []
-           OSProcessStreamConnectionProvider)
-      (.setCommandLine (GeneralCommandLine. ^List command)))))
-
-(defn -createLanguageClient [_ ^Project project]
-  (LanguageClientImpl. project))
-
-(defn -getServerInterface [_]
-  com.github.clojure_lsp.intellij.ClojureLanguageServer)
 
 (defn ^:private create-temp-file ^VirtualFile
   [^Project project ^String path ^String text]
@@ -87,38 +67,56 @@
       (LSPIJUtils/findResourceFor fixed-uri))
     (LSPIJUtils/findResourceFor uri)))
 
-(defn -createClientFeatures [_]
-  (let [lsp-client-features (proxy+ [] LSPClientFeatures
-                              (keepServerAlive [_] true)
-                              (initializeParams [_ ^InitializeParams params]
-                                (.setWorkDoneToken params "clojure-lsp-startup")
-                                (.setInitializationOptions params {"dependency-scheme" "jar"
-                                                                   "hover" {"arity-on-same-line?" true}}))
-                              (findFileByUri ^VirtualFile [_ ^String uri]
-                                (find-file-by-uri uri))
-                              (handleServerStatusChanged [^LSPClientFeatures this ^ServerStatus server-status]
-                                (let [status (keyword (.toString server-status))]
-                                  (db/assoc-in (.getProject this) [:status] status)
-                                  (run! #(% status) (db/get-in (.getProject this) [:on-status-changed-fns])))))]
-    (.setProgressFeature lsp-client-features
-                         (proxy+ [] LSPProgressFeature
-                           (updateMessage [_ ^String message ^ProgressIndicator indicator]
-                             (.setText indicator (str "LSP: " message)))))
-    (.setServerInstaller lsp-client-features
-                         (proxy+ [] LanguageServerInstallerBase
-                           (getInstallationTaskTitle [_] "LSP: installing clojure-lsp")
-                           (progressCheckingServerInstalled [_ indicator] (tasks/set-progress indicator "LSP: checking for clojure-lsp"))
-                           (progressInstallingServer [_ indicator] (tasks/set-progress indicator "LSP: downloading clojure-lsp"))
-                           (checkServerInstalled [_ _indicator]
-                             (let [{:keys [status path]} (server/server-install-status)]
-                               (if (identical? :installed status)
-                                 (do
-                                   (when-not @server-path* (reset! server-path* path))
-                                   true)
-                                 false)))
-                           (install [^LanguageServerInstallerBase this _indicator]
-                             (when-not @server-installing*
-                               (reset! server-installing* true)
-                               (reset! server-path* (server/install-server! (.getProject (.getClientFeatures this))))
-                               (reset! server-installing* false)))))
-    lsp-client-features))
+(def-extension ClojureLanguageServerFactory []
+  LanguageServerFactory
+  (createConnectionProvider [_ ^Project _project]
+    (let [path (loop []
+                 (Thread/sleep 100)
+                 (or (settings/server-path)
+                     (some-> ^File @server-path* .getCanonicalPath)
+                     (recur)))
+          command [path "listen"]]
+      (doto (proxy+
+             []
+             OSProcessStreamConnectionProvider)
+        (.setCommandLine (GeneralCommandLine. ^List command)))))
+
+  (createLanguageClient [_ ^Project project] (LanguageClientImpl. project))
+
+  (getServerInterface [_] com.github.clojure_lsp.intellij.ClojureLanguageServer)
+
+  (createClientFeatures [_]
+    (doto
+     (proxy+ [] LSPClientFeatures
+       (keepServerAlive [_] true)
+       (initializeParams [_ ^InitializeParams params]
+         (.setWorkDoneToken params "clojure-lsp-startup")
+         (.setInitializationOptions params {"dependency-scheme" "jar"
+                                            "hover" {"arity-on-same-line?" true}}))
+       (findFileByUri ^VirtualFile [_ ^String uri]
+         (find-file-by-uri uri))
+       (handleServerStatusChanged [^LSPClientFeatures this ^ServerStatus server-status]
+         (let [status (keyword (.toString server-status))]
+           (db/assoc-in (.getProject this) [:status] status)
+           (run! #(% status) (db/get-in (.getProject this) [:on-status-changed-fns])))))
+      (.setProgressFeature
+       (proxy+ [] LSPProgressFeature
+         (updateMessage [_ ^String message ^ProgressIndicator indicator]
+           (.setText indicator (str "LSP: " message)))))
+      (.setServerInstaller
+       (proxy+ [] LanguageServerInstallerBase
+         (getInstallationTaskTitle [_] "LSP: installing clojure-lsp")
+         (progressCheckingServerInstalled [_ indicator] (tasks/set-progress indicator "LSP: checking for clojure-lsp"))
+         (progressInstallingServer [_ indicator] (tasks/set-progress indicator "LSP: downloading clojure-lsp"))
+         (checkServerInstalled [_ _indicator]
+           (let [{:keys [status path]} (server/server-install-status)]
+             (if (identical? :installed status)
+               (do
+                 (when-not @server-path* (reset! server-path* path))
+                 true)
+               false)))
+         (install [^LanguageServerInstallerBase this _indicator]
+           (when-not @server-installing*
+             (reset! server-installing* true)
+             (reset! server-path* (server/install-server! (.getProject (.getClientFeatures this))))
+             (reset! server-installing* false))))))))

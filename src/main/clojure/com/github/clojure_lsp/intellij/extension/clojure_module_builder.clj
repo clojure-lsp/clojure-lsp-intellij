@@ -23,7 +23,7 @@
 
 (set! *warn-on-reflection* true)
 
-(def clojure-module
+(def ^:private clojure-module
   (proxy+ ClojureModuleType ["CLOJURE_MODULE"] ModuleType
           (getName [_] "Clojure")
           (getDescription [_] "Create programs using the Clojure language.")

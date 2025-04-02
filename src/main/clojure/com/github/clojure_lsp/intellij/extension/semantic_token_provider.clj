@@ -1,11 +1,10 @@
 (ns com.github.clojure-lsp.intellij.extension.semantic-token-provider
-  (:gen-class
-   :name com.github.clojure_lsp.intellij.extension.ClojureSemanticTokensColorsProvider
-   :implements [com.redhat.devtools.lsp4ij.features.semanticTokens.SemanticTokensColorsProvider])
+  (:require
+   [com.github.ericdallo.clj4intellij.extension :refer [def-extension]])
   (:import
    [com.intellij.openapi.editor.colors TextAttributesKey]
    [com.intellij.psi PsiFile]
-   [com.redhat.devtools.lsp4ij.features.semanticTokens DefaultSemanticTokensColorsProvider SemanticTokensHighlightingColors]
+   [com.redhat.devtools.lsp4ij.features.semanticTokens DefaultSemanticTokensColorsProvider SemanticTokensColorsProvider SemanticTokensHighlightingColors]
    [java.awt Font]
    [java.util List]
    [org.eclipse.lsp4j SemanticTokenModifiers SemanticTokenTypes]))
@@ -28,13 +27,15 @@
 
 (def ^:private bold-function-declaration (memoize bold-function-declaration*))
 
-(defn -getTextAttributesKey [_ ^String token-type ^List token-modifiers ^PsiFile psi-file]
-  (condp = token-type
-    SemanticTokenTypes/Namespace SemanticTokensHighlightingColors/STATIC_PROPERTY
-    SemanticTokenTypes/Function (if (modifier? SemanticTokenModifiers/Definition token-modifiers)
-                                  (bold-function-declaration)
-                                  SemanticTokensHighlightingColors/MACRO)
-    SemanticTokenTypes/Type SemanticTokensHighlightingColors/STATIC_PROPERTY
-    SemanticTokenTypes/Variable SemanticTokensHighlightingColors/READONLY_VARIABLE
-    SemanticTokenTypes/Keyword SemanticTokensHighlightingColors/NUMBER
-    (.getTextAttributesKey ^DefaultSemanticTokensColorsProvider default-provider token-type token-modifiers psi-file)))
+(def-extension ClojureSemanticTokensColorsProvider []
+  SemanticTokensColorsProvider
+  (getTextAttributesKey [_ ^String token-type ^List token-modifiers ^PsiFile psi-file]
+    (condp = token-type
+      SemanticTokenTypes/Namespace SemanticTokensHighlightingColors/STATIC_PROPERTY
+      SemanticTokenTypes/Function (if (modifier? SemanticTokenModifiers/Definition token-modifiers)
+                                    (bold-function-declaration)
+                                    SemanticTokensHighlightingColors/MACRO)
+      SemanticTokenTypes/Type SemanticTokensHighlightingColors/STATIC_PROPERTY
+      SemanticTokenTypes/Variable SemanticTokensHighlightingColors/READONLY_VARIABLE
+      SemanticTokenTypes/Keyword SemanticTokensHighlightingColors/NUMBER
+      (.getTextAttributesKey ^DefaultSemanticTokensColorsProvider default-provider token-type token-modifiers psi-file))))

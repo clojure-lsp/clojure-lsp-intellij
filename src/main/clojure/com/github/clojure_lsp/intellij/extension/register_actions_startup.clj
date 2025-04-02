@@ -1,14 +1,10 @@
 (ns com.github.clojure-lsp.intellij.extension.register-actions-startup
-  (:gen-class
-   :name com.github.clojure_lsp.intellij.extension.RegisterActionsStartup
-   :implements [com.intellij.openapi.startup.StartupActivity
-                com.intellij.openapi.project.DumbAware])
   (:require
    [camel-snake-kebab.core :as csk]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
-   [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.ericdallo.clj4intellij.action :as action]
+   [com.github.ericdallo.clj4intellij.extension :refer [def-extension]]
    [com.github.ericdallo.clj4intellij.logger :as logger]
    [com.github.ericdallo.clj4intellij.tasks :as tasks]
    [com.github.ericdallo.clj4intellij.util :as util]
@@ -23,13 +19,15 @@
     CommonDataKeys]
    [com.intellij.openapi.editor Editor]
    [com.intellij.openapi.project Project]
+   [com.intellij.openapi.startup ProjectActivity]
    [com.redhat.devtools.lsp4ij LanguageServerManager]
    [com.redhat.devtools.lsp4ij.commands LSPCommand LSPCommandAction]
-   [com.redhat.devtools.lsp4ij.usages LSPUsageType LSPUsagesManager LocationData]))
+   [com.redhat.devtools.lsp4ij.usages LSPUsageType LSPUsagesManager LocationData]
+   [kotlinx.coroutines CoroutineScope]))
 
 (set! *warn-on-reflection* true)
 
-(def clojure-lsp-commands
+(def ^:private clojure-lsp-commands
   [{:name "add-missing-import" :text "Add import to namespace" :description "Add import to namespace"}
    {:name "add-missing-libspec" :text "Add missing require" :description "Add missing require"}
    {:name "add-require-suggestion" :text "Add require suggestion" :description "Add require suggestion"}
@@ -74,7 +72,11 @@
    {:name "backward-slurp" :text "Slurp backward" :description "Slurp backward (Paredit)" :keyboard-shortcut {:first "alt shift CLOSE_BRACKET" :replace-all true}}
    {:name "backward-barf" :text "Barf backward" :description "Barf backward (Paredit)" :keyboard-shortcut {:first "alt shift OPEN_BRACKET" :replace-all true}}
    {:name "raise-sexp" :text "Raise sexpr" :description "Raise current sexpr (Paredit)" :keyboard-shortcut {:first "alt R" :replace-all true}}
-   {:name "kill-sexp" :text "Kill sexpr" :description "Kill current sexpr (Paredit)" :keyboard-shortcut {:first "alt K" :replace-all true}}])
+   {:name "kill-sexp" :text "Kill sexpr" :description "Kill current sexpr (Paredit)" :keyboard-shortcut {:first "alt K" :replace-all true}}
+   {:name "forward" :text "Move forward" :description "Move cursor forward a sexpr (Paredit)" :keyboard-shortcut {:first "ctrl alt CLOSE_BRACKET" :replace-all true}}
+   {:name "forward-select" :text "Select forward" :description "Select forward a sexpr (Paredit)" :keyboard-shortcut {:first "ctrl shift alt CLOSE_BRACKET" :replace-all true}}
+   {:name "backward" :text "Move backward" :description "Move cursor backward a sexpr (Paredit)" :keyboard-shortcut {:first "ctrl alt OPEN_BRACKET" :replace-all true}}
+   {:name "backward-select" :text "Select backward" :description "Select backward a sexpr (Paredit)" :keyboard-shortcut {:first "ctrl shift alt OPEN_BRACKET" :replace-all true}}])
 
 (defn ^:private on-action-performed [command-name text ^AnActionEvent event]
   (when-let [editor ^Editor (.getData event CommonDataKeys/EDITOR_EVEN_IF_INACTIVE)]
@@ -86,7 +88,7 @@
        (fn [_]
          (lsp-client/execute-command command-name text [(editor/editor->uri editor) line character] project))))))
 
-(defn register-command!
+(defn ^:private register-command!
   [& {:keys [id on-performed]}]
   (let [manager (ActionManager/getInstance)
         action (proxy+ [] LSPCommandAction
@@ -110,28 +112,24 @@
      (.getDataContext event)
      (.getInputEvent event))))
 
-(defn -runActivity [_this ^Project _project]
-  (doseq [{:keys [name text description use-shortcut-of keyboard-shortcut]} clojure-lsp-commands]
-    (action/register-action! :id (str "ClojureLSP." (csk/->PascalCase name))
-                             :title text
-                             :description description
-                             :icon Icons/CLOJURE
-                             :keyboard-shortcut keyboard-shortcut
-                             :use-shortcut-of use-shortcut-of
-                             :on-performed (partial on-action-performed name text)))
-  (register-command! :id "code-lens-references"
-                     :on-performed #'code-lens-references-performed)
-  (action/register-group! :id "ClojureLSP.Refactors"
-                          :popup true
-                          :text "Clojure refactors"
-                          :icon Icons/CLOJURE
-                          :children (concat [{:type :add-to-group :group-id "RefactoringMenu" :anchor :first}]
-                                            (mapv (fn [{:keys [name]}] {:type :reference :ref (str "ClojureLSP." (csk/->PascalCase name))}) clojure-lsp-commands)
-                                            [{:type :separator}]))
-  (logger/info "Actions registered"))
-
-(comment
-  (do
-    (.unregisterAction (ActionManager/getInstance) "ClojureLSP.ForwardSlurp")
-    (.unregisterAction (ActionManager/getInstance) "ClojureLSP.ForwardBarf")
-    (-runActivity nil (first (db/all-projects)))))
+(def-extension RegisterActionsStartup []
+  ProjectActivity
+  (execute [_this ^Project _project ^CoroutineScope _]
+    (doseq [{:keys [name text description use-shortcut-of keyboard-shortcut]} clojure-lsp-commands]
+      (action/register-action! :id (str "ClojureLSP." (csk/->PascalCase name))
+                               :title text
+                               :description description
+                               :icon Icons/CLOJURE
+                               :keyboard-shortcut keyboard-shortcut
+                               :use-shortcut-of use-shortcut-of
+                               :on-performed (partial on-action-performed name text)))
+    (register-command! :id "code-lens-references"
+                       :on-performed #'code-lens-references-performed)
+    (action/register-group! :id "ClojureLSP.Refactors"
+                            :popup true
+                            :text "Clojure refactors"
+                            :icon Icons/CLOJURE
+                            :children (concat [{:type :add-to-group :group-id "RefactoringMenu" :anchor :first}]
+                                              (mapv (fn [{:keys [name]}] {:type :reference :ref (str "ClojureLSP." (csk/->PascalCase name))}) clojure-lsp-commands)
+                                              [{:type :separator}]))
+    (logger/info "Actions registered")))

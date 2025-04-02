@@ -4,8 +4,18 @@
 
 - Fix go to declaration or usages. #70
 
-## 3.1.0
+## 3.3.0
 
+- Add support for `forward`, `backward`, `forward-select`, `backward-select` paredit actions. #72
+
+## 3.2.0
+
+- Bump clj4intellij to 0.7.1
+- Support Namespaces on search everywhere (Shift + shift). #64
+
+## 3.1.1
+
+- Remove `:` lexer check since this is delegated to clojure-lsp/clj-kondo already.
 - Fix comment form complain about missing paren.
 - Improve server installation fixing concurrency bugs + using lsp4ij install API.
 

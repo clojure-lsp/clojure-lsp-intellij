@@ -1,7 +1,4 @@
 (ns com.github.clojure-lsp.intellij.extension.general-settings
-  (:gen-class
-   :name com.github.clojure_lsp.intellij.extension.GeneralSettingsConfigurable
-   :implements [com.intellij.openapi.options.Configurable])
   (:require
    [clojure.pprint :as pprint]
    [clojure.string :as str]
@@ -10,11 +7,13 @@
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.server :as server]
    [com.github.clojure-lsp.intellij.settings :as settings]
+   [com.github.ericdallo.clj4intellij.extension :refer [def-extension]]
    [seesaw.color :as s.color]
    [seesaw.core :as s]
    [seesaw.font :as s.font]
    [seesaw.mig :as s.mig])
   (:import
+   [com.intellij.openapi.options Configurable]
    [com.intellij.ui IdeBorderFactory]
    [java.awt Toolkit]
    [java.awt.datatransfer StringSelection]))
@@ -93,48 +92,50 @@
                             :foreground (s.color/color 110 110 110)) "wrap"]]
                  (remove nil?)))))
 
-(defn -createComponent [_]
-  (let [project (first (db/all-projects))
-        server-info (lsp-client/server-info project)
-        component (build-component server-info)]
-    (reset! component* component)
-    component))
+(def-extension ClojureGeneralSettingsConfigurable []
+  Configurable
+  (createComponent [_]
+    (let [project (first (db/all-projects))
+          server-info (lsp-client/server-info project)
+          component (build-component server-info)]
+      (reset! component* component)
+      component))
 
-(defn -getPreferredFocusedComponent [_]
-  (s/select @component* [:#copy-server-info]))
+  (getPreferredFocusedComponent [_]
+    (s/select @component* [:#copy-server-info]))
 
-(defn -isModified [_]
-  (let [server-path (s/config (s/select @component* [:#server-path]) :text)
-        trace-level-combo-box (s/config (s/select @component* [:#trace-level]) :selected-item)
-        server-log-path (s/config (s/select @component* [:#server-log]) :text)]
-    (boolean
-     (or (not= server-path (or (settings/server-path) ""))
-         (not= trace-level-combo-box (settings/server-trace-level))
-         (not= server-log-path (or (settings/server-log-path) ""))
-         (and (str/blank? server-log-path)
-              (settings/server-log-path))))))
+  (isModified [_]
+    (let [server-path (s/config (s/select @component* [:#server-path]) :text)
+          trace-level-combo-box (s/config (s/select @component* [:#trace-level]) :selected-item)
+          server-log-path (s/config (s/select @component* [:#server-log]) :text)]
+      (boolean
+       (or (not= server-path (or (settings/server-path) ""))
+           (not= trace-level-combo-box (settings/server-trace-level))
+           (not= server-log-path (or (settings/server-log-path) ""))
+           (and (str/blank? server-log-path)
+                (settings/server-log-path))))))
 
-(defn -reset [_]
-  (let [project (first (db/all-projects))
-        server-info (lsp-client/server-info project)
-        trace-level-combo-box (settings/server-trace-level)
-        server-log-path (or (settings/server-log-path) (:log-path server-info))
-        server-path (or (settings/server-path) (.getCanonicalPath (config/download-server-path)))]
-    (s/config! (s/select @component* [:#trace-level]) :selected-item trace-level-combo-box)
-    (s/config! (s/select @component* [:#server-log]) :text server-log-path)
-    (s/config! (s/select @component* [:#server-path]) :text server-path)))
+  (reset [_]
+    (let [project (first (db/all-projects))
+          server-info (lsp-client/server-info project)
+          trace-level-combo-box (settings/server-trace-level)
+          server-log-path (or (settings/server-log-path) (:log-path server-info))
+          server-path (or (settings/server-path) (.getCanonicalPath (config/download-server-path)))]
+      (s/config! (s/select @component* [:#trace-level]) :selected-item trace-level-combo-box)
+      (s/config! (s/select @component* [:#server-log]) :text server-log-path)
+      (s/config! (s/select @component* [:#server-path]) :text server-path)))
 
-(defn -disposeUIResources [_]
-  (reset! component* nil))
+  (disposeUIResources [_]
+    (reset! component* nil))
 
-(defn -apply [_]
-  (let [trace-level (s/config (s/select @component* [:#trace-level]) :selected-item)
-        server-log-path (when (s/config (s/select @component* [:#custom-server-log?]) :selected?)
-                          (s/config (s/select @component* [:#server-log]) :text))
-        server-path (when (s/config (s/select @component* [:#custom-server-path?]) :selected?)
-                      (s/config (s/select @component* [:#server-path]) :text))]
-    (settings/set-server-path! server-path)
-    (settings/set-server-log-path! server-log-path)
-    (settings/set-server-trace-level! trace-level)))
+  (apply [_]
+    (let [trace-level (s/config (s/select @component* [:#trace-level]) :selected-item)
+          server-log-path (when (s/config (s/select @component* [:#custom-server-log?]) :selected?)
+                            (s/config (s/select @component* [:#server-log]) :text))
+          server-path (when (s/config (s/select @component* [:#custom-server-path?]) :selected?)
+                        (s/config (s/select @component* [:#server-path]) :text))]
+      (settings/set-server-path! server-path)
+      (settings/set-server-log-path! server-log-path)
+      (settings/set-server-trace-level! trace-level)))
 
-(defn -cancel [_])
+  (cancel [_]))

@@ -1,4 +1,4 @@
-{:cljfmt {:indents {proxy+ [[:block 2] [:inner 1]]}}
+{:classpath-config-paths ["ericdallo/clj4intellij"]
  :project-specs [{:classpath-cmd ["./gradlew" "-q" "classpath"]
                   :project-path "build.gradle.kts"}
                  {:classpath-cmd ["clojure" "-Spath"]
