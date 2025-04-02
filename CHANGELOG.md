@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 3.4.0
+
 - Fix go to declaration or usages. #70
 
 ## 3.3.0
