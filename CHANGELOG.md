@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix go to declaration or usages. #70
+
 ## 3.3.0
 
 - Add support for `forward`, `backward`, `forward-select`, `backward-select` paredit actions. #72
@@ -14,9 +16,6 @@
 ## 3.1.1
 
 - Remove `:` lexer check since this is delegated to clojure-lsp/clj-kondo already.
-
-## 3.1.0
-
 - Fix comment form complain about missing paren.
 - Improve server installation fixing concurrency bugs + using lsp4ij install API.
 
