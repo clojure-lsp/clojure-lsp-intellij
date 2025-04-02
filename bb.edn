@@ -1,5 +1,6 @@
 {:paths ["src/scripts"]
  :tasks {tag scripts/tag
          build-plugin scripts/build-plugin
+         test scripts/tests
          install-plugin scripts/install-plugin
          publish-plugin scripts/publish-plugin}}

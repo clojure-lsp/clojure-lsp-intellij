@@ -1,0 +1,40 @@
+name: Tests
+on:
+  pull_request:
+
+permissions:
+    contents: read
+    checks: write
+    pull-requests: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: 'gradle'
+
+      - name: Install Clojure
+        uses: DeLaGuardo/setup-clojure@master
+        with:
+          bb: '1.12.196'
+          cli: 1.12.0.1530
+
+      - name: Run tests
+        run: ./gradlew test
+
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v5
+        if: success() || failure() # always run even if the previous step fails
+        with:
+          report_paths: '**/build/test-results/test/TEST-*.xml'
+          simplified_summary: true
+          comment: true
