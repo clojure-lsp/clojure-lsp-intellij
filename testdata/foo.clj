@@ -1,3 +1,3 @@
 (ns foo)
 
-(println "Oiii")
+(println) "Oiii"
