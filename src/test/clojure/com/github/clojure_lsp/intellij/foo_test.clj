@@ -12,7 +12,8 @@
    [com.intellij.ide DataManager]
    [com.intellij.openapi.actionSystem ActionManager]
    [com.intellij.openapi.components ServiceManager]
-   [com.intellij.openapi.wm WindowManager]))
+   [com.intellij.openapi.wm WindowManager]
+   [com.intellij.testFramework EditorTestUtil]))
 
 (set! *warn-on-reflection* true)
 
@@ -21,6 +22,14 @@
   (let [status-bar (.. (WindowManager/getInstance) (getStatusBar project))]
     (.getWidget status-bar widget-id)))
 
+(defn ensure-editor
+  "Ensure the editor was created in the UI thread"
+  [project]
+  (let [repl-content (repl-content project)]
+    @(app-manager/invoke-later!
+      {:invoke-fn (fn []
+                    (.addNotify repl-content)
+                    (.getEditor repl-content true))})))
 
 (defn run-editor-action [action-id project]
   (let [action (.getAction (ActionManager/getInstance) action-id)
@@ -43,7 +52,8 @@
         deps-file (.createFile fixture "deps.edn" "{}")
         _ (.setTestDataPath fixture "testdata")
         clj-file (.copyFileToProject fixture "foo.clj")
-        project (.getProject fixture)]
+        project (.getProject fixture)
+        editor (.getEditor fixture)]
     (is (= project-name (.getName project)))
     (is deps-file)
 
@@ -71,7 +81,8 @@
     (println (lsp-client/server-status project))
     (println (db/get-in project [:status]))
 
-
+    (println "editor >> ")
+    (println editor)
     (run-editor-action "ClojureLSP.ForwardSlurp" project)
 
     @(app-manager/invoke-later!
