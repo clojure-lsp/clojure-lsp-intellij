@@ -1,3 +1,3 @@
 (ns foo)
 
-(println<caret>) "Oiii"
+(println) "Oiii"
