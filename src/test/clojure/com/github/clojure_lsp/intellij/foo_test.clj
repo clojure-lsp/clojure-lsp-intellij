@@ -1,62 +1,24 @@
 (ns com.github.clojure-lsp.intellij.foo-test
   (:require
-   [clojure.java.io :as io]
    [clojure.test :refer [deftest is]]
-   [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.server :as server]
+   [com.github.clojure-lsp.intellij.test-utils :as test-utils]
    [com.github.ericdallo.clj4intellij.app-manager :as app-manager]
    [com.github.ericdallo.clj4intellij.test :as clj4intellij.test])
   (:import
-   [com.github.clojure_lsp.intellij.extension SettingsState]
-   [com.intellij.ide DataManager]
-   [com.intellij.openapi.actionSystem ActionManager]
+   [com.github.clojure_lsp.intellij.extension SettingsState] 
    [com.intellij.openapi.components ServiceManager]
-   [com.intellij.openapi.editor LogicalPosition]
-   [com.intellij.openapi.wm WindowManager]))
+   [com.intellij.openapi.editor LogicalPosition]))
 
 (set! *warn-on-reflection* true)
 
-(defn dispatch-all-until
-  [{:keys [project millis timeout]
-    :or {millis 1000
-         timeout 10000}}]
-  (let [start-time (System/currentTimeMillis)]
-    (loop []
-      (let [current-time (System/currentTimeMillis)
-            elapsed-time (- current-time start-time)
-            _ (println "Elapsed time >> "elapsed-time)
-            status (lsp-client/server-status project)]
-        (cond
-          (>= elapsed-time timeout)
-          (throw (ex-info "LSP server failed to start within timeout"
-                         {:elapsed-time elapsed-time
-                          :final-status status}))
-          
-          (= status :started)
-          true
-          
-          :else
-          (do
-            (clj4intellij.test/dispatch-all)
-            (Thread/sleep millis)
-            (recur)))))))
 
 
-(defn get-status-bar-widget [project widget-id]
-  (let [status-bar (.. (WindowManager/getInstance) (getStatusBar project))]
-    (.getWidget status-bar widget-id)))
 
-(defn run-editor-action [action-id project]
-  (let [action (.getAction (ActionManager/getInstance) action-id)
-        context (.getDataContext (DataManager/getInstance))]
-    (println "Running action:" action-id)
-    (app-manager/write-command-action
-     project
-     (fn []
-       (.actionPerformed
-        action
-        (com.intellij.openapi.actionSystem.AnActionEvent/createFromDataContext action-id nil context))))))
+
+
+
 
 
 (deftest foo-test
@@ -78,7 +40,7 @@
       (.loadState my-settings my-settings));; Atualiza estado
     
     (clj4intellij.test/dispatch-all) 
-    (dispatch-all-until {:project project})
+    (test-utils/dispatch-all-until {:project project})
     (println "status LSP >> " (db/get-in project [:status])) 
     (let [editor (.getEditor fixture)
           document (.getDocument editor)
@@ -91,7 +53,7 @@
         {:invoke-fn (fn []
                       #_(.moveToOffset caret (+ offset 9))
                       (.moveToLogicalPosition caret new-position))}))
-    (run-editor-action "ClojureLSP.ForwardSlurp" project)
+    (test-utils/run-editor-action "ClojureLSP.ForwardSlurp" project)
     (clj4intellij.test/dispatch-all)
     (println (-> fixture .getEditor .getDocument .getText)) 
     (.checkResultByFile fixture "foo_expected.clj")
