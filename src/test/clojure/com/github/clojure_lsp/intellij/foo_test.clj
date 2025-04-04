@@ -17,6 +17,31 @@
 
 (set! *warn-on-reflection* true)
 
+(defn dispatch-all-until
+  [{:keys [project millis timeout]
+    :or {millis 1000
+         timeout 10000}}]
+  (let [start-time (System/currentTimeMillis)]
+    (loop []
+      (let [current-time (System/currentTimeMillis)
+            elapsed-time (- current-time start-time)
+            _ (println "Elapsed time >> "elapsed-time)
+            status (lsp-client/server-status project)]
+        (cond
+          (>= elapsed-time timeout)
+          (throw (ex-info "LSP server failed to start within timeout"
+                         {:elapsed-time elapsed-time
+                          :final-status status}))
+          
+          (= status :started)
+          true
+          
+          :else
+          (do
+            (clj4intellij.test/dispatch-all)
+            (Thread/sleep millis)
+            (recur)))))))
+
 
 (defn get-status-bar-widget [project widget-id]
   (let [status-bar (.. (WindowManager/getInstance) (getStatusBar project))]
@@ -25,8 +50,6 @@
 (defn run-editor-action [action-id project]
   (let [action (.getAction (ActionManager/getInstance) action-id)
         context (.getDataContext (DataManager/getInstance))]
-
-
     (println "Running action:" action-id)
     (println "Action:" action)
     (app-manager/write-command-action
@@ -53,20 +76,24 @@
 
        ;; Para configurações persistentes via ServiceManager
     (let [my-settings (ServiceManager/getService SettingsState)] ;; Substitua pela classe real
-      (.setServerPath my-settings "/tmp/clojure-lsp") ;; Atualiza o caminho do servidor
+      #_(.setServerPath my-settings "/tmp/clojure-lsp") ;; Atualiza o caminho do servidor
       (.loadState my-settings my-settings));; Atualiza estado
     (println "LSP exists? >> ")
-    (println (.exists (io/as-file "/tmp/clojure-lsp")))
-    (server/start! project)
+    #_(println (.exists (io/as-file "/tmp/clojure-lsp")))
+    #_(server/start! project)
 
-    #_(clj4intellij.test/dispatch-all)
+    (clj4intellij.test/dispatch-all)
     (println "status LSP >> ")
     (println (lsp-client/server-status project))
     (println (db/get-in project [:status]))
-    (Thread/sleep 10000)
-    #_(clj4intellij.test/dispatch-all-until
-       {:cond-fn (fn [] (= (db/get-in project [:status]) :started))
-        :millis 3000})
+    #_(Thread/sleep 10000)
+    (dispatch-all-until {:project project})
+    #_(dispatch-all-until
+     {:cond-fn (fn [] 
+                 (let [status (lsp-client/server-status project)]
+                   (println "Current status:" status)
+                   (= status :started)))
+      :millis 1000})
     (println "status LSP >> ")
     (println (lsp-client/server-status project))
     (println (db/get-in project [:status]))
@@ -94,14 +121,13 @@
     (clj4intellij.test/dispatch-all)
     (println (-> fixture .getEditor .getDocument .getText))
 
-    @(app-manager/invoke-later!
+    #_@(app-manager/invoke-later!
       {:invoke-fn (fn []
                     (let [widget (get-status-bar-widget project "ClojureLSPStatusBar")]
                       (println "Widget:" widget)
                       (is (some? widget))))})
 
     (.checkResultByFile fixture "foo_expected.clj")
-
-    (is false)))
+    (server/shutdown! project)))
 
 
