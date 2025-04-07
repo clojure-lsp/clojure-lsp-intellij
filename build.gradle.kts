@@ -247,6 +247,6 @@ fun fetchLatestLsp4ijNightlyVersion(): String {
         println("Failed to fetch LSP4IJ nightly build version: ${e.message}")
     }
 
-    val minVersion = "0.11.1-20250226-013217"
+    val minVersion = "0.12.1-20250404-161025"
     return if (minVersion < onlineVersion) onlineVersion else minVersion
 }
