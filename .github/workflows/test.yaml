@@ -29,7 +29,7 @@ jobs:
           cli: 1.12.0.1530
 
       - name: Run tests
-        run: ./gradlew test
+        run: ./gradlew test --debug
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v5
