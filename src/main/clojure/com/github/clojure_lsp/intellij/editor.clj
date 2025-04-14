@@ -1,9 +1,10 @@
 (ns com.github.clojure-lsp.intellij.editor
   (:require
    [com.github.clojure-lsp.intellij.db :as db]
-   [com.github.clojure-lsp.intellij.editor :as editor])
+   [com.github.clojure-lsp.intellij.editor :as editor]
+   [com.github.ericdallo.clj4intellij.app-manager :as app-manager])
   (:import
-   [com.intellij.openapi.editor Editor]
+   [com.intellij.openapi.editor CaretModel Editor LogicalPosition]
    [com.intellij.openapi.fileEditor FileDocumentManager]
    [com.intellij.openapi.project ProjectLocator]
    [com.intellij.openapi.util.text StringUtil]
@@ -23,3 +24,11 @@
 (defn guess-project-for [^VirtualFile file]
   (or (.guessProjectForFile (ProjectLocator/getInstance) file)
       (first (db/all-projects))))
+
+(defn move-caret-to-position
+  "Moves the caret to the specified logical position in the editor."
+  [^Editor editor line column]
+  (let [caret ^CaretModel (.getCaretModel editor)
+        new-position (LogicalPosition. line column)]
+    @(app-manager/invoke-later!
+      {:invoke-fn (fn [] (.moveToLogicalPosition caret new-position))})))

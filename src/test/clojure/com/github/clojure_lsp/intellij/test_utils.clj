@@ -9,15 +9,23 @@
    [com.github.clojure_lsp.intellij.extension SettingsState]
    [com.intellij.ide DataManager]
    [com.intellij.openapi.actionSystem ActionManager]
-   [com.intellij.openapi.components ServiceManager]
-   [com.intellij.openapi.editor LogicalPosition]
-   [com.intellij.openapi.wm WindowManager]))
+   [com.intellij.openapi.components ServiceManager]))
 
 (set! *warn-on-reflection* true)
 
-(defn get-status-bar-widget [project widget-id]
-  (let [status-bar (.. (WindowManager/getInstance) (getStatusBar project))]
-    (.getWidget status-bar widget-id)))
+(defn get-editor-text
+  "Returns the text content of the editor's document."
+  [fixture]
+  (-> fixture .getEditor .getDocument .getText))
+
+(defn open-file-in-editor
+  "Opens a file in the editor and returns the editor instance."
+  [fixture file]
+  (let [project (.getProject fixture)]
+    (app-manager/write-command-action
+     project
+     (fn [] (.openFileInEditor fixture file)))
+    (.getEditor fixture)))
 
 (defn run-editor-action
   "Runs an editor action with the given ID for the specified project."
@@ -76,33 +84,6 @@
      {:fixture fixture
       :project project
       :deps-file deps-file})))
-
-(defn open-file-in-editor
-  "Opens a file in the editor and returns the editor instance."
-  [fixture file]
-  (let [project (.getProject fixture)]
-    (app-manager/write-command-action
-     project
-     (fn [] (.openFileInEditor fixture file)))
-    (.getEditor fixture)))
-
-(defn move-caret-to-position
-  "Moves the caret to the specified logical position in the editor."
-  [editor line column]
-  (let [caret (.getCaretModel editor)
-        new-position (LogicalPosition. line column)]
-    @(app-manager/invoke-later!
-      {:invoke-fn (fn [] (.moveToLogicalPosition caret new-position))})))
-
-(defn get-editor-text
-  "Returns the text content of the editor's document."
-  [fixture]
-  (-> fixture .getEditor .getDocument .getText))
-
-(defn check-result-by-file
-  "Checks if the current editor content matches the expected file."
-  [fixture expected-file]
-  (.checkResultByFile fixture expected-file))
 
 (defn setup-lsp-server
   "Sets up and waits for the LSP server to be ready."
