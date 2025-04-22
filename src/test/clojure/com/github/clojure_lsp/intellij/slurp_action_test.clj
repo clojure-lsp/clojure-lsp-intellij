@@ -23,16 +23,17 @@
    The test ensures that the Forward Slurp action correctly modifies the code structure
    by moving the closing parenthesis forward."
   (let [project-name "clojure.core"
-        {:keys [fixture project deps-file]} (test-utils/setup-test-project project-name)
-        clj-file (.copyFileToProject ^CodeInsightTestFixture fixture "foo.clj")]
+        {:keys [fixtures project deps-file]} (test-utils/setup-test-project project-name)
+        clj-file (.copyFileToProject ^CodeInsightTestFixture fixtures "foo.clj")]
     (is (= project-name (.getName ^Project project)))
     (is deps-file)
 
-    (let [editor (test-utils/open-file-in-editor fixture clj-file)]
+    (let [editor (test-utils/open-file-in-editor fixtures clj-file)]
       (test-utils/setup-lsp-server project)
       (editor/move-caret-to-position editor 2 8)
       (test-utils/run-editor-action "ClojureLSP.ForwardSlurp" project)
       (clj4intellij.test/dispatch-all)
-      (println (test-utils/get-editor-text fixture))
-      (.checkResultByFile ^CodeInsightTestFixture fixture "foo_expected.clj")
+
+      (.checkResultByFile ^CodeInsightTestFixture fixtures "foo_expected.clj")
+
       (test-utils/teardown-test-project project))))

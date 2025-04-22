@@ -32,7 +32,6 @@
   [action-id project]
   (let [action (.getAction (ActionManager/getInstance) action-id)
         context (.getDataContext (DataManager/getInstance))]
-    (println "Running action:" action-id)
     (app-manager/write-command-action
      project
      (fn []
@@ -76,18 +75,18 @@
   ([project-name]
    (setup-test-project project-name "{}"))
   ([project-name deps-content]
-   (let [fixture (clj4intellij.test/setup project-name)
-         deps-file (.createFile fixture "deps.edn" deps-content)
-         _ (.setTestDataPath fixture "testdata")
-         project (.getProject fixture)]
-     {:fixture fixture
+   (let [fixtures (clj4intellij.test/setup project-name)
+         deps-file (.createFile fixtures "deps.edn" deps-content)
+         _ (.setTestDataPath fixtures "testdata")
+         project (.getProject fixtures)]
+     {:fixtures fixtures
       :project project
       :deps-file deps-file})))
 
 (defn setup-lsp-server
   "Sets up and waits for the LSP server to be ready."
   [project]
-  (let [my-settings (ServiceManager/getService SettingsState)]
+  (let [my-settings ^SettingsState (ServiceManager/getService SettingsState)]
     (.loadState my-settings my-settings)
     (clj4intellij.test/dispatch-all)
     (wait-lsp-start {:project project})))
