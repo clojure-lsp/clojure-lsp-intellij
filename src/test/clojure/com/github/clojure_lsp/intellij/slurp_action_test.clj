@@ -22,7 +22,7 @@
    
    The test ensures that the Forward Slurp action correctly modifies the code structure
    by moving the closing parenthesis forward."
-  (let [project-name "clojure.core"
+  (let [project-name "clojure.sample-project"
         {:keys [fixtures project deps-file]} (test-utils/setup-test-project project-name)
         clj-file (.copyFileToProject ^CodeInsightTestFixture fixtures "foo.clj")]
     (is (= project-name (.getName ^Project project)))
