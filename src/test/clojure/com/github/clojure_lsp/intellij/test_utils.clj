@@ -1,26 +1,26 @@
-(ns com.github.clojure-lsp.intellij.test-utils 
+(ns com.github.clojure-lsp.intellij.test-utils
   (:require
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.server :as server]
    [com.github.ericdallo.clj4intellij.app-manager :as app-manager]
-   [com.github.ericdallo.clj4intellij.test :as clj4intellij.test]
-   [com.github.clojure-lsp.intellij.db :as db])
+   [com.github.ericdallo.clj4intellij.test :as clj4intellij.test])
   (:import
    [com.github.clojure_lsp.intellij.extension SettingsState]
    [com.intellij.ide DataManager]
    [com.intellij.openapi.actionSystem ActionManager]
-   [com.intellij.openapi.components ServiceManager]))
+   [com.intellij.openapi.components ServiceManager]
+   [com.intellij.testFramework.fixtures CodeInsightTestFixture]))
 
 (set! *warn-on-reflection* true)
 
 (defn get-editor-text
   "Returns the text content of the editor's document."
-  [fixture]
+  [^CodeInsightTestFixture fixture]
   (-> fixture .getEditor .getDocument .getText))
 
 (defn open-file-in-editor
   "Opens a file in the editor and returns the editor instance."
-  [fixture file]
+  [^CodeInsightTestFixture fixture file]
   (let [project (.getProject fixture)]
     (app-manager/write-command-action
      project
@@ -40,7 +40,7 @@
         action
         (com.intellij.openapi.actionSystem.AnActionEvent/createFromDataContext action-id nil context))))))
 
-(defn dispatch-all-until
+(defn wait-lsp-start
   "Dispatches all events until the LSP server is started or the timeout is reached."
   [{:keys [project millis timeout]
     :or {millis 1000
@@ -49,7 +49,6 @@
     (loop []
       (let [current-time (System/currentTimeMillis)
             elapsed-time (- current-time start-time)
-            _ (println "Elapsed time >> " elapsed-time)
             status (lsp-client/server-status project)]
         (cond
           (>= elapsed-time timeout)
@@ -91,5 +90,4 @@
   (let [my-settings (ServiceManager/getService SettingsState)]
     (.loadState my-settings my-settings)
     (clj4intellij.test/dispatch-all)
-    (dispatch-all-until {:project project})
-    (println "status LSP >> " (db/get-in project [:status]))))
+    (wait-lsp-start {:project project})))

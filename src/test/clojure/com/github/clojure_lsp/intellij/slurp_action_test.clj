@@ -1,13 +1,16 @@
-(ns com.github.clojure-lsp.intellij.foo-test
+(ns com.github.clojure-lsp.intellij.slurp-action-test
   (:require
    [clojure.test :refer [deftest is]]
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.clojure-lsp.intellij.test-utils :as test-utils]
-   [com.github.ericdallo.clj4intellij.test :as clj4intellij.test]))
+   [com.github.ericdallo.clj4intellij.test :as clj4intellij.test])
+  (:import
+   [com.intellij.openapi.project Project]
+   [com.intellij.testFramework.fixtures CodeInsightTestFixture]))
 
 (set! *warn-on-reflection* true)
 
-(deftest foo-test
+(deftest slurp-action-test
   "Tests the Forward Slurp editor action functionality in Clojure LSP.
    This test:
    1. Sets up a test project with a Clojure file
@@ -21,8 +24,8 @@
    by moving the closing parenthesis forward."
   (let [project-name "clojure.core"
         {:keys [fixture project deps-file]} (test-utils/setup-test-project project-name)
-        clj-file (.copyFileToProject fixture "foo.clj")]
-    (is (= project-name (.getName project)))
+        clj-file (.copyFileToProject ^CodeInsightTestFixture fixture "foo.clj")]
+    (is (= project-name (.getName ^Project project)))
     (is deps-file)
 
     (let [editor (test-utils/open-file-in-editor fixture clj-file)]
@@ -31,5 +34,5 @@
       (test-utils/run-editor-action "ClojureLSP.ForwardSlurp" project)
       (clj4intellij.test/dispatch-all)
       (println (test-utils/get-editor-text fixture))
-      (.checkResultByFile fixture "foo_expected.clj")
+      (.checkResultByFile ^CodeInsightTestFixture fixture "foo_expected.clj")
       (test-utils/teardown-test-project project))))

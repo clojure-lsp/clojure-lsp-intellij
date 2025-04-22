@@ -37,4 +37,4 @@ jobs:
         with:
           report_paths: '**/build/test-results/test/TEST-*.xml'
           simplified_summary: true
-          comment: true
+          comment: false
