@@ -35,18 +35,24 @@ repositories {
 
 dependencies {
     implementation ("org.clojure:clojure:1.12.0")
-    implementation ("com.github.ericdallo:clj4intellij:0.7.1")
+    implementation ("com.github.ericdallo:clj4intellij:0.8.0")
     implementation ("seesaw:seesaw:1.5.0")
     implementation ("camel-snake-kebab:camel-snake-kebab:0.4.3")
     implementation ("com.rpl:proxy-plus:0.0.9")
     implementation ("dev.weavejester:cljfmt:0.13.0")
     implementation ("com.github.clojure-lsp:clojure-lsp:2025.01.22-23.28.23")
+    implementation ("nrepl:nrepl:1.3.1")
+
+    testImplementation("junit:junit:latest.release")
+    testImplementation("org.junit.platform:junit-platform-launcher:latest.release")
+    testRuntimeOnly ("dev.clojurephant:jovial:0.4.2")
 }
 
 sourceSets {
     main {
         java.srcDirs("src/main", "src/gen")
         if (project.gradle.startParameter.taskNames.contains("buildPlugin") ||
+            project.gradle.startParameter.taskNames.contains("clojureRepl") ||
             project.gradle.startParameter.taskNames.contains("runIde")) {
             resources.srcDirs("src/main/dev-resources")
         }
@@ -146,6 +152,10 @@ tasks {
         systemProperty("jb.consents.confirmation.enabled", "false")
     }
 
+    test {
+        systemProperty("idea.mimic.jar.url.connection", "true")
+    }
+
     signPlugin {
         certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
         privateKey.set(System.getenv("PRIVATE_KEY"))
@@ -165,6 +175,26 @@ tasks {
         enabled = false
     }
 
+    clojureRepl {
+        dependsOn("compileClojure")
+        classpath.from(sourceSets.main.get().runtimeClasspath
+                       + file("build/classes/kotlin/main")
+                       + file("build/clojure/main")
+        )
+        // doFirst {
+        //     println(classpath.asPath)
+        // }
+        forkOptions.jvmArgs = listOf("--add-opens=java.desktop/java.awt=ALL-UNNAMED",
+                                     "--add-opens=java.desktop/java.awt.event=ALL-UNNAMED",
+                                     "--add-opens=java.desktop/sun.awt=ALL-UNNAMED",
+                                     "--add-opens=java.desktop/sun.font=ALL-UNNAMED",
+                                     "--add-opens=java.base/java.lang=ALL-UNNAMED",
+                                     "-Djava.system.class.loader=com.intellij.util.lang.PathClassLoader",
+                                     "-Didea.mimic.jar.url.connection=true",
+                                     "-Didea.force.use.core.classloader=true"
+        )
+    }
+
     generateParser {
         source.set("src/main/gramar/clojure.bnf")
         targetRoot.set("src/gen")
@@ -180,6 +210,10 @@ tasks {
     }
 }
 
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}
+
 grammarKit {
   jflexRelease.set("1.7.0-1")
   grammarKitRelease.set("2021.1.2")
@@ -187,7 +221,7 @@ grammarKit {
 }
 
 clojure.builds.named("main") {
-    classpath.from(sourceSets.main.get().runtimeClasspath.asPath)
+    classpath.from(sourceSets.main.get().runtimeClasspath.asPath + "build/classes/kotlin/main")
     checkAll()
     aotAll()
     reflection.set("fail")
@@ -213,6 +247,6 @@ fun fetchLatestLsp4ijNightlyVersion(): String {
         println("Failed to fetch LSP4IJ nightly build version: ${e.message}")
     }
 
-    val minVersion = "0.0.1-20231213-012910"
+    val minVersion = "0.12.1-20250404-161025"
     return if (minVersion < onlineVersion) onlineVersion else minVersion
 }
