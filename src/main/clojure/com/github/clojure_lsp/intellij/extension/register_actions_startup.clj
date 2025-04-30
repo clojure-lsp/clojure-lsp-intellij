@@ -3,6 +3,7 @@
    [camel-snake-kebab.core :as csk]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.editor :as editor]
+   [com.github.clojure-lsp.intellij.extension.new-file :as extension.new-file]
    [com.github.ericdallo.clj4intellij.action :as action]
    [com.github.ericdallo.clj4intellij.extension :refer [def-extension]]
    [com.github.ericdallo.clj4intellij.logger :as logger]
@@ -114,7 +115,15 @@
 
 (def-extension RegisterActionsStartup []
   ProjectActivity
-  (execute [_this ^Project _project ^CoroutineScope _]
+  (execute [_this ^Project project ^CoroutineScope _]
+    (action/register-action! :id "ClojureLSP.NewClojureFile"
+                             :title "Clojure namespace"
+                             :description "Create a Clojure namespace"
+                             :icon Icons/CLOJURE
+                             :action (extension.new-file/->ClojureNewFileAction project))
+    (action/register-group! :id "ClojureLSP.NewGroup"
+                            :children [{:type :add-to-group :group-id "NewGroup" :anchor :first}
+                                       {:type :reference :ref "ClojureLSP.NewClojureFile"}])
     (doseq [{:keys [name text description use-shortcut-of keyboard-shortcut]} clojure-lsp-commands]
       (action/register-action! :id (str "ClojureLSP." (csk/->PascalCase name))
                                :title text

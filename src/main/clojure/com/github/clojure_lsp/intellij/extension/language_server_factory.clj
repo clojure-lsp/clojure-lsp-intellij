@@ -18,7 +18,7 @@
    [com.intellij.openapi.vfs LocalFileSystem VirtualFile]
    [com.redhat.devtools.lsp4ij LSPIJUtils LanguageServerFactory ServerStatus]
    [com.redhat.devtools.lsp4ij.client LanguageClientImpl]
-   [com.redhat.devtools.lsp4ij.client.features EditorBehaviorFeature LSPClientFeatures LSPProgressFeature]
+   [com.redhat.devtools.lsp4ij.client.features LSPClientFeatures LSPProgressFeature]
    [com.redhat.devtools.lsp4ij.installation LanguageServerInstallerBase]
    [com.redhat.devtools.lsp4ij.server OSProcessStreamConnectionProvider]
    [java.io File]

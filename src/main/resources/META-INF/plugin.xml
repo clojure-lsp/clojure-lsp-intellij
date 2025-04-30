@@ -36,6 +36,10 @@
         <lang.syntaxHighlighterFactory language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.syntax_highlighter.ClojureSyntaxHighlighter"/>
         <colorSettingsPage implementation="com.github.clojure_lsp.intellij.extension.color_settings_page.ClojureColorSettingsPage"/>
 
+        <internalFileTemplate name="ClojureNamespace"/>
+        <internalFileTemplate name="ClojureScriptNamespace"/>
+        <internalFileTemplate name="CLJCNamespace"/>
+
         <!-- Features -->
         <postStartupActivity implementation="com.github.ericdallo.clj4intellij.extension.NREPLStartup"/>
         <postStartupActivity id="clojure-lsp-init-db" implementation="com.github.clojure_lsp.intellij.extension.init_db_startup.InitDBStartup"/>
