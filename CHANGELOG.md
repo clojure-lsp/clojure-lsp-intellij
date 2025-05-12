@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 3.5.0
+
 - Add support for creating Clojure namespaces. #78
 
 ## 3.4.0
