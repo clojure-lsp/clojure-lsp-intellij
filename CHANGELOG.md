@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 3.5.2
+
 - Fix `QuoteHandler` compile error by merging `BAD_CHARACTER` into the quote-handler `TokenSet`.
 
 ## 3.5.1
