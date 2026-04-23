@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix `QuoteHandler` compile error by merging `BAD_CHARACTER` into the quote-handler `TokenSet`.
+
 ## 3.5.1
 
 - Fix auto closing single quotes. 
