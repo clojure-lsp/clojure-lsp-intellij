@@ -4,6 +4,8 @@
 
 ## 3.5.1
 
+- Fix auto closing single quotes. 
+
 ## 3.5.0
 
 - Add support for creating Clojure namespaces. #78
