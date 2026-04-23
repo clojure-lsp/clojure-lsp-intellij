@@ -228,25 +228,63 @@ clojure.builds.named("main") {
 }
 
 fun fetchLatestLsp4ijNightlyVersion(): String {
-    val client = HttpClient.newBuilder().build();
-    var onlineVersion = ""
-    try {
-        val request: HttpRequest = HttpRequest.newBuilder()
-            .uri(URI("https://plugins.jetbrains.com/api/plugins/23257/updates?channel=nightly&size=1"))
+    // Last known nightly compatible with pluginSinceBuild=233 (IC-2023.3).
+    // Used as a fallback when the JetBrains API is unreachable or every recent
+    // nightly only supports a newer IDE baseline than `pluginSinceBuild`.
+    val fallbackVersion = "0.17.1-20251011-184738"
+
+    val pluginSinceBuild = prop("pluginSinceBuild")
+    val targetSinceMajor = pluginSinceBuild.substringBefore('.').toIntOrNull()
+    if (targetSinceMajor == null) {
+        println("Could not parse pluginSinceBuild='$pluginSinceBuild'; falling back to $fallbackVersion")
+        return fallbackVersion
+    }
+
+    val client = HttpClient.newBuilder().build()
+
+    fun httpGet(url: String): String? = try {
+        val request = HttpRequest.newBuilder()
+            .uri(URI(url))
             .GET()
             .timeout(Duration.of(10, ChronoUnit.SECONDS))
             .build()
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        val pattern = Pattern.compile("\"version\":\"([^\"]+)\"")
-        val matcher = pattern.matcher(response.body())
-        if (matcher.find()) {
-            onlineVersion = matcher.group(1)
-            println("Latest approved nightly build: $onlineVersion")
-        }
-    } catch (e:Exception) {
-        println("Failed to fetch LSP4IJ nightly build version: ${e.message}")
+        client.send(request, HttpResponse.BodyHandlers.ofString()).body()
+    } catch (e: Exception) {
+        println("Failed HTTP GET $url: ${e.message}")
+        null
     }
 
-    val minVersion = "0.12.1-20250404-161025"
-    return if (minVersion < onlineVersion) onlineVersion else minVersion
+    val listBody = httpGet("https://plugins.jetbrains.com/api/plugins/23257/updates?channel=nightly&size=100")
+    if (listBody == null) {
+        println("Could not fetch LSP4IJ nightly list; falling back to $fallbackVersion")
+        return fallbackVersion
+    }
+
+    // Anchor on `id`+`link`+`version` to avoid matching `"version":` substrings inside the `notes` HTML.
+    val itemRegex = Pattern.compile("\"id\":(\\d+),\"link\":\"[^\"]*\",\"version\":\"([^\"]+)\"")
+    val itemMatcher = itemRegex.matcher(listBody)
+    val updates = mutableListOf<Pair<String, String>>() // (id, version) in API order (newest first)
+    while (itemMatcher.find()) {
+        updates.add(itemMatcher.group(1) to itemMatcher.group(2))
+    }
+    if (updates.isEmpty()) {
+        println("Could not parse LSP4IJ nightly updates; falling back to $fallbackVersion")
+        return fallbackVersion
+    }
+
+    val sinceRegex = Pattern.compile("\"since\":\"([^\"]*)\"")
+    for ((id, version) in updates) {
+        val detail = httpGet("https://plugins.jetbrains.com/api/updates/$id") ?: continue
+        val sinceMatcher = sinceRegex.matcher(detail)
+        if (!sinceMatcher.find()) continue
+        val sinceStr = sinceMatcher.group(1)
+        val sinceMajor = sinceStr.substringBefore('.').toIntOrNull() ?: continue
+        if (sinceMajor <= targetSinceMajor) {
+            println("Latest LSP4IJ nightly compatible with build $pluginSinceBuild: $version (since=$sinceStr)")
+            return version
+        }
+    }
+
+    println("No LSP4IJ nightly compatible with pluginSinceBuild=$pluginSinceBuild in last ${updates.size}; falling back to $fallbackVersion")
+    return fallbackVersion
 }
