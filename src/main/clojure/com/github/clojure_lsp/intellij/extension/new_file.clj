@@ -1,6 +1,5 @@
 (ns com.github.clojure-lsp.intellij.extension.new-file
   (:require
-   [clojure.java.io :as io]
    [clojure.string :as string]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.rpl.proxy-plus :refer [proxy+]])
@@ -8,24 +7,61 @@
    [com.github.clojure_lsp.intellij Icons]
    [com.intellij.ide.actions CreateFileFromTemplateAction CreateFileFromTemplateDialog$Builder]
    [com.intellij.ide.fileTemplates FileTemplate]
-   [com.intellij.psi PsiDirectory]))
+   [com.intellij.psi PsiDirectory]
+   [java.io File]
+   [java.nio.file Path Paths]))
 
 (set! *warn-on-reflection* true)
 
+(defn ^:private ->path ^Path [^String s]
+  (when (and s (not (string/blank? s)))
+    (let [cleaned (cond-> s
+                    (string/starts-with? s "file://") (subs 7))]
+      (try
+        (-> (Paths/get cleaned (into-array String []))
+            .toAbsolutePath
+            .normalize)
+        (catch Exception _ nil)))))
+
 (defn ^:private filename->source-path [filename project]
-  (let [source-paths (get-in (lsp-client/server-info project) [:final-settings "source-paths"])]
-    (first (filter #(string/starts-with? filename %) source-paths))))
+  (let [dir-path (->path filename)
+        source-paths (get-in (lsp-client/server-info project) [:final-settings "source-paths"])]
+    (when dir-path
+      (some (fn [sp]
+              (when-let [spath (->path sp)]
+                (when (.startsWith dir-path spath)
+                  spath)))
+            source-paths))))
 
 (defn ^:private dir->partial-namespace
   [filename project]
-  (when-let [current-source-path (filename->source-path filename project)]
-    (some-> filename
-            (string/replace-first (re-pattern current-source-path) "")
-            (string/replace (System/getProperty "file.separator") ".")
-            (string/replace #"_" "-")
-            not-empty
-            (subs 1)
-            (str "."))))
+  (when-let [source-path (filename->source-path filename project)]
+    (when-let [dir-path (->path filename)]
+      (let [rel-str (str (.relativize ^Path source-path ^Path dir-path))]
+        (when-not (string/blank? rel-str)
+          (-> rel-str
+              (string/replace File/separator ".")
+              (string/replace "_" "-")
+              (str ".")))))))
+
+(defn ^:private ns->rel-path
+  "Возвращает путь нового файла ОТНОСИТЕЛЬНО dir, как требует createFileFromTemplate."
+  [project ^String ns ^PsiDirectory dir]
+  (let [separator    File/separator
+        dir-filename (.getPath (.getVirtualFile dir))
+        source-path  (filename->source-path dir-filename project)
+        ns-path      (-> ns
+                         (string/replace "." separator)
+                         (string/replace "-" "_"))]
+    (if-let [sp source-path]
+      (if-let [dir-path (->path dir-filename)]
+        (let [rel-dir (str (.relativize ^Path sp ^Path dir-path))
+              prefix  (if (string/blank? rel-dir) "" (str rel-dir separator))]
+          (if (and (seq prefix) (string/starts-with? ns-path prefix))
+            (subs ns-path (count prefix))
+            ns-path))
+        ns-path)
+      ns-path)))
 
 (defn ^:private dialog [project ^PsiDirectory dir ^CreateFileFromTemplateDialog$Builder builder]
   (let [filename (.getPath (.getVirtualFile dir))
@@ -40,15 +76,7 @@
 
 (defn ^:private create-file-from-template
   [project ^String ns ^FileTemplate template ^PsiDirectory dir]
-  (let [dir-filename (.getPath (.getVirtualFile dir))
-        separator (System/getProperty "file.separator")
-        source-path (filename->source-path dir-filename project)
-        ns-path (-> ns
-                    (string/replace "." separator)
-                    (string/replace "-" "_"))
-        new-name (string/replace-first (.getCanonicalPath (io/file source-path ns-path))
-                                       (str dir-filename separator)
-                                       "")]
+  (let [new-name (ns->rel-path project ns dir)]
     (CreateFileFromTemplateAction/createFileFromTemplate new-name template dir nil true)))
 
 (defn ->ClojureNewFileAction [project]
