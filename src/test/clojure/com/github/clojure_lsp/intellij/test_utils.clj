@@ -75,7 +75,12 @@
   ([project-name]
    (setup-test-project project-name "{}"))
   ([project-name deps-content]
-   (let [fixtures (clj4intellij.test/setup project-name)
+   ;; setup-heavy gives us a disk-backed CodeInsightTestFixture, which is
+   ;; required by recent LSP4IJ versions: their FileSystemWatcherManager
+   ;; calls VirtualFile.toNioPath() on the project base, and that throws
+   ;; UnsupportedOperationException for the in-memory TempFileSystem used
+   ;; by light fixtures.
+   (let [fixtures (clj4intellij.test/setup-heavy project-name)
          deps-file (.createFile fixtures "deps.edn" deps-content)
          _ (.setTestDataPath fixtures "testdata")
          project (.getProject fixtures)]
