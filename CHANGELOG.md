@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix new namespace creation incorrectly creating files under the absolute host filesystem path. #83
+
 ## 3.5.2
 
 - Fix `QuoteHandler` compile error by merging `BAD_CHARACTER` into the quote-handler `TokenSet`.
