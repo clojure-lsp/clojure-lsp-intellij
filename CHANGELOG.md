@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Implement `createServerInstaller` and `createLanguageServerSettingsContributor` on `ClojureLanguageServerFactory`. Newer LSP4IJ versions added these as default interface methods, but our `def-extension`/`gen-class`-backed factory always overrides interface methods, so explicit stubs are required.
+- Fix `slurp-action-test` against newer LSP4IJ versions. Bump `clj4intellij` to `0.9.0` and switch the test fixture to `setup-heavy` so the project base has a real filesystem path (LSP4IJ's `FileSystemWatcherManager` calls `VirtualFile.toNioPath()`, which throws on the in-memory `TempFileSystem` used by light fixtures).
 - Fix new namespace creation incorrectly creating files under the absolute host filesystem path. #83
 
 ## 3.5.2

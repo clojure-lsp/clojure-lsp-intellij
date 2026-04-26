@@ -85,6 +85,13 @@
 
   (getServerInterface [_] com.github.clojure_lsp.intellij.ClojureLanguageServer)
 
+  ;; Newer LSP4IJ versions added these as default methods on
+  ;; LanguageServerFactory. `def-extension` is gen-class-backed and always
+  ;; overrides interface methods (no fall-through to defaults), so we must
+  ;; declare explicit stubs that return nil — matching the upstream defaults.
+  (createServerInstaller [_] nil)
+  (createLanguageServerSettingsContributor [_] nil)
+
   (createClientFeatures [_]
     (doto
      (proxy+ [] LSPClientFeatures
