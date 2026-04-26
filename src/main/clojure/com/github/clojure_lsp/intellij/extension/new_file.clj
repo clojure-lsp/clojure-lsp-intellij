@@ -45,7 +45,7 @@
               (str ".")))))))
 
 (defn ^:private ns->rel-path
-  "Возвращает путь нового файла ОТНОСИТЕЛЬНО dir, как требует createFileFromTemplate."
+  "Returns the new file path RELATIVE to dir, as createFileFromTemplate requires."
   [project ^String ns ^PsiDirectory dir]
   (let [separator    File/separator
         dir-filename (.getPath (.getVirtualFile dir))
