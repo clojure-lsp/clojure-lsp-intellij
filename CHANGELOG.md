@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## 3.5.4
+
 ## 3.5.3
 
 - Implement `createServerInstaller` and `createLanguageServerSettingsContributor` on `ClojureLanguageServerFactory`. Newer LSP4IJ versions added these as default interface methods, but our `def-extension`/`gen-class`-backed factory always overrides interface methods, so explicit stubs are required.
