@@ -8,6 +8,8 @@ on:
 jobs:
   publish-plugin:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,3 +29,20 @@ jobs:
         env:
           JETBRAINS_TOKEN: ${{ secrets.JETBRAINS_TOKEN }}
         run: bb publish-plugin
+
+      - name: Extract release notes from CHANGELOG
+        id: changelog
+        run: |
+          {
+            echo 'notes<<CHANGELOG_EOF'
+            ./gradlew getChangelog --quiet --no-header
+            echo CHANGELOG_EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body: ${{ steps.changelog.outputs.notes }}
+          files: build/distributions/clojure-lsp-*.zip
