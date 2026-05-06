@@ -127,12 +127,12 @@
     (doseq [{:keys [name text description use-shortcut-of keyboard-shortcut]} clojure-lsp-commands]
           (apply action/register-action!
                   (cond-> [:id (str "ClojureLSP." (csk/->PascalCase name))
-                                   :title text
-                                                    :description description
-                                                                     :icon Icons/CLOJURE
-                                                                                      :use-shortcut-of use-shortcut-of
-                                                                                                       :on-performed (partial on-action-performed name text)]
-                                                                                                                 keyboard-shortcut (conj :keyboard-shortcut keyboard-shortcut)))))
+                           :title text
+                           :description description
+                           :icon Icons/CLOJURE
+                           :use-shortcut-of use-shortcut-of
+                           :on-performed (partial on-action-performed name text)]
+                 keyboard-shortcut (conj :keyboard-shortcut keyboard-shortcut)))))
     (register-command! :id "code-lens-references"
                        :on-performed #'code-lens-references-performed)
     (action/register-group! :id "ClojureLSP.Refactors"
