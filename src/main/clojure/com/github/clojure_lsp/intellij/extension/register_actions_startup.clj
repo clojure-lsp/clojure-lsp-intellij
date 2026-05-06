@@ -20,7 +20,7 @@
     CommonDataKeys]
    [com.intellij.openapi.editor Editor]
    [com.intellij.openapi.project Project]
-   [com.intellij.openapi.startup ProjectActivity]
+   [com.intellij.openapi.startup ProjectActivity
    [com.redhat.devtools.lsp4ij LanguageServerManager]
    [com.redhat.devtools.lsp4ij.commands LSPCommand LSPCommandAction]
    [com.redhat.devtools.lsp4ij.usages LSPUsageType LSPUsagesManager LocationData]
@@ -125,13 +125,14 @@
                             :children [{:type :add-to-group :group-id "NewGroup" :anchor :first}
                                        {:type :reference :ref "ClojureLSP.NewClojureFile"}])
     (doseq [{:keys [name text description use-shortcut-of keyboard-shortcut]} clojure-lsp-commands]
-      (action/register-action! :id (str "ClojureLSP." (csk/->PascalCase name))
-                               :title text
-                               :description description
-                               :icon Icons/CLOJURE
-                               :keyboard-shortcut keyboard-shortcut
-                               :use-shortcut-of use-shortcut-of
-                               :on-performed (partial on-action-performed name text)))
+          (apply action/register-action!
+                  (cond-> [:id (str "ClojureLSP." (csk/->PascalCase name))
+                                   :title text
+                                                    :description description
+                                                                     :icon Icons/CLOJURE
+                                                                                      :use-shortcut-of use-shortcut-of
+                                                                                                       :on-performed (partial on-action-performed name text)]
+                                                                                                                 keyboard-shortcut (conj :keyboard-shortcut keyboard-shortcut)))))
     (register-command! :id "code-lens-references"
                        :on-performed #'code-lens-references-performed)
     (action/register-group! :id "ClojureLSP.Refactors"
