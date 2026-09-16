@@ -1,7 +1,6 @@
 (ns com.github.clojure-lsp.intellij.test-utils
   (:require
    [com.github.clojure-lsp.intellij.client :as lsp-client]
-   [com.github.clojure-lsp.intellij.server :as server]
    [com.github.ericdallo.clj4intellij.app-manager :as app-manager]
    [com.github.ericdallo.clj4intellij.test :as clj4intellij.test])
   (:import
@@ -9,7 +8,9 @@
    [com.intellij.ide DataManager]
    [com.intellij.openapi.actionSystem ActionManager]
    [com.intellij.openapi.components ServiceManager]
-   [com.intellij.testFramework.fixtures CodeInsightTestFixture]))
+   [com.intellij.openapi.project Project]
+   [com.intellij.testFramework.fixtures CodeInsightTestFixture]
+   [com.redhat.devtools.lsp4ij LanguageServerManager LanguageServerManager$StopOptions]))
 
 (set! *warn-on-reflection* true)
 
@@ -66,8 +67,14 @@
 
 (defn teardown-test-project
   "Shuts down all resources for the given project."
-  [project]
-  (server/shutdown! project))
+  [^Project project]
+  ;; LSP4IJ's default stop options disable the server definition, which is
+  ;; shared by all projects of the JVM and would prevent the next test from
+  ;; starting the server.
+  (.stop (LanguageServerManager/getInstance project)
+         "clojure-lsp"
+         (doto (LanguageServerManager$StopOptions.)
+           (.setWillDisable false))))
 
 (defn setup-test-project
   "Sets up a test project with the given name and optional deps.edn content.

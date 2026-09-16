@@ -3,6 +3,7 @@
    [clojure.java.io :as io]
    [clojure.string :as string]
    [com.github.clojure-lsp.intellij.client :as lsp-client]
+   [com.github.clojure-lsp.intellij.completion :as completion]
    [com.github.clojure-lsp.intellij.config :as config]
    [com.github.clojure-lsp.intellij.db :as db]
    [com.github.clojure-lsp.intellij.editor :as editor]
@@ -106,6 +107,7 @@
          (let [status (keyword (.toString server-status))]
            (db/assoc-in (.getProject this) [:status] status)
            (run! #(% status) (db/get-in (.getProject this) [:on-status-changed-fns])))))
+      (.setCompletionFeature (completion/completion-feature))
       (.setProgressFeature
        (proxy+ [] LSPProgressFeature
          (updateMessage [_ ^String message ^ProgressIndicator indicator]
