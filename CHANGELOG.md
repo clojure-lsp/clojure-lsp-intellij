@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Fix the Clojure build classpath, which broke compilation on Windows.
+- Drop the nrepl dependency from the plugin distribution, it is only used for development. #14
 
 ## 3.5.6
 

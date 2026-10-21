@@ -21,6 +21,10 @@ plugins {
     id("org.jetbrains.grammarkit") version "2021.2.2"
 }
 
+// nrepl and its config are only for development, never shipped in the plugin zip.
+val devTasks = listOf("clojureRepl", "runIde")
+val isDevBuild = gradle.startParameter.taskNames.any { task -> devTasks.any { task.endsWith(it) } }
+
 group = prop("pluginGroup")
 version = prop("pluginVersion")
 
@@ -35,13 +39,17 @@ repositories {
 
 dependencies {
     implementation ("org.clojure:clojure:1.12.0")
-    implementation ("com.github.ericdallo:clj4intellij:0.9.0")
+    implementation ("com.github.ericdallo:clj4intellij:0.9.0") {
+        exclude(group = "nrepl", module = "nrepl")
+    }
     implementation ("seesaw:seesaw:1.5.0")
     implementation ("camel-snake-kebab:camel-snake-kebab:0.4.3")
     implementation ("com.rpl:proxy-plus:0.0.9")
     implementation ("dev.weavejester:cljfmt:0.13.0")
     implementation ("com.github.clojure-lsp:clojure-lsp:2025.01.22-23.28.23")
-    implementation ("nrepl:nrepl:1.3.1")
+    if (isDevBuild) {
+        implementation ("nrepl:nrepl:1.3.1")
+    }
 
     testImplementation("junit:junit:latest.release")
     testImplementation("org.junit.platform:junit-platform-launcher:latest.release")
@@ -51,9 +59,7 @@ dependencies {
 sourceSets {
     main {
         java.srcDirs("src/main", "src/gen")
-        if (project.gradle.startParameter.taskNames.contains("buildPlugin") ||
-            project.gradle.startParameter.taskNames.contains("clojureRepl") ||
-            project.gradle.startParameter.taskNames.contains("runIde")) {
+        if (isDevBuild) {
             resources.srcDirs("src/main/dev-resources")
         }
     }
