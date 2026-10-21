@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Fix the Clojure build classpath, which broke compilation on Windows.
+- Fix code actions such as Paredit slurp/barf failing on Windows: the document URI sent to the server was `file://C:/...` with unencoded spaces instead of the `file:///C:/...` URI LSP4IJ uses.
 
 ## 3.5.6
 
