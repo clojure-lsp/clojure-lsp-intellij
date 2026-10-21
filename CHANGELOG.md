@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Fix the Clojure build classpath, which broke compilation on Windows.
+- Add a Plugin Verifier GitHub Actions workflow that runs on every push and pull request and uploads the report. #10
 
 ## 3.5.6
 
