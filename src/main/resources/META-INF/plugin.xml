@@ -80,6 +80,7 @@
             instance="com.github.clojure_lsp.intellij.extension.general_settings.ClojureGeneralSettingsConfigurable"
             id="com.github.clojure_lsp.intellij.extension.general_settings.ClojureGeneralSettingsConfigurable"
             displayName="Clojure LSP"/>
+        <qualifiedNameProvider implementation="com.github.clojure_lsp.intellij.extension.qualified_name_provider.ClojureQualifiedNameProvider"/>
         <lineIndentProvider implementation="com.github.clojure_lsp.intellij.extension.line_indent.ClojureLineIndentProvider"/>
         <notificationGroup id="Clojure LSP notifications"
                            displayType="BALLOON"/>

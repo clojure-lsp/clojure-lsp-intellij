@@ -5,6 +5,7 @@
    [com.github.ericdallo.clj4intellij.logger :as logger])
   (:import
    [com.github.clojure_lsp.intellij ClojureLanguageServer]
+   [com.google.gson Gson JsonElement]
    [com.intellij.openapi.project Project]
    [com.redhat.devtools.lsp4ij LanguageServerItem LanguageServerManager]
    [com.redhat.devtools.lsp4ij.commands CommandExecutor LSPCommandContext]
@@ -15,6 +16,7 @@
     ReferenceContext
     ReferenceParams
     TextDocumentIdentifier
+    TextDocumentPositionParams
     WorkspaceSymbolParams]
    [org.eclipse.lsp4j.jsonrpc.messages Either]))
 
@@ -53,6 +55,21 @@
                                            (Position. line character)
                                            (ReferenceContext. false)))
             deref)))
+
+(defn cursor-info
+  "Analysis of the elements at the position, as returned by clojure/cursorInfo/raw.
+   Nil when the server is not running or does not answer within `timeout-ms`,
+   since callers may be on the EDT."
+  [^String uri line character ^Project project timeout-ms]
+  (when (identical? :started (server-status project))
+    (when-let [server (project->ls-server project)]
+      (let [result (deref (.cursorInfo server (TextDocumentPositionParams. (TextDocumentIdentifier. uri)
+                                                                           (Position. line character)))
+                          timeout-ms
+                          nil)]
+        (if (instance? JsonElement result)
+          (.fromJson (Gson.) ^JsonElement result Object)
+          result)))))
 
 (defn symbols [^String query ^Project project]
   (when-let [server (project->ls-server project)]
