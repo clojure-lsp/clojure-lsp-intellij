@@ -11,4 +11,7 @@ interface ClojureLanguageServer : LanguageServer {
 
     @JsonRequest("clojure/serverInfo/raw")
     fun serverInfo(): CompletableFuture<Any>
+
+    @JsonRequest("clojure/cursorInfo/raw")
+    fun cursorInfo(params: Any): CompletableFuture<Any>
 }

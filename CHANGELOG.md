@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Fix the Clojure build classpath, which broke compilation on Windows.
+- Copy Reference copies the fully qualified name of the var under the caret, like `bar.foo/aa`, instead of `file:line`. #80
 
 ## 3.5.6
 
