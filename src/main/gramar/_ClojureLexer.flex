@@ -129,7 +129,7 @@ SYM_TAIL={SYM_PART}+ (":" {SYM_PART}+)?
   "("                    { yybegin(YYINITIAL); yypushback(1); return C_SHARP; }  // Fn
   "{"                    { yybegin(YYINITIAL); yypushback(1); return C_SHARP; }  // Set
   "="                    { yybegin(YYINITIAL); return C_SHARP_EQ; }  // Eval
-  "!"                    { yybegin(YYINITIAL); return C_SHARP_COMMENT; }  // Comment
+  "!" [^\r\n]*           { yybegin(YYINITIAL); return LINE_COMMENT; }  // Shebang, read as a line comment
   "<"                    { yybegin(YYINITIAL); return BAD_CHARACTER; }  // Unreadable
   "_"                    { yybegin(YYINITIAL); return C_SHARP_COMMENT; }  // Discard
   "?@"                   { yybegin(YYINITIAL); return C_SHARP_QMARK_AT; }  // Conditional w/ Splicing
