@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Fix the Clojure build classpath, which broke compilation on Windows.
+- Fix back-to-back char literals (`\a\b`, `[\!\@]`) being marked as an error. #54
 
 ## 3.5.6
 
