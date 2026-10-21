@@ -8,13 +8,18 @@
    [com.intellij.openapi.fileEditor FileDocumentManager]
    [com.intellij.openapi.project ProjectLocator]
    [com.intellij.openapi.util.text StringUtil]
-   [com.intellij.openapi.vfs VirtualFile]))
+   [com.intellij.openapi.vfs VirtualFile]
+   [com.redhat.devtools.lsp4ij LSPIJUtils]))
 
 (set! *warn-on-reflection* true)
 
-(defn editor->uri [^Editor editor]
-  ;; TODO sanitize URL, encode, etc
-  (.getUrl (.getFile (FileDocumentManager/getInstance) (.getDocument editor))))
+(defn editor->uri
+  "The file URI of the editor's document, built the same way LSP4IJ builds
+   the URIs it sends to the server, e.g. file:///C:/Users/Some%20One/foo.clj.
+   VirtualFile.getUrl is not a valid URI on Windows (file://C:/...) and does
+   not encode spaces, so the server could not match the document."
+  [^Editor editor]
+  (LSPIJUtils/toUriAsString (.getFile (FileDocumentManager/getInstance) (.getDocument editor))))
 
 (defn offset->cursor-position [^Editor editor offset]
   (let [text (.getCharsSequence (.getDocument editor))
