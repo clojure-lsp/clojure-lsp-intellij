@@ -306,6 +306,31 @@
   (when-not (whole-region? text start end)
     (noop-at end)))
 
+(defn replacement-keeps-balance?
+  "True when replacing the region with `replacement` keeps the brackets
+   balanced."
+  [text start end replacement]
+  (keeps-balance? text [[start end replacement]]))
+
+(defn change-keeps-balance?
+  "True when going from `before` to `after` does not unbalance anything."
+  [before after]
+  (<= (structure-errors after) (structure-errors before)))
+
+(defn restoring-edit
+  "The single edit [start end replacement] over `from` that turns it into
+   `to`, found by skipping their common prefix and suffix."
+  [^String from ^String to]
+  (let [n (min (.length from) (.length to))
+        prefix (loop [i 0]
+                 (if (and (< i n) (= (.charAt from i) (.charAt to i))) (recur (inc i)) i))
+        suffix (loop [i 0]
+                 (if (and (< i (- n prefix))
+                          (= (.charAt from (- (.length from) 1 i)) (.charAt to (- (.length to) 1 i))))
+                   (recur (inc i))
+                   i))]
+    [prefix (- (.length from) suffix) (subs to prefix (- (.length to) suffix))]))
+
 (defn region-removable?
   "True when deleting the region keeps the brackets balanced."
   [text start end]
@@ -550,3 +575,118 @@
     (when (structural? node)
       (when-let [child (last (filter #(and (= :coll (:type %)) (:closed? %) (<= (:end %) offset)) (:children node)))]
         (move (dec (:end child)))))))
+
+;; Slurping, barfing, raising and moving over forms
+
+(defn ^:private shift-caret
+  "Where a caret at `offset` ends up after applying `edits`."
+  [offset edits]
+  (+ offset (reduce + 0 (keep (fn [[start end ^String replacement]]
+                                (when (<= end offset)
+                                  (- (.length replacement) (- end start))))
+                              edits))))
+
+(defn ^:private result [offset edits]
+  {:edits edits :caret (shift-caret offset edits)})
+
+(defn ^:private sexps
+  "The children of `node` that are forms, skipping comments."
+  [node]
+  (remove #(= :comment (:type %)) (:children node)))
+
+(defn ^:private coll-path
+  "Nodes from the root down to the innermost closed coll containing `offset`."
+  [text offset]
+  (let [path (path-at (parse text offset offset) offset)
+        index (last (keep-indexed (fn [i node] (when (and (= :coll (:type node)) (:closed? node)) i)) path))]
+    (when index
+      (subvec path 0 (inc index)))))
+
+(defn forward-slurp
+  "Moves the closing bracket of the current form past the next form."
+  [^String text offset]
+  (when-let [path (coll-path text offset)]
+    (let [coll (peek path)
+          next-form (first (filter #(>= (:start %) (:end coll)) (sexps (peek (pop path)))))
+          closer (dec (:end coll))]
+      (when next-form
+        (result offset [[(:end next-form) (:end next-form) (str (.charAt text closer))]
+                        [closer (if (empty? (sexps coll)) (:start next-form) (inc closer)) ""]])))))
+
+(defn backward-slurp
+  "Moves the opening bracket of the current form before the previous form."
+  [^String text offset]
+  (when-let [path (coll-path text offset)]
+    (let [{:keys [start open-end] :as coll} (peek path)
+          prev-form (last (filter #(<= (:end %) start) (sexps (peek (pop path)))))]
+      (when prev-form
+        (result offset [[(if (empty? (sexps coll)) (:end prev-form) start) open-end ""]
+                        [(:start prev-form) (:start prev-form) (subs text start open-end)]])))))
+
+(defn forward-barf
+  "Moves the closing bracket of the current form before its last form."
+  [^String text offset]
+  (when-let [{:keys [open-end end] :as coll} (peek (coll-path text offset))]
+    (let [forms (sexps coll)
+          close (str (.charAt text (dec end)))]
+      (when (seq forms)
+        (let [before (if-let [prev-form (last (butlast forms))] (:end prev-form) open-end)]
+          (result offset [[(dec end) end ""]
+                          [before before (if (next forms) close (str close " "))]]))))))
+
+(defn backward-barf
+  "Moves the opening bracket of the current form after its first form."
+  [^String text offset]
+  (when-let [{:keys [start open-end] :as coll} (peek (coll-path text offset))]
+    (let [forms (sexps coll)
+          opening (subs text start open-end)]
+      (when (seq forms)
+        (let [after (if-let [second-form (second forms)] (:start second-form) (:end (first forms)))]
+          (result offset [[start open-end ""]
+                          [after after (if (next forms) opening (str " " opening))]]))))))
+
+(defn raise-sexp
+  "Replaces the current form with the form at the caret."
+  [text offset]
+  (when-let [coll (peek (coll-path text offset))]
+    (when-let [form (form-at (sexps coll) offset)]
+      {:edits [[(:start coll) (:end coll) (subs text (:start form) (:end form))]]
+       :caret (+ (:start coll) (max 0 (- offset (:start form))))})))
+
+(defn kill-sexp
+  "Kills the form at or after the caret. The result has the killed text in
+   :killed."
+  [^String text offset]
+  (let [node (context text offset)]
+    (when (structural? node)
+      (when-let [{:keys [start end]} (form-at (sexps node) offset)]
+        (let [end (if (and (< end (.length text)) (= \space (.charAt text end))) (inc end) end)]
+          (assoc (delete-range start end) :killed (subs text start end)))))))
+
+(defn forward-sexp
+  "Moves the caret to the end of the form at or after it."
+  [text offset]
+  (let [node (context text offset)]
+    (when (structural? node)
+      (when-let [form (form-at (sexps node) offset)]
+        (move (:end form))))))
+
+(defn backward-sexp
+  "Moves the caret to the start of the form at or before it."
+  [text offset]
+  (let [node (context text offset)]
+    (when (structural? node)
+      (when-let [form (last (filter #(< (:start %) offset) (sexps node)))]
+        (move (:start form))))))
+
+(defn forward-select
+  "Extends the selection to the end of the next form."
+  [text start end]
+  (when-let [{:keys [caret]} (forward-sexp text end)]
+    {:edits [] :caret caret :selection [start caret]}))
+
+(defn backward-select
+  "Extends the selection to the start of the previous form."
+  [text start end]
+  (when-let [{:keys [caret]} (backward-sexp text start)]
+    {:edits [] :caret caret :selection [caret end]}))

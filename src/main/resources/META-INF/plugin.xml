@@ -78,6 +78,21 @@
         <editorActionHandler action="EditorDelete" order="first" implementationClass="com.github.clojure_lsp.intellij.extension.paredit.PareditDeleteHandler"/>
         <editorActionHandler action="EditorCut" order="first" implementationClass="com.github.clojure_lsp.intellij.extension.paredit.PareditCutHandler"/>
         <editorActionHandler action="EditorDeleteLine" order="first" implementationClass="com.github.clojure_lsp.intellij.extension.paredit.PareditDeleteLineHandler"/>
+        <editorActionHandler action="EditorPaste" order="first" implementationClass="com.github.clojure_lsp.intellij.extension.paredit.PareditPasteHandler"/>
+        <editorActionHandler action="EditorDeleteToWordStart" order="first" implementationClass="com.github.clojure_lsp.intellij.extension.paredit.PareditRevertingHandler"/>
+        <editorActionHandler action="EditorDeleteToWordEnd" order="first" implementationClass="com.github.clojure_lsp.intellij.extension.paredit.PareditRevertingHandler"/>
+        <editorActionHandler action="EditorDeleteToLineStart" order="first" implementationClass="com.github.clojure_lsp.intellij.extension.paredit.PareditRevertingHandler"/>
+        <editorActionHandler action="EditorDeleteToLineEnd" order="first" implementationClass="com.github.clojure_lsp.intellij.extension.paredit.PareditRevertingHandler"/>
+        <editorActionHandler action="EditorJoinLines" order="first" implementationClass="com.github.clojure_lsp.intellij.extension.paredit.PareditRevertingHandler"/>
+        <editorActionHandler action="EditorKillToWordStart" order="first" implementationClass="com.github.clojure_lsp.intellij.extension.paredit.PareditRevertingHandler"/>
+        <editorActionHandler action="EditorKillToWordEnd" order="first" implementationClass="com.github.clojure_lsp.intellij.extension.paredit.PareditRevertingHandler"/>
+        <editorActionHandler action="EditorKillRegion" order="first" implementationClass="com.github.clojure_lsp.intellij.extension.paredit.PareditRevertingHandler"/>
+        <editorActionHandler action="EditorCutLineBackward" order="first" implementationClass="com.github.clojure_lsp.intellij.extension.paredit.PareditRevertingHandler"/>
+        <editorActionHandler action="EditorCutLineEnd" order="first" implementationClass="com.github.clojure_lsp.intellij.extension.paredit.PareditRevertingHandler"/>
+        <statusBarWidgetFactory
+            id="ClojureLSPParedit"
+            order="after ClojureLSPStatusBar"
+            implementation="com.github.clojure_lsp.intellij.extension.paredit_status_bar.PareditStatusBarFactory" />
         <applicationService serviceImplementation="com.github.clojure_lsp.intellij.extension.SettingsState"/>
         <searchEverywhereContributor implementation="com.github.clojure_lsp.intellij.extension.search_contributors.NamespaceSearchContributorFactory"/>
         <applicationConfigurable

@@ -164,3 +164,33 @@
   (is (= "(a (|b c))" (run paredit/forward-down "(a |(b c))")))
   (is (= "(|a)" (run paredit/forward-down "|(a)")))
   (is (= "(a (b c|) d)" (run paredit/backward-down "(a (b c) |d)"))))
+
+(deftest slurp-barf-test
+  (is (= "(ns foo)\n\n(println| \"Oiii\")" (run paredit/forward-slurp "(ns foo)\n\n(println|) \"Oiii\"")))
+  (is (= "(a (b| c) d)" (run paredit/forward-slurp "(a (b|) c d)")))
+  (is (= "(a (|b))" (run paredit/forward-slurp "(a (|) b)")))
+  (is (= :default (run paredit/forward-slurp "(a (b|))")))
+  (is (= "(a (b c|))" (run paredit/backward-slurp "(a b (c|))")))
+  (is (= "(a|)" (run paredit/backward-slurp "a (|)")))
+  (is (= "(a #{b c|})" (run paredit/backward-slurp "(a b #{c|})")))
+  (is (= "(a b) |c" (run paredit/forward-barf "(a b |c)")))
+  (is (= "() |a" (run paredit/forward-barf "(|a)")))
+  (is (= "a (|b c)" (run paredit/backward-barf "(a |b c)")))
+  (is (= "a (|)" (run paredit/backward-barf "(a|)")))
+  (is (= :default (run paredit/forward-barf "(|)"))))
+
+(deftest raise-kill-test
+  (is (= "(a |c)" (run paredit/raise-sexp "(a (b |c))")))
+  (is (= "(a |(c d))" (run paredit/raise-sexp "(a (b |(c d)))")))
+  (is (= "(a |c)" (run paredit/kill-sexp "(a |b c)")))
+  (is (= "(a |)" (run paredit/kill-sexp "(a |(b c))")))
+  (is (= "b " (:killed (paredit/kill-sexp "(a b c)" 3)))))
+
+(deftest move-over-forms-test
+  (is (= "(a (b c)| d)" (run paredit/forward-sexp "(a |(b c) d)")))
+  (is (= "(a b  c|)" (run paredit/forward-sexp "(a b|  c)")))
+  (is (= :default (run paredit/forward-sexp "(a b|)")))
+  (is (= "(a |(b c) d)" (run paredit/backward-sexp "(a (b c)| d)")))
+  (is (= "(|ab c)" (run paredit/backward-sexp "(a|b c)")))
+  (is (= [3 8] (:selection (paredit/forward-select "(a (b c) d)" 3 3))))
+  (is (= [3 9] (:selection (paredit/backward-select "(a (b c) d)" 9 9)))))

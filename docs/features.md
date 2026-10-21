@@ -78,6 +78,8 @@ This plugin relies on [clojure-lsp](https://clojure-lsp.io/) features and [lsp4i
 
 #### Paredit
 
+Paredit actions run in the plugin itself, so they are instant and do not need the server.
+
 ##### Forward slurp
 
 > <kbd>Alt</kbd> + <kbd>]</kbd>
@@ -132,7 +134,7 @@ This plugin relies on [clojure-lsp](https://clojure-lsp.io/) features and [lsp4i
 
 ##### Structural editing mode
 
-Off by default. Turn it on in `Settings` > `Tools` > `Clojure LSP` > `Editor`, or with the `Toggle structural editing mode` action. While it is on:
+Off by default. Turn it on in `Settings` > `Tools` > `Clojure LSP` > `Editor`, with the `Toggle structural editing mode` action, or by clicking `Paredit: off` in the status bar. While it is on:
 
 - Typing `(`, `[` or `{` inserts the balanced pair, and with a selection wraps it.
 - Typing `)`, `]` or `}` moves the caret past the end of the enclosing form instead of inserting an unbalanced bracket.
@@ -140,9 +142,10 @@ Off by default. Turn it on in `Settings` > `Tools` > `Clojure LSP` > `Editor`, o
 - Typing `;` where it would comment out closing brackets moves the rest of the line to the next one; typing `\` right before a bracket, quote or `;` inserts `\ ` so it does not swallow it.
 - <kbd>Backspace</kbd> and <kbd>Delete</kbd> only delete empty pairs and step over non-empty ones; escape sequences and char literals such as `\(` are deleted whole.
 - Deleting, cutting or typing over a selection, and deleting or cutting a whole line, only happen when the removed text holds whole forms.
-- With several carets the editor keeps its default behavior.
+- Pasting text that would unbalance the brackets is refused, and deleting to the word or line start/end or joining lines is undone when it would.
+- It works with several carets.
 
-The actions below work whether the mode is on or off. Key bindings follow Cursive.
+The actions below work whether the mode is on or off. Key bindings follow Cursive, with Cursive's macOS bindings on macOS.
 
 ##### Wrap with (), [] or {}
 

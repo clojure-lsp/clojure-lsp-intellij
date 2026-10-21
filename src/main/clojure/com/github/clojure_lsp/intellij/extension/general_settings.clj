@@ -5,6 +5,7 @@
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.config :as config]
    [com.github.clojure-lsp.intellij.db :as db]
+   [com.github.clojure-lsp.intellij.extension.paredit :as extension.paredit]
    [com.github.clojure-lsp.intellij.server :as server]
    [com.github.clojure-lsp.intellij.settings :as settings]
    [com.github.ericdallo.clj4intellij.extension :refer [def-extension]]
@@ -144,6 +145,7 @@
       (settings/set-server-path! server-path)
       (settings/set-server-log-path! server-log-path)
       (settings/set-server-trace-level! trace-level)
-      (settings/set-paredit-enabled! (s/config (s/select @component* [:#paredit-enabled?]) :selected?))))
+      (settings/set-paredit-enabled! (s/config (s/select @component* [:#paredit-enabled?]) :selected?))
+      (extension.paredit/refresh-widgets!)))
 
   (cancel [_]))
