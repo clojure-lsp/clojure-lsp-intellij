@@ -221,7 +221,7 @@ grammarKit {
 }
 
 clojure.builds.named("main") {
-    classpath.from(sourceSets.main.get().runtimeClasspath.asPath + "build/classes/kotlin/main")
+    classpath.from(sourceSets.main.get().compileClasspath, file("build/classes/kotlin/main"), file("build/classes/java/main"))
     checkAll()
     aotAll()
     reflection.set("fail")
