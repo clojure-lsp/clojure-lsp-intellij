@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Fix the Clojure build classpath, which broke compilation on Windows.
+- Fix new Clojure projects created with the New Project wizard showing no files: the module now gets the project dir as content root with `src` and `test` source folders, and the VFS is refreshed after the template is written. #77
 
 ## 3.5.6
 
