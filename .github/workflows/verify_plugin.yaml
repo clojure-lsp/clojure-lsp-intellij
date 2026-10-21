@@ -1,0 +1,37 @@
+name: Plugin Verifier
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-plugin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: 'gradle'
+
+      # The verifier reports false positives caused by the Clojure (AOT/gen-class)
+      # integration, so its result is informational and does not fail the build.
+      # Compare the uploaded report with the previous run to spot new problems.
+      - name: Run Plugin Verifier
+        continue-on-error: true
+        run: ./gradlew runPluginVerifier
+
+      - name: Upload Plugin Verifier report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-verifier-report
+          path: build/reports/pluginVerifier
+          if-no-files-found: warn
