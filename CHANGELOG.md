@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- Fix the Clojure build classpath, which broke compilation on Windows.
+- Fix new Clojure projects created with the New Project wizard showing no files: the module now gets the project dir as content root with `src` and `test` source folders, and the VFS is refreshed after the template is written. #77
+
 ## 3.5.6
 
 - Fix IDE freeze/deadlock while typing with the completion popup open. LSP4IJ awaited `completionItem/resolve` on the EDT inside `getExpensiveRenderer`, now the item is resolved in the background renderer and completion documentation is computed asynchronously.

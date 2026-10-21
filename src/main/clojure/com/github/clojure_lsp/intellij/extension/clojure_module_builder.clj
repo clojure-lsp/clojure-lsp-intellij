@@ -2,7 +2,8 @@
   (:gen-class
    :name com.github.clojure_lsp.intellij.extension.ClojureModuleBuilder
    :extends com.intellij.ide.util.projectWizard.ModuleBuilder
-   :exposes-methods {commitModule superCommitModule})
+   :exposes-methods {commitModule superCommitModule
+                    doAddContentEntry superDoAddContentEntry})
   (:require
    [camel-snake-kebab.core :as csk]
    [clojure.java.io :as io]
@@ -16,7 +17,8 @@
    com.intellij.openapi.Disposable
    [com.intellij.openapi.module ModifiableModuleModel ModuleType]
    [com.intellij.openapi.project Project]
-   [com.intellij.openapi.roots ModifiableRootModel]
+   [com.intellij.openapi.roots ContentEntry ModifiableRootModel]
+   [com.intellij.openapi.vfs VfsUtil VirtualFile]
    [java.io File]
    [java.net JarURLConnection]
    [java.util.jar JarEntry]))
@@ -81,8 +83,6 @@
           (updateDataModel [_]
             (swap! wizard* assoc :project-type (s/id-of (s/selection (:button-group @wizard*)))))))
 
-(defn -setupRootModel [^ModuleBuilder _ ^ModifiableRootModel _])
-
 (defn ^:private normalize-entry-name [entry-name project-template project-name]
   (-> entry-name
       (string/replace (str project-template File/separatorChar) "")
@@ -113,13 +113,29 @@
               (io/make-parents new-file)
               (spit new-file content))))))))
 
+(defn ^:private add-source-folders [^ContentEntry content-entry]
+  (when-let [root (.getFile content-entry)]
+    (doseq [[folder test?] [["src" false] ["test" true]]]
+      (when-let [^VirtualFile dir (.findChild root folder)]
+        (.addSourceFolder content-entry dir (boolean test?))))))
+
 (set! *warn-on-reflection* false)
+
+(defn -setupRootModel [this ^ModifiableRootModel model]
+  (some-> (.superDoAddContentEntry this model)
+          add-source-folders))
 
 (defn -commitModule [this ^Project project ^ModifiableModuleModel model]
   (let [project-path (.getBasePath project)
         project-name (.getName project)
         template (project-template (:project-type @wizard*))]
+    (when-not (.getContentEntryPath this)
+      (.setContentEntryPath this project-path))
     (copy-template template project-path project-name)
+    ;; The template is written with java.io, so the VFS must be refreshed
+    ;; before the module content root is created, otherwise IntelliJ does
+    ;; not see the new files.
+    (VfsUtil/markDirtyAndRefresh false true true (into-array File [(io/file project-path)]))
     (.superCommitModule this project model)))
 
 (set! *warn-on-reflection* true)
