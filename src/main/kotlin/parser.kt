@@ -40,8 +40,12 @@ class ClojureLexer(language: Language) : LookAheadLexer(FlexAdapter(_ClojureLexe
       in ClojureTokens.LITERALS -> {
         baseLexer.advance()
         val tokenType = baseLexer.tokenType
+        // A char literal is self-delimited by its own leading backslash, so a char
+        // literal directly followed by another char literal (`\a\b`, `[\!\@]`) is
+        // valid Clojure and must not be merged into one bad token (issue #54).
         if (tokenType0 == C_NUMBER && ClojureTokens.SYM_ALIKE.contains(tokenType) ||
-            tokenType0 == C_CHAR && (tokenType == C_SYM || ClojureTokens.LITERALS.contains(tokenType))) {
+            tokenType0 == C_CHAR && tokenType != C_CHAR &&
+            (tokenType == C_SYM || ClojureTokens.LITERALS.contains(tokenType))) {
           advanceAs(baseLexer, TokenType.BAD_CHARACTER)
         }
         else {
