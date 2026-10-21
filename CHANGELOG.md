@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 - Fix the Clojure build classpath, which broke compilation on Windows.
+- Fix a shebang line (`#!/usr/bin/env ...`) at the top of a file being marked as an error. #71
 
 ## 3.5.6
 
