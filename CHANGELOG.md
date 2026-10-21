@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Fix the Clojure build classpath, which broke compilation on Windows.
+
 ## 3.5.6
 
 - Fix IDE freeze/deadlock while typing with the completion popup open. LSP4IJ awaited `completionItem/resolve` on the EDT inside `getExpensiveRenderer`, now the item is resolved in the background renderer and completion documentation is computed asynchronously.
