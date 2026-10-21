@@ -11,6 +11,7 @@ class SettingsState : PersistentStateComponent<SettingsState?> {
     var traceLevel: String? = null
     var serverLogPath: String? = null
     var serverPath: String? = null
+    var pareditEnabled: Boolean = false
 
     override fun getState(): SettingsState? {
         return this

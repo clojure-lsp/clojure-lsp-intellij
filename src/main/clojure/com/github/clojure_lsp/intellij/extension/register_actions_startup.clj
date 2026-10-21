@@ -4,6 +4,7 @@
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.clojure-lsp.intellij.extension.new-file :as extension.new-file]
+   [com.github.clojure-lsp.intellij.extension.paredit :as extension.paredit]
    [com.github.ericdallo.clj4intellij.action :as action]
    [com.github.ericdallo.clj4intellij.extension :refer [def-extension]]
    [com.github.ericdallo.clj4intellij.logger :as logger]
@@ -67,17 +68,7 @@
    {:name "thread-last-all" :text "Thread last all" :description "Thread last all"}
    {:name "thread-last" :text "Thread last expression" :description "Thread last expression"}
    {:name "unwind-all" :text "Unwind whole thread" :description "Unwind whole thread"}
-   {:name "unwind-thread" :text "Unwind thread once" :description "Unwind thread once"}
-   {:name "forward-slurp" :text "Slurp forward" :description "Slurp forward (Paredit)" :keyboard-shortcut {:first "alt CLOSE_BRACKET" :replace-all true}}
-   {:name "forward-barf" :text "Barf forward" :description "Barf forward (Paredit)" :keyboard-shortcut {:first "alt OPEN_BRACKET" :replace-all true}}
-   {:name "backward-slurp" :text "Slurp backward" :description "Slurp backward (Paredit)" :keyboard-shortcut {:first "alt shift CLOSE_BRACKET" :replace-all true}}
-   {:name "backward-barf" :text "Barf backward" :description "Barf backward (Paredit)" :keyboard-shortcut {:first "alt shift OPEN_BRACKET" :replace-all true}}
-   {:name "raise-sexp" :text "Raise sexpr" :description "Raise current sexpr (Paredit)" :keyboard-shortcut {:first "alt R" :replace-all true}}
-   {:name "kill-sexp" :text "Kill sexpr" :description "Kill current sexpr (Paredit)" :keyboard-shortcut {:first "alt K" :replace-all true}}
-   {:name "forward" :text "Move forward" :description "Move cursor forward a sexpr (Paredit)" :keyboard-shortcut {:first "ctrl alt CLOSE_BRACKET" :replace-all true}}
-   {:name "forward-select" :text "Select forward" :description "Select forward a sexpr (Paredit)" :keyboard-shortcut {:first "ctrl shift alt CLOSE_BRACKET" :replace-all true}}
-   {:name "backward" :text "Move backward" :description "Move cursor backward a sexpr (Paredit)" :keyboard-shortcut {:first "ctrl alt OPEN_BRACKET" :replace-all true}}
-   {:name "backward-select" :text "Select backward" :description "Select backward a sexpr (Paredit)" :keyboard-shortcut {:first "ctrl shift alt OPEN_BRACKET" :replace-all true}}])
+   {:name "unwind-thread" :text "Unwind thread once" :description "Unwind thread once"}])
 
 (defn ^:private on-action-performed [command-name text ^AnActionEvent event]
   (when-let [editor ^Editor (.getData event CommonDataKeys/EDITOR_EVEN_IF_INACTIVE)]
@@ -133,6 +124,20 @@
                       :use-shortcut-of use-shortcut-of
                       :on-performed (partial on-action-performed name text)]
                keyboard-shortcut (into [:keyboard-shortcut keyboard-shortcut]))))
+    (doseq [{:keys [name text description keyboard-shortcut operation]} extension.paredit/actions]
+      (apply action/register-action!
+             (cond-> [:id (str "ClojureLSP." (csk/->PascalCase name))
+                      :title text
+                      :description description
+                      :icon Icons/CLOJURE
+                      :on-performed (partial extension.paredit/perform-action! operation)]
+               keyboard-shortcut (into [:keyboard-shortcut keyboard-shortcut]))))
+    (action/register-action! :id "ClojureLSP.TogglePareditMode"
+                             :title "Toggle structural editing mode"
+                             :description "Toggle the Paredit mode that keeps brackets balanced while typing"
+                             :icon Icons/CLOJURE
+                             :on-performed (fn [^AnActionEvent event]
+                                             (extension.paredit/toggle-strict-mode! (.getProject event))))
     (register-command! :id "code-lens-references"
                        :on-performed #'code-lens-references-performed)
     (action/register-group! :id "ClojureLSP.Refactors"
@@ -141,5 +146,8 @@
                             :icon Icons/CLOJURE
                             :children (concat [{:type :add-to-group :group-id "RefactoringMenu" :anchor :first}]
                                               (mapv (fn [{:keys [name]}] {:type :reference :ref (str "ClojureLSP." (csk/->PascalCase name))}) clojure-lsp-commands)
-                                              [{:type :separator}]))
+                                              [{:type :separator}]
+                                              (mapv (fn [{:keys [name]}] {:type :reference :ref (str "ClojureLSP." (csk/->PascalCase name))}) extension.paredit/actions)
+                                              [{:type :reference :ref "ClojureLSP.TogglePareditMode"}
+                                               {:type :separator}]))
     (logger/info "Actions registered")))

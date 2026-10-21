@@ -13,6 +13,9 @@
 (defn server-log-path []
   (.getServerLogPath (SettingsState/get)))
 
+(defn paredit-enabled? []
+  (.getPareditEnabled (SettingsState/get)))
+
 (defn set-server-trace-level! [^String trace-level]
   (.setTraceLevel (SettingsState/get) trace-level))
 
@@ -21,3 +24,6 @@
 
 (defn set-server-path! [^String server-path]
   (.setServerPath (SettingsState/get) (not-empty server-path)))
+
+(defn set-paredit-enabled! [enabled?]
+  (.setPareditEnabled (SettingsState/get) (boolean enabled?)))

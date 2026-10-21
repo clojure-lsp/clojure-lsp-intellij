@@ -5,6 +5,7 @@
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.config :as config]
    [com.github.clojure-lsp.intellij.db :as db]
+   [com.github.clojure-lsp.intellij.extension.paredit :as extension.paredit]
    [com.github.clojure-lsp.intellij.server :as server]
    [com.github.clojure-lsp.intellij.settings :as settings]
    [com.github.ericdallo.clj4intellij.extension :refer [def-extension]]
@@ -52,6 +53,10 @@
                   [(s/label :text "When not speciying a custom server path, the plugin will download the latest clojure-lsp automatically."
                             :font (s.font/font  :size 14)
                             :foreground (s.color/color 110 110 110)) "wrap"]
+                  [(s.mig/mig-panel :border (IdeBorderFactory/createTitledBorder "Editor")
+                                    :items [[(s/checkbox :id :paredit-enabled?
+                                                         :selected? (settings/paredit-enabled?)
+                                                         :text "Structural editing mode (Paredit): keep brackets balanced while typing") "wrap"]]) "span"]
                   [(s.mig/mig-panel :border (IdeBorderFactory/createTitledBorder "Troubleshooting")
                                     :items [[(s/label "Server log path *") ""]
                                             [(s/text :id :server-log
@@ -107,9 +112,11 @@
   (isModified [_]
     (let [server-path (s/config (s/select @component* [:#server-path]) :text)
           trace-level-combo-box (s/config (s/select @component* [:#trace-level]) :selected-item)
-          server-log-path (s/config (s/select @component* [:#server-log]) :text)]
+          server-log-path (s/config (s/select @component* [:#server-log]) :text)
+          paredit-enabled? (s/config (s/select @component* [:#paredit-enabled?]) :selected?)]
       (boolean
        (or (not= server-path (or (settings/server-path) ""))
+           (not= paredit-enabled? (settings/paredit-enabled?))
            (not= trace-level-combo-box (settings/server-trace-level))
            (not= server-log-path (or (settings/server-log-path) ""))
            (and (str/blank? server-log-path)
@@ -123,7 +130,8 @@
           server-path (or (settings/server-path) (.getCanonicalPath (config/download-server-path)))]
       (s/config! (s/select @component* [:#trace-level]) :selected-item trace-level-combo-box)
       (s/config! (s/select @component* [:#server-log]) :text server-log-path)
-      (s/config! (s/select @component* [:#server-path]) :text server-path)))
+      (s/config! (s/select @component* [:#server-path]) :text server-path)
+      (s/config! (s/select @component* [:#paredit-enabled?]) :selected? (settings/paredit-enabled?))))
 
   (disposeUIResources [_]
     (reset! component* nil))
@@ -136,6 +144,8 @@
                         (s/config (s/select @component* [:#server-path]) :text))]
       (settings/set-server-path! server-path)
       (settings/set-server-log-path! server-log-path)
-      (settings/set-server-trace-level! trace-level)))
+      (settings/set-server-trace-level! trace-level)
+      (settings/set-paredit-enabled! (s/config (s/select @component* [:#paredit-enabled?]) :selected?))
+      (extension.paredit/refresh-widgets!)))
 
   (cancel [_]))
