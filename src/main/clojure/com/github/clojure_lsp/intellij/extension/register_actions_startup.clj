@@ -4,6 +4,7 @@
    [com.github.clojure-lsp.intellij.client :as lsp-client]
    [com.github.clojure-lsp.intellij.editor :as editor]
    [com.github.clojure-lsp.intellij.extension.new-file :as extension.new-file]
+   [com.github.clojure-lsp.intellij.extension.paredit :as extension.paredit]
    [com.github.ericdallo.clj4intellij.action :as action]
    [com.github.ericdallo.clj4intellij.extension :refer [def-extension]]
    [com.github.ericdallo.clj4intellij.logger :as logger]
@@ -133,6 +134,19 @@
                       :use-shortcut-of use-shortcut-of
                       :on-performed (partial on-action-performed name text)]
                keyboard-shortcut (into [:keyboard-shortcut keyboard-shortcut]))))
+    (doseq [{:keys [name text description keyboard-shortcut operation]} extension.paredit/actions]
+      (apply action/register-action!
+             (cond-> [:id (str "ClojureLSP." (csk/->PascalCase name))
+                      :title text
+                      :description description
+                      :icon Icons/CLOJURE
+                      :on-performed (partial extension.paredit/perform-action! operation)]
+               keyboard-shortcut (into [:keyboard-shortcut keyboard-shortcut]))))
+    (action/register-action! :id "ClojureLSP.TogglePareditMode"
+                             :title "Toggle structural editing mode"
+                             :description "Toggle the Paredit mode that keeps brackets balanced while typing"
+                             :icon Icons/CLOJURE
+                             :on-performed extension.paredit/toggle-strict-mode!)
     (register-command! :id "code-lens-references"
                        :on-performed #'code-lens-references-performed)
     (action/register-group! :id "ClojureLSP.Refactors"
@@ -141,5 +155,8 @@
                             :icon Icons/CLOJURE
                             :children (concat [{:type :add-to-group :group-id "RefactoringMenu" :anchor :first}]
                                               (mapv (fn [{:keys [name]}] {:type :reference :ref (str "ClojureLSP." (csk/->PascalCase name))}) clojure-lsp-commands)
-                                              [{:type :separator}]))
+                                              [{:type :separator}]
+                                              (mapv (fn [{:keys [name]}] {:type :reference :ref (str "ClojureLSP." (csk/->PascalCase name))}) extension.paredit/actions)
+                                              [{:type :reference :ref "ClojureLSP.TogglePareditMode"}
+                                               {:type :separator}]))
     (logger/info "Actions registered")))

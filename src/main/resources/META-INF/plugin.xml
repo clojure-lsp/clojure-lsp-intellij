@@ -73,6 +73,11 @@
         <lang.commenter language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.commenter.ClojureCommenter"/>
         <lang.quoteHandler language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.QuoteHandler"/>
         <lang.braceMatcher language="clojure" implementationClass="com.github.clojure_lsp.intellij.extension.brace_matcher.BraceMatcher"/>
+        <typedHandler order="first" implementation="com.github.clojure_lsp.intellij.extension.paredit.PareditTypedHandler"/>
+        <editorActionHandler action="EditorBackSpace" order="first" implementationClass="com.github.clojure_lsp.intellij.extension.paredit.PareditBackspaceHandler"/>
+        <editorActionHandler action="EditorDelete" order="first" implementationClass="com.github.clojure_lsp.intellij.extension.paredit.PareditDeleteHandler"/>
+        <editorActionHandler action="EditorCut" order="first" implementationClass="com.github.clojure_lsp.intellij.extension.paredit.PareditCutHandler"/>
+        <editorActionHandler action="EditorDeleteLine" order="first" implementationClass="com.github.clojure_lsp.intellij.extension.paredit.PareditDeleteLineHandler"/>
         <applicationService serviceImplementation="com.github.clojure_lsp.intellij.extension.SettingsState"/>
         <searchEverywhereContributor implementation="com.github.clojure_lsp.intellij.extension.search_contributors.NamespaceSearchContributorFactory"/>
         <applicationConfigurable

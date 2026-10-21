@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- Add a Paredit structural editing mode, off by default (Settings > Tools > Clojure LSP > Editor, or the `Toggle structural editing mode` action). Typing, Backspace and Delete keep brackets, strings and char literals balanced.
+- Add structural editing actions: wrap with `()`/`[]`/`{}`, splice (also killing backward/forward), split, join, kill to end of line, and move out of/into sexprs. Key bindings follow Cursive.
 - Fix the Clojure build classpath, which broke compilation on Windows.
 
 ## 3.5.6
