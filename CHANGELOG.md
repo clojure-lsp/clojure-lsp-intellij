@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- Fix the Clojure build classpath, which broke compilation on Windows.
+- Drop the nrepl dependency from the plugin distribution, it is only used for development. #14
+
 ## 3.5.6
 
 - Fix IDE freeze/deadlock while typing with the completion popup open. LSP4IJ awaited `completionItem/resolve` on the EDT inside `getExpensiveRenderer`, now the item is resolved in the background renderer and completion documentation is computed asynchronously.
